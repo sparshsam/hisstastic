@@ -46,23 +46,16 @@
   // ---- Radius profile: natural snake body width ----
   function bodyRadius(t) {
     // t = 0 at head, 1 at tail
-    // Head (t=0): moderately wide
-    // Neck (t~0.1): slightly narrower
-    // Mid-body (t~0.3-0.6): widest
-    // Rear (t~0.7-0.8): gradual taper
-    // Tail (t>0.8): sharp taper to tip
     if (t < 0.05) {
-      // Head/neck transition
-      return 0.85 + t * 2.5;
+      return 0.85 + t * 2.5;           // Head/neck
     } else if (t < 0.6) {
-      // Front to mid body — full width
-      return 0.9 + 0.1 * Math.sin(Math.PI * ((t - 0.05) / 0.55));
-    } else if (t < 0.8) {
-      // Rear body — gentle taper
-      return 1.0 - (t - 0.6) * 1.5;
+      return 0.9 + 0.1 * Math.sin(Math.PI * ((t - 0.05) / 0.55)); // Full body
+    } else if (t < 0.75) {
+      return 1.0 - (t - 0.6) * 1.0;    // Gentle rear taper: 0.85 at t=0.75
     } else {
-      // Tail — sharp taper
-      return 0.5 - (t - 0.8) * 2.0;
+      // Tail — smooth eased taper (not sharp linear drop)
+      const tailT = (t - 0.75) / 0.25; // 0→1 across tail
+      return 0.85 * (1 - tailT * tailT * 0.9); // Quadratic ease: 0.85→~0.09
     }
   }
 
@@ -407,11 +400,21 @@
     }
   }
 
+  const SNAKE_COLORS = [
+    '#2E7D32', // main green
+    '#00695C', // teal
+    '#827717', // olive
+    '#4E342E', // dark brown
+    '#BF360C', // copper
+    '#33691E', // dark green
+    '#5D4037', // brown
+  ];
+
   // ---- SnakeField ----
   function SnakeField() {
     this.canvas = null;
     this.ctx = null;
-    this.snake = null;
+    this.snakes = [];
     this.animFrame = null;
     this.running = false;
     this.reducedMotion = false;
@@ -442,18 +445,61 @@
     document.addEventListener('visibilitychange', this.handleVis);
   };
 
+  /**
+   * Create 7 snakes: one large main serpent + 6 smaller companions.
+   */
+  SnakeField.prototype._populateSnakes = function () {
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const safe = getSafeZone();
+    const isMobile = w < 768;
+    this.snakes = [];
+
+    // Main snake — large, full length
+    const main = new ProceduralSnake(rng, w, h, safe);
+    main.color = SNAKE_COLORS[0];
+    if (isMobile) {
+      main.baseRadius *= 0.7;
+      main.headRadius *= 0.7;
+      main.spineCount = 140;
+      main.waveAmp *= 0.7;
+    }
+    this.snakes.push(main);
+
+    // 6 companion snakes — smaller, different colors, random spawn locations
+    for (let i = 1; i <= 6; i++) {
+      const comp = new ProceduralSnake(rng, w, h, safe);
+      comp.color = SNAKE_COLORS[i % SNAKE_COLORS.length];
+      // Smaller body
+      comp.baseRadius *= 0.5 + rng() * 0.15; // 50-65% of main width
+      comp.headRadius *= 0.5 + rng() * 0.15;
+      comp.spineCount = Math.floor((60 + rng() * 60) * (isMobile ? 0.6 : 1)); // 60-120
+      comp.spacing = 6 + rng() * 2; // 6-8px
+      comp.waveAmp *= 0.6 + rng() * 0.3;
+      comp.speed = rng() * 0.3 + 0.3; // 0.3-0.6
+      comp.opacity = 0.6 + rng() * 0.25; // slightly fainter
+      // Randomize initial position further
+      comp.x = rng() * w;
+      comp.y = rng() * h;
+      comp.angle = rng() * Math.PI * 2;
+      // Reset path to new position
+      comp.path = [];
+      for (let j = 0; j < comp.maxPath; j++) {
+        comp.path.push({
+          x: comp.x - Math.cos(comp.angle) * 3 * (j + 1),
+          y: comp.y - Math.sin(comp.angle) * 3 * (j + 1),
+          angle: comp.angle,
+        });
+      }
+      this.snakes.push(comp);
+    }
+  };
+
   SnakeField.prototype._resize = function () {
     if (!this.canvas) return;
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    const w = this.canvas.width;
-    this.snake = new ProceduralSnake(rng, w, this.canvas.height, getSafeZone());
-    if (w < 768) {
-      this.snake.baseRadius *= 0.7;
-      this.snake.headRadius *= 0.7;
-      this.snake.spineCount = 140;  // 140 × 8 = 1120px (still long)
-      this.snake.waveAmp *= 0.7;
-    }
+    this._populateSnakes();
   };
 
   SnakeField.prototype._animate = function (timestamp) {
@@ -465,9 +511,11 @@
     const dt = Math.min(timestamp - this.startTime, 33);
     this.startTime = timestamp;
     ctx.clearRect(0, 0, w, h);
-    if (this.snake) {
-      if (!this.reducedMotion) this.snake.update(dt, w, h, getSafeZone());
-      this.snake.draw(ctx);
+    const safe = getSafeZone();
+    for (let i = 0; i < this.snakes.length; i++) {
+      const s = this.snakes[i];
+      if (!this.reducedMotion) s.update(dt, w, h, safe);
+      s.draw(ctx);
     }
     this.animFrame = requestAnimationFrame(this._animate.bind(this));
   };
