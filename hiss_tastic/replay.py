@@ -170,7 +170,7 @@ class ReplayPlayer:
 def load_replay_file(filepath):
     """Load and validate a replay file, returning normalized replay data."""
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, "r", encoding="utf-8-sig") as f:
             data = json.load(f)
     except FileNotFoundError as exc:
         raise ReplayValidationError(f"Replay file not found: {filepath}") from exc

@@ -144,6 +144,9 @@ class Game:
         score = 0
         food_count = 0
 
+        if self.ghost_session:
+            self.ghost_session.reset()
+
         # Setup replay recorder
         if self.replay_recorder:
             self.replay_recorder.seed = seed
