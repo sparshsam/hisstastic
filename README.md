@@ -54,6 +54,7 @@ hiss_tastic/          # Game package (12 modules)
   input.py            # Event processing
   game.py             # Main Game class and state machine
   replay.py           # Deterministic replay recording/playback
+  ghost.py            # Local-only ghost replay helpers
   audio.py            # Procedural sound effects
   states.py           # Game state constants
 main.py               # Entry point
@@ -111,6 +112,14 @@ Play back a replay:
 python -m hiss_tastic.replay_cli play replays/replay_12345_20260604.json
 ```
 
+Check ghost replay compatibility:
+
+```bash
+python -m hiss_tastic.replay_cli ghost-check replays/replay_12345_20260604.json
+```
+
+See [docs/replay-ux.md](docs/replay-ux.md) and [docs/ghost-racing.md](docs/ghost-racing.md).
+
 ## Validation
 
 Run the smoke-test suite:
@@ -127,7 +136,7 @@ See [docs/packaging.md](docs/packaging.md) for standalone executable instruction
 
 - This is a solo local game — no multiplayer, no online leaderboards.
 - There is no web build, level system, or browser runtime.
-- The project does not collect, store, transmit, or verify player data.
+- The project does not transmit player data. Replay files are local JSON artifacts only when explicitly recorded.
 - Audio uses procedural generation (no music files bundled).
 
 ## Ecosystem Role

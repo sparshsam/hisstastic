@@ -16,12 +16,22 @@ Do not rewrite gameplay, change mechanics, or add new features unless the change
 4. Run the relevant verification steps.
 5. Submit a pull request with a short summary and manual test notes.
 
+## Git Safety
+
+- Never force-push `main`.
+- Never rewrite protected or shared branches.
+- Prefer normal `git push` after commits.
+- Force-push only on isolated feature branches when absolutely necessary.
+- If a force-push is used, explain the reason in the pull request or final report.
+
 ## Standards
 
 - Preserve the original prototype unless a change is explicitly requested.
 - Keep documentation restrained and accurate.
 - Avoid telemetry, engagement-pressure mechanics, or unnecessary network services.
 - Document any change that affects runtime behavior, dependencies, or data handling.
+- Preserve deterministic replay behavior when changing input, spawn, timing, or scoring code.
+- Keep ghost racing local-only and non-scoring.
 - Follow the [ecosystem standards](https://github.com/sparshsam/ecosystem-standards).
 
 ## Code of Conduct
