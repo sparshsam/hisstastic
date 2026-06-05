@@ -44,11 +44,29 @@ vercel inspect <deployment-url> --scope "sparsh-sams-projects"
 
 ### PWA Notes
 
-- Service worker (`web/sw.js`) pre-caches all 12 assets
+- Service worker (`web/sw.js`) pre-caches all 15 assets (12 original + 3 new: `snakeFacts.js`, `commentary.js`, `snakeField.js`)
 - Verified ACTIVE on production with correct scope
-- Offline cache full (12/12 assets cached)
+- Offline cache full (15/15 assets cached)
 - Manifest loads with correct content type (`application/manifest+json`)
 - Icons serve with correct MIME type (`image/png`)
+
+## Snake Field Background
+
+The browser runtime features a procedural snake field (`web/js/snakeField.js`) that renders up to 27 decorative snakes on a fixed background canvas. Each snake:
+
+- Is a filled polygon silhouette built from a spine curve with natural body width profile
+- Has smooth head-forward slithering via path-following + full-body sine wave
+- Has a distinct head, eyes, optional tongue flick, and tapered tail
+- Uses DVD-logo-style bounce at viewport edges (immediate angle reversal)
+- Varies in size (5 large 14–20px, 9 medium 9–15px, 13 small 6–10px)
+- Has species-appropriate colors from a 27-color palette
+
+Key files:
+- `web/js/snakeField.js` — snake rendering engine (path sampling, sine wave, polygon mesh)
+- `web/js/snakeFacts.js` — 24 snake fact/roast entries for live commentary
+- `web/js/commentary.js` — event-driven commentary engine
+
+Performance: snakes pause animation when tab is hidden; count reduces on mobile (0.55× scale); respects `prefers-reduced-motion`. No external libraries, no image assets.
 
 ## Privacy Posture
 
