@@ -4,6 +4,29 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.1] - 2026-06-05
+
+### Changed
+
+- **Rewrote snake field locomotion:** Replaced drifting-line behavior with proper head-forward body-following snake movement. Each snake now has a heading angle, sinusoidal lateral undulation for natural slithering, and a trail-based body that follows the head's path.
+- **Enhanced snake visual identity:** Snakes now have distinct rounded heads with highlights and tiny eyes, tapered bodies drawn from tail to head, stronger opacity (0.35–0.70, up from 0.15–0.55), and a richer 47-color snake-like palette (greens, olives, browns, coppers, teals).
+- **Exclusion zone steering:** Snakes are spawned outside the central UI area and gently steered away from the game panel, controls, and commentary box.
+- **Increased density:** Desktop 120–220 (was 100–180), tablet 70–120 (was 60–100), mobile 35–70 (was 25–50).
+- **Natural path curvature:** Each snake has a persistent turn bias so it curves naturally rather than drifting in straight lines.
+
+### Fixed
+
+- Snakes no longer look like floating ribbons or faint drifting lines.
+- Body now visibly follows the head's path — viewers immediately recognize them as tiny snakes.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Reduced-motion support preserved (88% count reduction, static rendering).
+- Tab-visibility pause preserved.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+- Python runtime remains canonical and unaffected.
+
 ## [0.4.0] - 2026-06-05
 
 ### Added
