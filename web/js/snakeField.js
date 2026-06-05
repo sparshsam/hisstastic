@@ -1,18 +1,22 @@
 /**
- * Hiss-Tastic Ambient Snakes — smooth Snake.io-style segmented body locomotion.
+ * Hiss-Tastic — single large ambient snake with path-following body.
  *
- * Each snake is a proper segmented follower:
- *   - Head at (this.x, this.y) moves with smooth steering — drawn separately
- *   - Body segments trail BEHIND the head, following via distance constraint
- *   - Rendered as overlapping circles: head first, body tapers to tail
- *   - Eyes and tongue face the movement direction (head-first)
- *   - Three size tiers for high density without sacrificing quality
+ * This is a foundation prototype: ONE snake with natural slithering motion.
+ * The head moves forward with smooth organic steering. The body is sampled
+ * from a path history array at increasing distances behind the head,
+ * producing clean, continuous body curves.
+ *
+ * Once this works convincingly, future branches can duplicate the snake
+ * for higher density.
  *
  * Canvas 2D, no external deps, no image assets.
  */
 
 (function () {
   'use strict';
+
+  // ---- Debug toggle (off by default) ----
+  const DEBUG = window.HISS_DEBUG_SNAKE === true;
 
   // ---- Seeded PRNG ----
   function createRNG(seed) {
@@ -25,24 +29,7 @@
     };
   }
 
-  const SEED = 42;
-  const rng = createRNG(SEED);
-
-  // ---- Palettes ----
-  const COLORS = [
-    '#2E7D32','#388E3C','#4CAF50','#43A047','#1B5E20','#558B2F',
-    '#689F38','#7CB342','#827717','#9E9D24','#AFB42B','#C0CA33',
-    '#BF360C','#D84315','#E64A19','#F57C00','#E65100','#FF8F00',
-    '#00695C','#00796B','#00897B','#26A69A',
-    '#4E342E','#5D4037','#3E2723','#33691E',
-    '#A1887F','#8D6E63','#795548',
-  ];
-
-  const ACCENTS = [
-    '#FFD600','#FFEA00','#FDD835','#FFC107',
-    '#E0E0E0','#BDBDBD','#D7CCC8','#F5F5F5',
-    '#1A1A1A','#2C2C2C','#333333',
-  ];
+  const rng = createRNG(42);
 
   // ---- Safe zone ----
   function getSafeZone() {
@@ -53,379 +40,277 @@
     const cx = w / 2;
     const cy = h / 2;
     return {
-      x: cx - panelW / 2 - 20,
-      y: cy - panelH / 2 - 60,
-      w: panelW + 40,
-      h: panelH + 150,
+      x: cx - panelW / 2 - 25,
+      y: cy - panelH / 2 - 65,
+      w: panelW + 50,
+      h: panelH + 160,
     };
   }
 
-  // ---- AmbientSnake ----
-  class AmbientSnake {
-    constructor(rng, viewW, viewH, safe, tier) {
-      this.tier = tier || 'medium';
-
+  // ---- Single Prototype Snake ----
+  class PrototypeSnake {
+    constructor(rng, viewW, viewH, safe) {
       // Head
-      this.x = 0;
-      this.y = 0;
-      this.angle = rng() * Math.PI * 2;
+      this.x = viewW / 2;
+      this.y = rng() * viewH * 0.3 + viewH * 0.1; // spawn in upper area
+      this.angle = rng() * 0.5 + 0.2; // slight right-down
 
-      // Size preset by tier
-      this._applyTier(rng);
+      // Speed
+      this.speed = rng() * 0.3 + 0.35; // 0.35–0.65
 
-      // Free-roaming wander steering
+      // Smooth steering
       this.wanderAngle = this.angle;
       this.wanderTimer = 0;
-      this.wanderInterval = rng() * 120 + 60; // frames between wander target changes
-      this.turnSpeed = rng() * 0.015 + 0.008; // how fast it can turn
+      this.wanderInterval = rng() * 200 + 150; // change target every N frames
+      this.turnSpeed = rng() * 0.006 + 0.004; // gentle turning
 
-      // Stuck detection
-      this.stuckCheckX = 0;
-      this.stuckCheckY = 0;
-      this.stuckFrames = 0;
+      // Visual
+      this.color = '#2E7D32';
+      this.opacity = 0.85;
 
-      // Personality
-      const personalities = ['cruiser', 'wanderer', 'darter', 'glider'];
-      this.personality = personalities[Math.floor(rng() * personalities.length)];
-      this._applyPersonality(rng);
+      // Head
+      this.headRadius = rng() * 3 + 9; // 9–12 px
 
-      // Body segments — populated after placement
-      this.segments = [];
-      this._placeInViewport(viewW, viewH, safe, rng);
-    }
+      // Body
+      this.bodyThickness = rng() * 3 + 6; // 6–9 px
+      this.segmentSpacing = 6; // px between path samples
+      this.segmentCount = 55; // 55 segments × 6px = 330px body length
 
-    _applyPersonality(rng) {
-      switch (this.personality) {
-        case 'cruiser':
-          this.speed = rng() * 0.3 + 0.3;     // 0.3–0.6
-          this.turnSpeed *= 0.6;               // slow turns
-          break;
-        case 'wanderer':
-          this.speed = rng() * 0.4 + 0.4;     // 0.4–0.8
-          this.wanderInterval = rng() * 200 + 100;
-          break;
-        case 'darter':
-          this.speed = rng() * 0.6 + 0.7;     // 0.7–1.3
-          this.turnSpeed *= 1.4;               // quick turns
-          this.wanderInterval = rng() * 60 + 30;
-          break;
-        case 'glider':
-          this.speed = rng() * 0.2 + 0.5;     // 0.5–0.7
-          this.turnSpeed *= 0.4;               // very smooth
-          this.wanderInterval = rng() * 300 + 200;
-          break;
-      }
-    }
+      // Path history (stores head positions)
+      this.path = [];
+      this.maxPathLength = this.segmentCount + 20;
 
-    _applyTier(rng) {
-      switch (this.tier) {
-        case 'large':
-          this.segCount = Math.floor(rng() * 16) + 15;   // 15–30
-          this.segSpacing = rng() * 3 + 4;                // 4–7 px
-          this.headRadius = rng() * 4 + 5;                // 5–9 px
-          this.bodyRadius = rng() * 2 + 3;                // 3–5 px
-          this.hasAccent = rng() > 0.4;
-          this.hasEyes = true;
-          this.hasTongue = rng() > 0.4;
-          break;
-        case 'medium':
-          this.segCount = Math.floor(rng() * 9) + 12;     // 12–20
-          this.segSpacing = rng() * 2 + 3;                // 3–5 px
-          this.headRadius = rng() * 2 + 4;                // 4–6 px
-          this.bodyRadius = rng() * 1.5 + 2.5;            // 2.5–4 px
-          this.hasAccent = rng() > 0.6;
-          this.hasEyes = true;
-          this.hasTongue = false;
-          break;
-        default: // tiny
-          this.segCount = Math.floor(rng() * 6) + 8;      // 8–14
-          this.segSpacing = rng() * 1.5 + 2.5;            // 2.5–4 px
-          this.headRadius = rng() * 1.5 + 3.5;            // 3.5–5 px
-          this.bodyRadius = rng() * 1 + 2.5;              // 2.5–3.5 px
-          this.hasAccent = false;
-          this.hasEyes = false;
-          this.hasTongue = false;
-          break;
-      }
-
-      this.color = COLORS[Math.floor(rng() * COLORS.length)];
-      this.opacity = rng() * 0.2 + 0.7;
-      this.accentColor = ACCENTS[Math.floor(rng() * ACCENTS.length)];
-      this.accentInterval = rng() > 0.5 ? 3 : 4;
+      // Tongue
+      this.hasTongue = true;
       this.tonguePhase = rng() * Math.PI * 2;
-    }
 
-    _placeInViewport(viewW, viewH, safe, rng) {
-      const margin = 20;
-      const choice = rng() * 7;
-      let sx, sy;
+      // Exclusion zone tracking for smooth avoidance
+      this._lastSteer = 0;
 
-      if (choice < 1) {
-        sx = margin + rng() * (viewW - margin * 2);
-        sy = margin + rng() * Math.max(10, safe.y * 0.5);
-      } else if (choice < 2) {
-        sx = margin + rng() * (viewW - margin * 2);
-        sy = safe.y + safe.h + rng() * Math.max(10, viewH - safe.y - safe.h - margin);
-        sy = Math.min(sy, viewH - margin);
-      } else if (choice < 3) {
-        sx = margin + rng() * Math.max(10, safe.x * 0.5);
-        sy = margin + rng() * (viewH - margin * 2);
-      } else if (choice < 4) {
-        sx = safe.x + safe.w + rng() * Math.max(10, viewW - safe.x - safe.w - margin);
-        sx = Math.min(sx, viewW - margin);
-        sy = margin + rng() * (viewH - margin * 2);
-      } else if (choice < 5) {
-        sx = margin + rng() * Math.max(10, safe.x * 0.4);
-        sy = margin + rng() * Math.max(10, safe.y * 0.4);
-      } else if (choice < 6) {
-        sx = safe.x + safe.w + rng() * Math.max(10, viewW - safe.x - safe.w - margin) * 0.5;
-        sy = margin + rng() * Math.max(10, safe.y * 0.4);
-      } else {
-        sx = margin + rng() * Math.max(10, safe.x * 0.4);
-        sy = safe.y + safe.h + rng() * Math.max(10, viewH - safe.y - safe.h - margin) * 0.5;
-      }
-
-      this.x = Math.max(margin, Math.min(viewW - margin, sx));
-      this.y = Math.max(margin, Math.min(viewH - margin, sy));
-
-      // Initialize body segments trailing BEHIND the head
-      this.segments = [];
-      for (let i = 0; i < this.segCount; i++) {
-        this.segments.push({
-          x: this.x - Math.cos(this.angle) * this.segSpacing * (i + 1),
-          y: this.y - Math.sin(this.angle) * this.segSpacing * (i + 1),
+      // Populate initial path behind the head
+      for (let i = 0; i < this.maxPathLength; i++) {
+        this.path.push({
+          x: this.x - Math.cos(this.angle) * this.segmentSpacing * (i + 1) * 0.5,
+          y: this.y - Math.sin(this.angle) * this.segmentSpacing * (i + 1) * 0.5,
         });
       }
     }
 
     /**
-     * Respawn the snake in a new border position (used by stuck detection).
-     */
-    _respawn(viewW, viewH, safe) {
-      this.wanderAngle = Math.random() * Math.PI * 2;
-      this.angle = this.wanderAngle;
-      this._placeInViewport(viewW, viewH, safe, rng);
-    }
-
-    /**
-     * Update head position and body segments.
-     * Free-roaming wandering: smooth random steering, edge avoidance, stuck detection.
-     * segs[0] = neck, segs[n-1] = tail.
+     * Update head position and path.
      */
     update(dt, viewW, viewH, safe) {
       // === Wander steering ===
-      // Periodically pick a new wander target direction
       this.wanderTimer += dt;
       if (this.wanderTimer >= this.wanderInterval) {
         this.wanderTimer = 0;
-        // Smooth random change: stay near current direction with some drift
-        const drift = (Math.random() - 0.5) * 1.8;
-        this.wanderAngle += drift;
+        // Gentle random drift
+        this.wanderAngle += (Math.random() - 0.5) * 1.2;
       }
 
-      // Smoothly steer toward wander target
       let targetAngle = this.wanderAngle;
 
-      // Steer away from exclusion zone (stronger influence when closer)
-      const safeCx = safe.x + safe.w / 2;
-      const safeCy = safe.y + safe.h / 2;
-      const dxSafe = this.x - safeCx;
-      const dySafe = this.y - safeCy;
-      const distSafe = Math.hypot(dxSafe, dySafe);
+      // === Exclusion zone avoidance ===
+      const cx = safe.x + safe.w / 2;
+      const cy = safe.y + safe.h / 2;
+      const dx = this.x - cx;
+      const dy = this.y - cy;
+      const dist = Math.hypot(dx, dy);
       const influenceR = Math.max(safe.w, safe.h) * 0.9;
 
-      if (distSafe < influenceR && distSafe > 1) {
-        const strength = Math.max(0, 1 - distSafe / influenceR) * 1.2;
-        const awayAngle = Math.atan2(dySafe, dxSafe);
-        // Blend wander target with away direction
-        const blend = 1 / (1 + strength * 3);
+      if (dist < influenceR && dist > 1) {
+        const strength = Math.max(0, 1 - dist / influenceR) * 1.5;
+        const awayAngle = Math.atan2(dy, dx);
         const diff = awayAngle - targetAngle;
-        targetAngle += Math.atan2(Math.sin(diff), Math.cos(diff)) * (1 - blend);
+        targetAngle += Math.atan2(Math.sin(diff), Math.cos(diff)) * (strength / (1 + strength));
       }
-
-      // Steer toward target
-      const angleDiff = targetAngle - this.angle;
-      const maxTurn = this.turnSpeed * dt;
-      this.angle += Math.sign(Math.sin(angleDiff)) * Math.min(Math.abs(Math.sin(angleDiff)), maxTurn);
-
-      // === Move head ===
-      const moveX = Math.cos(this.angle) * this.speed * 0.06 * dt;
-      const moveY = Math.sin(this.angle) * this.speed * 0.06 * dt;
-      this.x += moveX;
-      this.y += moveY;
 
       // === Edge avoidance ===
-      const edgeMargin = 25;
-      const edgeStr = 0.04 * dt;
-      if (this.x < edgeMargin) { this.angle += edgeStr; this.x = Math.max(0, this.x); }
-      if (this.y < edgeMargin) { this.angle -= edgeStr; this.y = Math.max(0, this.y); }
-      if (this.x > viewW - edgeMargin) { this.angle -= edgeStr; this.x = Math.min(viewW, this.x); }
-      if (this.y > viewH - edgeMargin) { this.angle += edgeStr; this.y = Math.min(viewH, this.y); }
+      const edge = 40;
+      if (this.x < edge) targetAngle += 0.3;
+      if (this.x > viewW - edge) targetAngle -= 0.3;
+      if (this.y < edge) targetAngle -= 0.3;
+      if (this.y > viewH - edge) targetAngle += 0.3;
 
-      // === Hard wrap (only when fully off-screen) ===
-      if (this.x < -80) this.x = viewW + 70;
-      if (this.x > viewW + 80) this.x = -70;
-      if (this.y < -80) this.y = viewH + 70;
-      if (this.y > viewH + 80) this.y = -70;
+      // === Steer toward target ===
+      const diff = targetAngle - this.angle;
+      const maxTurn = this.turnSpeed * dt;
+      this.angle += Math.sign(Math.sin(diff)) * Math.min(Math.abs(Math.sin(diff)), maxTurn);
 
-      // === Stuck detection ===
-      // Check if snake hasn't moved meaningfully in ~2 seconds (120 frames)
-      this.stuckFrames += dt;
-      if (this.stuckFrames > 120) {
-        const dist = Math.hypot(this.x - this.stuckCheckX, this.y - this.stuckCheckY);
-        if (dist < 20) {
-          // Reorient: pick a completely new direction
-          this.wanderAngle = Math.random() * Math.PI * 2;
-          this.angle = this.wanderAngle;
-          // If stuck in the exclusion zone, respawn outside it
-          if (distSafe < 100) {
-            this._respawn(viewW, viewH, safe);
-          }
-        }
-        this.stuckCheckX = this.x;
-        this.stuckCheckY = this.y;
-        this.stuckFrames = 0;
-      }
+      // === Move head ===
+      this.x += Math.cos(this.angle) * this.speed * 0.06 * dt;
+      this.y += Math.sin(this.angle) * this.speed * 0.06 * dt;
 
-      // === Body segments follow ===
-      const spacing = this.segSpacing;
-      const segs = this.segments;
-      this._follow(this.x, this.y, segs[0], spacing);
-      for (let i = 1; i < segs.length; i++) {
-        this._follow(segs[i - 1].x, segs[i - 1].y, segs[i], spacing);
-      }
-    }
+      // === Soft edge clamp ===
+      this.x = Math.max(5, Math.min(viewW - 5, this.x));
+      this.y = Math.max(5, Math.min(viewH - 5, this.y));
 
-    _follow(tx, ty, seg, spacing) {
-      const dx = tx - seg.x;
-      const dy = ty - seg.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist < 0.5) return;
-      const move = dist - spacing;
-      if (move > 0) {
-        seg.x += (dx / dist) * move;
-        seg.y += (dy / dist) * move;
+      // === Screen wrap (teleport) if fully offscreen ===
+      if (this.x < -100) this.x = viewW + 90;
+      if (this.x > viewW + 100) this.x = -90;
+      if (this.y < -100) this.y = viewH + 90;
+      if (this.y > viewH + 100) this.y = -90;
+
+      // === Record head position in path ===
+      this.path.unshift({ x: this.x, y: this.y });
+      if (this.path.length > this.maxPathLength) {
+        this.path.length = this.maxPathLength;
       }
     }
 
     /**
-     * Draw the snake head-first.
-     * Head at (this.x, this.y) with eyes/tongue facing this.angle.
-     * Body segments drawn from neck (segs[0]) to tail (segs[n-1]),
-     * iterating tail→head so head overlaps body.
+     * Draw the snake.
+     * Body is sampled from the path at increasing distances behind the head.
+     * Drawn as a smooth thick curve with tapered tail and distinct head.
      */
     draw(ctx) {
-      const segs = this.segments;
-      if (segs.length < 2) return;
+      const path = this.path;
+      if (path.length < 2) return;
 
       ctx.save();
 
-      // ---- Body: draw from tail to head so head overlaps ----
-      for (let i = segs.length - 1; i >= 0; i--) {
-        const seg = segs[i];
-        // Taper: segs[0] (neck) = thickest, segs[n-1] (tail) = thinnest
-        const t = 1 - i / (segs.length - 1); // 1 = neck, 0 = tail
-        const radius = this.bodyRadius + (this.headRadius - this.bodyRadius) * t * 0.7;
+      // === Build body point list by sampling path ===
+      const bodyPoints = [];
+      let accumulatedDist = 0;
+      let pathIdx = 0;
+      const spacing = this.segmentSpacing;
 
-        // Shadow
-        ctx.beginPath();
-        ctx.arc(seg.x + 1.2, seg.y + 1.2, radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0,0,0,0.08)';
-        ctx.globalAlpha = this.opacity * 0.3;
-        ctx.fill();
+      // Head is at path[0]. Walk along path collecting samples.
+      bodyPoints.push({ x: path[0].x, y: path[0].y });
 
-        // Body circle
-        ctx.beginPath();
-        ctx.arc(seg.x, seg.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.opacity;
-        ctx.fill();
-
-        // Accent stripe
-        if (this.hasAccent && i > 1 && i < segs.length - 2 && i % this.accentInterval === 0) {
-          ctx.beginPath();
-          ctx.arc(seg.x, seg.y, radius * 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = this.accentColor;
-          ctx.globalAlpha = this.opacity * 0.35;
-          ctx.fill();
+      for (let s = 1; s < this.segmentCount; s++) {
+        const targetDist = s * spacing;
+        // Walk forward along path until we've accumulated enough distance
+        while (accumulatedDist < targetDist && pathIdx < path.length - 1) {
+          const seg = path[pathIdx];
+          const next = path[pathIdx + 1];
+          const segDist = Math.hypot(seg.x - next.x, seg.y - next.y);
+          accumulatedDist += segDist;
+          pathIdx++;
         }
+        if (pathIdx >= path.length) break;
+
+        // Interpolate between current and next path point
+        const seg = path[pathIdx - 1];
+        const next = path[pathIdx];
+        const overshoot = accumulatedDist - targetDist;
+        const segDist = Math.hypot(seg.x - next.x, seg.y - next.y) || 1;
+        const t = 1 - overshoot / segDist;
+
+        bodyPoints.push({
+          x: seg.x + (next.x - seg.x) * t,
+          y: seg.y + (next.y - seg.y) * t,
+        });
       }
 
-      // ---- Head: drawn at (this.x, this.y) — the actual head position ----
+      if (bodyPoints.length < 2) {
+        ctx.restore();
+        return;
+      }
+
+      // === Draw body as smooth tapered curve ===
+      for (let i = 0; i < bodyPoints.length - 1; i++) {
+        const p0 = bodyPoints[i];
+        const p1 = bodyPoints[i + 1];
+        const t = 1 - i / (bodyPoints.length - 1); // 1 = head, 0 = tail
+
+        // Taper: full thickness at head, thin at tail
+        const thickness = (0.08 + 0.92 * t) * this.bodyThickness;
+
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = thickness;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalAlpha = this.opacity;
+        ctx.stroke();
+      }
+
+      // === Draw head ===
+      const head = bodyPoints[0];
       const headR = this.headRadius;
-      const angle = this.angle; // movement direction
 
       // Head shadow
       ctx.beginPath();
-      ctx.arc(this.x + 1.5, this.y + 1.5, headR, 0, Math.PI * 2);
+      ctx.arc(head.x + 2, head.y + 2, headR, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(0,0,0,0.12)';
       ctx.globalAlpha = this.opacity * 0.3;
       ctx.fill();
 
       // Head circle
       ctx.beginPath();
-      ctx.arc(this.x, this.y, headR, 0, Math.PI * 2);
+      ctx.arc(head.x, head.y, headR, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.globalAlpha = Math.min(1, this.opacity * 1.1);
       ctx.fill();
 
-      // Head highlight (top-forward)
+      // Head highlight
+      const hx = Math.cos(this.angle) * headR * 0.3 - Math.sin(this.angle) * headR * 0.2;
+      const hy = Math.sin(this.angle) * headR * 0.3 + Math.cos(this.angle) * headR * 0.2;
       ctx.beginPath();
-      ctx.arc(
-        this.x + Math.cos(angle) * headR * 0.3 - Math.sin(angle) * headR * 0.2,
-        this.y + Math.sin(angle) * headR * 0.3 + Math.cos(angle) * headR * 0.2,
-        headR * 0.3, 0, Math.PI * 2
-      );
+      ctx.arc(head.x + hx, head.y + hy, headR * 0.3, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(255,255,255,0.2)';
-      ctx.globalAlpha = Math.min(1, this.opacity * 1.1);
+      ctx.globalAlpha = Math.min(1, this.opacity);
       ctx.fill();
 
-      // Eyes — face movement direction
-      if (this.hasEyes && headR > 2.5) {
-        const eyeR = Math.max(1.2, headR * 0.2);
-        const eDist = headR * 0.5;
-        for (let s = -1; s <= 1; s += 2) {
-          const ex = this.x + Math.cos(angle) * eDist * 0.2 + Math.sin(angle) * s * eDist * 0.55;
-          const ey = this.y + Math.sin(angle) * eDist * 0.2 - Math.cos(angle) * s * eDist * 0.55;
-          ctx.beginPath();
-          ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(0,0,0,0.75)';
-          ctx.globalAlpha = Math.min(1, this.opacity * 1.3);
-          ctx.fill();
+      // Eyes
+      const eyeR = Math.max(2, headR * 0.2);
+      const eDist = headR * 0.5;
+      for (let s = -1; s <= 1; s += 2) {
+        const ex = head.x + Math.cos(this.angle) * eDist * 0.2 + Math.sin(this.angle) * s * eDist * 0.55;
+        const ey = head.y + Math.sin(this.angle) * eDist * 0.2 - Math.cos(this.angle) * s * eDist * 0.55;
+        ctx.beginPath();
+        ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
+        ctx.globalAlpha = Math.min(1, this.opacity * 1.3);
+        ctx.fill();
+      }
+
+      // Tongue flick
+      if (this.hasTongue) {
+        const flick = Math.sin(performance.now() * 0.004 + this.tonguePhase);
+        if (flick > 0.65) {
+          const tLen = headR * 1.3;
+          const fA = 0.35;
+          const tx = head.x + Math.cos(this.angle) * (headR + 2);
+          const ty = head.y + Math.sin(this.angle) * (headR + 2);
+          const alpha = this.opacity * 0.6 * ((flick - 0.65) / 0.35);
+
+          ctx.strokeStyle = '#CC4444';
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = alpha;
+
+          const bx = head.x + Math.cos(this.angle) * headR * 0.6;
+          const by = head.y + Math.sin(this.angle) * headR * 0.6;
+          ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(tx, ty); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(tx, ty);
+          ctx.lineTo(tx + Math.cos(this.angle - fA) * tLen * 0.5, ty + Math.sin(this.angle - fA) * tLen * 0.5);
+          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(tx, ty);
+          ctx.lineTo(tx + Math.cos(this.angle + fA) * tLen * 0.5, ty + Math.sin(this.angle + fA) * tLen * 0.5);
+          ctx.stroke();
         }
       }
 
-      // Tongue flick — extends forward from head
-      if (this.hasTongue) {
-        const flick = Math.sin(performance.now() * 0.004 + this.tonguePhase);
-        if (flick > 0.6) {
-          const tLen = headR * 1.3;
-          const fA = 0.35;
-          const tx = this.x + Math.cos(angle) * (headR + 3);
-          const ty = this.y + Math.sin(angle) * (headR + 3);
-          const alpha = this.opacity * 0.6 * ((flick - 0.6) / 0.4);
+      // === Debug overlay ===
+      if (DEBUG) {
+        ctx.fillStyle = 'red';
+        ctx.font = '10px monospace';
 
-          ctx.strokeStyle = '#CC4444';
-          ctx.lineWidth = 1.2;
-          ctx.globalAlpha = alpha;
+        // Head marker
+        ctx.beginPath(); ctx.arc(head.x, head.y, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillText('HEAD', head.x + 8, head.y - 8);
 
-          // Stem
-          ctx.beginPath();
-          ctx.moveTo(this.x + Math.cos(angle) * headR * 0.6, this.y + Math.sin(angle) * headR * 0.6);
-          ctx.lineTo(tx, ty);
-          ctx.stroke();
-
-          // Fork left
-          ctx.beginPath();
-          ctx.moveTo(tx, ty);
-          ctx.lineTo(tx + Math.cos(angle - fA) * tLen * 0.5, ty + Math.sin(angle - fA) * tLen * 0.5);
-          ctx.stroke();
-
-          // Fork right
-          ctx.beginPath();
-          ctx.moveTo(tx, ty);
-          ctx.lineTo(tx + Math.cos(angle + fA) * tLen * 0.5, ty + Math.sin(angle + fA) * tLen * 0.5);
-          ctx.stroke();
+        // Path markers (every 5th segment)
+        for (let i = 5; i < bodyPoints.length; i += 5) {
+          const p = bodyPoints[i];
+          ctx.fillStyle = 'rgba(255,0,0,0.3)';
+          ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(255,0,0,0.5)';
+          ctx.font = '8px monospace';
+          ctx.fillText(String(i), p.x + 4, p.y - 4);
         }
       }
 
@@ -433,11 +318,11 @@
     }
   }
 
-  // ---- Main SnakeField ----
+  // ---- SnakeField ----
   function SnakeField() {
     this.canvas = null;
     this.ctx = null;
-    this.snakes = [];
+    this.snake = null;
     this.animFrame = null;
     this.running = false;
     this.reducedMotion = false;
@@ -476,52 +361,15 @@
     if (!this.canvas) return;
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    this._populateSnakes();
-  };
-
-  /**
-   * Three-tier snake population for high density.
-   * Large:  full detail (eyes, tongue, bands) — ~10%
-   * Medium: eyes only — ~25%
-   * Tiny:   minimal (head + body circles) — ~65%
-   */
-  SnakeField.prototype._populateSnakes = function () {
+    // Only create the ONE snake
+    // On mobile, still just one — but smaller
     const w = this.canvas.width;
-    const h = this.canvas.height;
-    const isMobile = w < 768;
-    const isTablet = w >= 768 && w < 1024;
-    const isLarge = w >= 1400;
-    const density = this.reducedMotion ? 0.15 : 1;
-
-    let totalCount;
-    if (isMobile) {
-      totalCount = Math.floor((18 + Math.random() * 17) * density);         // 18–35
-    } else if (isTablet) {
-      totalCount = Math.floor((35 + Math.random() * 35) * density);         // 35–70
-    } else if (isLarge) {
-      totalCount = Math.floor((100 + Math.random() * 80) * density);        // 100–180
-    } else {
-      totalCount = Math.floor((60 + Math.random() * 60) * density);         // 60–120
-    }
-
-    const safe = getSafeZone();
-    this.snakes = [];
-
-    // Large snakes: ~10%
-    const largeCount = Math.max(2, Math.floor(totalCount * 0.1));
-    for (let i = 0; i < largeCount; i++) {
-      this.snakes.push(new AmbientSnake(rng, w, h, safe, 'large'));
-    }
-
-    // Medium snakes: ~25%
-    const mediumCount = Math.max(3, Math.floor(totalCount * 0.25));
-    for (let i = 0; i < mediumCount; i++) {
-      this.snakes.push(new AmbientSnake(rng, w, h, safe, 'medium'));
-    }
-
-    // Tiny snakes: remainder (~65%)
-    for (let i = this.snakes.length; i < totalCount; i++) {
-      this.snakes.push(new AmbientSnake(rng, w, h, safe, 'tiny'));
+    this.snake = new PrototypeSnake(rng, w, this.canvas.height, getSafeZone());
+    if (w < 768) {
+      // Scale down for mobile
+      this.snake.headRadius *= 0.7;
+      this.snake.bodyThickness *= 0.7;
+      this.snake.segmentCount = 35;
     }
   };
 
@@ -541,17 +389,12 @@
     this.startTime = timestamp;
 
     ctx.clearRect(0, 0, w, h);
-    const safe = getSafeZone();
 
-    if (this.reducedMotion) {
-      for (let i = 0; i < this.snakes.length; i++) {
-        this.snakes[i].draw(ctx);
+    if (this.snake) {
+      if (!this.reducedMotion) {
+        this.snake.update(dt, w, h, getSafeZone());
       }
-    } else {
-      for (let i = 0; i < this.snakes.length; i++) {
-        this.snakes[i].update(dt, w, h, safe);
-        this.snakes[i].draw(ctx);
-      }
+      this.snake.draw(ctx);
     }
 
     this.animFrame = requestAnimationFrame(this._animate.bind(this));
