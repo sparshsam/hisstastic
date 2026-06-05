@@ -10,8 +10,8 @@ A single large procedural snake rendered as a filled polygon silhouette. The bod
 
 ### Spine Model
 
-- 100 spine samples at 5px spacing = **500px body length**
-- Sampled from a 160-entry path history with angle interpolation
+- 240 spine samples at 8px spacing = **1920px body length** (≈2× viewport width)
+- Sampled from a 4000-entry path history with angle interpolation
 - Full-body sine wave applied laterally with mid-body amplitude peak
 - Wave fades to zero in the final 15% to prevent tail twist
 - Last 3 spine points smoothed for clean tail

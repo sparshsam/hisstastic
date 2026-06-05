@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.8] - 2026-06-05
+
+### Changed
+
+- **Snake body length increased 4×:** 240 spine samples × 8px spacing = 1920px body (was 300px). The serpent now spans the full viewport with long flowing S-curves.
+- **Slower, more elegant motion:** speed reduced to 0.4–0.6 (was 0.25–0.4), gentler turn speed, longer wander intervals for sweeping cinematic gliding.
+- **Longer, smoother waves:** wave frequency lowered to 0.01–0.03 (was 0.03–0.07) for longer undulation cycles. Wave amplitude increased to 20–35px (was 10–18px) for more dramatic curves.
+- **Path history dramatically increased:** 4000 entries (was 160) to support the full 1920px body sampling.
+- **Mobile scaling:** 140 spine samples (still ~1120px dramatic serpent).
+
+### Preserved
+
+- Same procedural polygon rendering (filled silhouette + outline + highlight).
+- Same head, eye, and tongue design.
+- Same smooth slither wave model.
+- All gameplay, commentary, PWA unchanged. No telemetry/API/backend/AI/wallet/multiplayer.
+
 ## [0.4.7] - 2026-06-05
 
 ### Changed
