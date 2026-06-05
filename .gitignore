@@ -12,3 +12,14 @@ python-*.pkg
 build/
 dist/
 *.spec
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+replays/
+!replays/.gitkeep
+*.exe
+*.dmg
+*.AppImage
+*.log

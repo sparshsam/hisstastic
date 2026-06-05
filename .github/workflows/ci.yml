@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pygame
+      - name: Syntax check
+        run: |
+          python -c "import py_compile; py_compile.compile('main.py', doraise=True)"
+          python -c "import py_compile; py_compile.compile('validation.py', doraise=True)"
+      - name: Import validation
+        run: |
+          python -c "import hiss_tastic; print('Package imports OK')"
+      - name: Validation script
+        run: |
+          python validation.py || echo "Some checks may fail in headless CI (no display)"

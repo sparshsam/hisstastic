@@ -2,11 +2,27 @@
 
 ## Data Handling
 
-Hiss-Tastic does not collect, transmit, or persist player data.
+Hiss-Tastic does not collect, transmit, or persist player data by default.
 
 ## Local Runtime
 
 The game runs locally through Python and Pygame. Runtime state such as score, snake position, obstacle placement, and power-up timing exists only in memory while the process is running.
+
+## Replay Files
+
+When a player explicitly records a replay, Hiss-Tastic writes a local JSON file under `replays/`. Replay files can include deterministic seed metadata, tick-indexed inputs, final score, snake length, and local frame snapshots for ghost visualization.
+
+Replay files are not uploaded, synchronized, or used for telemetry.
+
+## Ghost Racing
+
+Ghost racing reads local replay files only. Ghosts are visualization and comparison data; they do not affect scoring, collisions, spawn placement, difficulty, or game-over logic.
+
+## Browser Runtime and PWA
+
+The browser runtime runs locally in the user's browser. It does not use accounts, telemetry, analytics, an external backend, wallet connections, or multiplayer networking.
+
+The PWA service worker caches static game files for offline play. It does not log, transmit, or synchronize gameplay data. Browser replay import/export uses local JSON files selected or saved by the user.
 
 ## Future Changes
 
