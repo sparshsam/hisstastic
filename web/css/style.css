@@ -185,6 +185,45 @@ html, body {
   border-color: #FF1493;
 }
 
+/* ---- Commentary box (live snake-fact roasts) ---- */
+.commentary-box {
+  position: relative;
+  max-width: 560px;
+  margin: 6px auto 0 auto;
+  padding: 6px 12px;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #555;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  transition: opacity 0.6s ease;
+  z-index: 5;
+  pointer-events: none;
+  word-wrap: break-word;
+}
+
+.commentary-visible {
+  opacity: 1;
+}
+
+.commentary-fade {
+  opacity: 0;
+}
+
+/* ---- Background snake canvas sits behind everything ---- */
+#bg-snake-field {
+  z-index: 0;
+  pointer-events: none;
+}
+
+#game-container {
+  z-index: 1;
+  position: relative;
+}
+
 /* ---- Mobile landscape adjustments ---- */
 @media (max-height: 500px) {
   #game-container {

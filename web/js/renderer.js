@@ -213,12 +213,22 @@ class Renderer {
     this.clear();
     const ctx = this.ctx;
     const score = this.game.score;
-    const msg = this.game.getMeanMessage();
+
+    // Get snake-fact roast via commentary engine (falls back to legacy insults)
+    let msg;
+    if (window.commentary && window.commentary.enabled) {
+      msg = window.commentary.showGameOverRoast({
+        score: this.game.score,
+        selfCollision: this.game._lastCollisionType === 'self',
+      });
+    } else {
+      msg = this.game.getMeanMessage();
+    }
 
     ctx.fillStyle = CONFIG.colors.neonPink;
-    ctx.font = 'bold 20px monospace';
+    ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(msg, this.gw / 2, this.gh / 3);
+    this._wrapText(ctx, msg, this.gw / 2, this.gh / 3.5, this.gw - 40, 16);
 
     ctx.fillStyle = CONFIG.colors.black;
     ctx.font = 'bold 32px monospace';
@@ -251,6 +261,28 @@ class Renderer {
     ctx.fillStyle = CONFIG.colors.black;
     ctx.font = '14px monospace';
     ctx.fillText('Press P or ESC to resume', this.gw / 2, this.gh / 2 + 30);
+  }
+
+  // ---- Word-wrap helper for long text ----
+  _wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let lineY = y;
+
+    for (const word of words) {
+      const testLine = line ? line + ' ' + word : word;
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && line) {
+        ctx.fillText(line, x, lineY);
+        line = word;
+        lineY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line) {
+      ctx.fillText(line, x, lineY);
+    }
   }
 
   // ---- Replay info overlay ----

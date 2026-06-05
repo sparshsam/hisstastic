@@ -24,6 +24,14 @@ The browser runtime runs locally in the user's browser. It does not use accounts
 
 The PWA service worker caches static game files for offline play. It does not log, transmit, or synchronize gameplay data. Browser replay import/export uses local JSON files selected or saved by the user.
 
+### Snake Field Background
+
+The decorative snake field (`snakeField.js`) renders animated snakes locally using Canvas 2D. No image assets are loaded. No data is transmitted. Animation respects `prefers-reduced-motion` and pauses when the browser tab is hidden.
+
+### Live Commentary System
+
+The snake-fact roast system (`commentary.js` + `snakeFacts.js`) uses a local static dataset. No external APIs, AI/LLM calls, or network requests are made. Gameplay stats used for context-aware roasts exist only in memory during the session and are never transmitted or persisted. Commentary does not alter game state, scoring, or replay data.
+
 ## Future Changes
 
 If future versions add leaderboards, web builds, telemetry, accounts, or onchain score proofs, the privacy model must be updated before release. Optional score proof work should use minimal disclosure and must not become the lead identity of the project.
