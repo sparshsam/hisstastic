@@ -4,6 +4,26 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.4] - 2026-06-05
+
+### Fixed
+
+- **Snakes now move head-first.** Fixed critical directionality bug: head position `(this.x, this.y)` was not being drawn — head features (eyes, tongue) were placed on the tail segment instead. Now the head is drawn as a separate circle at the actual head position, with eyes and tongue facing `this.angle` (the movement direction). Body taper goes from thick (near head) to thin (tail).
+- **Snakes now free-roam instead of looping in place.** Replaced repetitive sine-wave oscillation with a smooth random wander steering model. Snakes periodically pick new wander targets, steer smoothly toward them, and naturally roam the viewport. Fixed stuck detection with automatic respawn.
+- **Massively increased snake density.** Three-tier system: large (15–30 segs, full detail), medium (12–20 segs, eyes), tiny (8–14 segs, minimal). Desktop: 60–120 snakes (was 10–18). Large desktop: 100–180. Tablet: 35–70. Mobile: 18–35.
+- **Tiny snake sizes increased.** Head radius 3.5–5px (was 3–4px), body radius 2.5–3.5px (was 2–2.8px) for better visibility.
+- **Movement personalities added:** cruisers (slow turns), wanderers (medium), darters (fast), gliders (smooth long arcs).
+- **Exclusion-zone avoidance improved:** smoother steering, stronger influence when very close to the game panel.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Commentary and game-over roasts unchanged.
+- Reduced-motion support preserved (15% count multiplier, static rendering).
+- Tab-visibility pause preserved.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+- Python runtime remains canonical and unaffected.
+
 ## [0.4.3] - 2026-06-05
 
 ### Changed
