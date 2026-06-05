@@ -4,6 +4,31 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.3] - 2026-06-05
+
+### Changed
+
+- **Replaced static border snakes with smooth Snake.io-style segmented locomotion.** Complete rewrite of `web/js/snakeField.js` with `AmbientSnake` class using head-forward segmented-following movement. Each snake now has a head that moves with smooth steering, and 12–30 body segments that follow via distance-constraint physics, creating living gliding motion.
+- **Larger, more visible snakes:** head radius 5–9px, body radius 3–6px, drawn as overlapping filled circles for smooth capsule bodies. Previously snakes were tiny decorative marks.
+- **Rich visual details:** eyes on every head, optional accent stripe patterns (every 3rd or 4th segment), optional red forked tongue flicks, subtle shadow beneath each segment for depth.
+- **Autonomous edge roaming:** snakes spawn in border zones, roam with sinusoidal steering + random bias, and smoothly steer away from the central game panel exclusion zone.
+- **Soft edge handling:** snakes are gently pushed away from viewport boundaries with hard wrap only as off-screen teleport fallback.
+
+### Fixed
+
+- Snakes no longer look like static decorative marks.
+- Snakes now exhibit living, gliding motion with visible segmented bodies.
+- Movement resembles Snake.io/Slither.io-style smooth segmented locomotion.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Commentary and game-over roasts unchanged.
+- Reduced-motion support preserved (40% count reduction, static rendering).
+- Tab-visibility pause preserved.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+- Python runtime remains canonical and unaffected.
+
 ## [0.4.2] - 2026-06-05
 
 ### Changed
