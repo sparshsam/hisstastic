@@ -7,7 +7,7 @@
 (function() {
   'use strict';
 
-  let game, renderer, input, audio, replay;
+  let game, renderer, input, audio, replay, commentary, snakeField;
   let lastTick = 0;
   let tickAccumulator = 0;
   let tickRate = 1000 / CONFIG.gameplay.initialSpeed; // ms per tick
@@ -27,6 +27,15 @@
     input = new InputHandler(game);
     audio = new GameAudio();
     replay = new ReplayManager(game, renderer);
+
+    // Initialize snake field background
+    snakeField = new SnakeField();
+    snakeField.init();
+
+    // Initialize live commentary
+    commentary = new CommentaryEngine();
+    commentary.init(game);
+    window.commentary = commentary;
 
     // Setup replay upload
     replay.setupUploadButton();

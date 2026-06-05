@@ -4,6 +4,29 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.0] - 2026-06-05
+
+### Added
+
+- **Decorative snake field background:** Animated snakes crawl around the game panel using a separate fixed canvas layer. Snakes vary by color, length, thickness, speed, wave amplitude, and direction. Performance-aware with mobile/tablet/desktop count tiers.
+- **Live snake-fact roast commentary:** Contextual educational snake facts paired with playful roasts triggered by gameplay events (wall collision, missed food, rapid direction changes, long survival, etc.). Local-only static dataset — no AI, API, or telemetry.
+- **Game-over snake-fact roasts:** Game-over screen now displays contextual snake-fact roasts derived from player behavior. Legacy insult messages preserved as fallback.
+- **Commentary UI:** Subtle fade-in/fade-out commentary box below the game panel. `aria-live="polite"` for accessibility.
+- **Reduced-motion support:** Snake field respects `prefers-reduced-motion` media query. At reduced setting, snakes appear as static decorative elements or very slow movement.
+- **Tab-visibility optimization:** Snake field animation pauses when the browser tab is hidden.
+- **Snake facts data module:** `web/js/snakeFacts.js` — 25+ fact/roast entries with tags, severity levels, and legacy insult fallbacks.
+- **Commentary engine:** `web/js/commentary.js` — event-driven engine with rate limiting, cooldown, deduplication, seeded RNG, and gameplay stat tracking.
+- **Snake field renderer:** `web/js/snakeField.js` — 300-line Canvas 2D renderer with tapering, waving, and looping snake animations. Performance-tuned with requestAnimationFrame.
+- **Documentation:** `docs/snake-field.md`, `docs/live-commentary.md`.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Commentary does not alter score, movement, collision, replay inputs, or game state.
+- Legacy insult messages preserved as `LEGACY_INSULTS` in `snakeFacts.js`.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+- Python runtime remains canonical and unaffected.
+
 ## [0.3.0] - 2026-06-04
 
 ### Added

@@ -37,7 +37,9 @@ This repository preserves an original AI-assisted Python/Pygame prototype from t
 - Experimental browser runtime in `web/`
 - Mobile-friendly touch controls
 - PWA installability and offline cache behavior
-- Legacy scoring messages preserved
+- Animated decorative snake field background (canvas-based, reduced-motion aware)
+- Live snake-fact roast commentary system (local-only, deterministic, no AI/API)
+- Legacy scoring messages preserved with snake-fact game-over roasts
 
 ## Architecture
 
@@ -73,6 +75,9 @@ web/
   js/app.js
   js/game.js
   js/replay.js
+  js/snakeFacts.js
+  js/commentary.js
+  js/snakeField.js
 ```
 
 ## Python Setup

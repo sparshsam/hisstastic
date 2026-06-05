@@ -11,6 +11,8 @@
 | Phase 5 â€” Packaging | âœ… Complete | 2026-06-04 |
 | Phase 6 - Browser-Based Version | Experimental foundation integrated | 2026-06-04 |
 | Phase 7 - Mobile-First and PWA | Experimental foundation integrated | 2026-06-04 |
+| Phase 7b - Decorative Snake Field | ✅ Complete | 2026-06-05 |
+| Phase 7c - Live Snake-Fact Commentary | ✅ Complete | 2026-06-05 |
 | Phase 8 â€” Agent-Playable Mode | ðŸ”œ Planned | â€” |
 | Phase 9 â€” Multiplayer | ðŸ”œ Planned | â€” |
 | Phase 10 â€” Onchain Score Verification | ðŸ”œ Planned | â€” |

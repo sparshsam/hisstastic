@@ -213,6 +213,7 @@ class HissTastic {
 
     // Event listeners
     this._listeners = {};
+    this._lastCollisionType = null;
 
     // DOM references (set by app.js)
     this.canvas = null;
@@ -263,6 +264,7 @@ class HissTastic {
     this.immune = false;
     this.immuneStartTime = 0;
     this.lastDirection = null;
+    this._lastCollisionType = null;
 
     this.state = 'PLAYING';
     this.emit(EVENTS.START, { seed });
@@ -299,6 +301,7 @@ class HissTastic {
     this.immune = false;
     this.immuneStartTime = 0;
     this.lastDirection = null;
+    this._lastCollisionType = null;
 
     // Replay playback setup
     this.replayMode = true;
@@ -323,7 +326,8 @@ class HissTastic {
     const [hx, hy] = this.snake.head;
     if (hx >= gw || hx < 0 || hy >= gh || hy < 0) {
       this.state = 'GAME_OVER';
-      this.emit(EVENTS.QUIT, { score: this.score });
+      this._lastCollisionType = 'wall';
+      this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'wall' });
       return;
     }
 
@@ -333,7 +337,8 @@ class HissTastic {
     // Self collision
     if (this.snake.collidesWithSelf() && !this.immune) {
       this.state = 'GAME_OVER';
-      this.emit(EVENTS.QUIT, { score: this.score });
+      this._lastCollisionType = 'self';
+      this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'self' });
       return;
     }
 
@@ -342,7 +347,8 @@ class HissTastic {
       if (this.snake.head[0] === o[0] && this.snake.head[1] === o[1]) {
         if (!this.immune) {
           this.state = 'GAME_OVER';
-          this.emit(EVENTS.QUIT, { score: this.score });
+          this._lastCollisionType = 'obstacle';
+          this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'obstacle' });
           return;
         }
         break;

@@ -19,6 +19,9 @@ web/
     audio.js              Web Audio API procedural sounds
     replay.js             Replay import/export/validation/display
     app.js                App initialization and main loop
+    snakeFacts.js         Static snake-fact/roast dataset (local, no API)
+    commentary.js         Live commentary engine (event-driven, deterministic)
+    snakeField.js         Animated decorative background snake field (Canvas 2D)
   manifest.webmanifest    PWA manifest
   sw.js                   Service worker with offline caching
   icons/                  PWA app icons
@@ -42,6 +45,34 @@ The JS game engine (`game.js`) replicates the Python runtime behavior:
 TITLE → PLAYING ⇄ PAUSED
 PLAYING → GAME_OVER → TITLE
 ```
+
+## Snake Field Background
+
+A decorative animated snake field (`snakeField.js`) renders dozens to hundreds of
+small wiggling snakes on a fixed background canvas behind the game panel.
+
+- Snakes vary by color, length, thickness, speed, wave amplitude, and direction.
+- Seeded PRNG (seed 42) for stable deterministic appearance.
+- `requestAnimationFrame`-driven with tab-visibility pause.
+- Snake count adapts to screen size: desktop ~100–180, tablet ~60–100, mobile ~25–50.
+- Respects `prefers-reduced-motion`: static decorative display when active.
+- Game panel sits above the background layer via z-index, so snakes never obstruct gameplay.
+- No external dependencies or image assets.
+
+## Live Commentary System
+
+A contextual snake-fact roast system (`commentary.js` + `snakeFacts.js`) provides
+educational snake facts paired with playful roasts based on player behavior.
+
+- 25+ fact/roast entries covering wall collision, self collision, missed food,
+  rapid direction changes, early death, long survival, power-up events, and more.
+- Deterministic seeded RNG for reproducible commentary sequences.
+- Rate-limited (4s cooldown) with deduplication to avoid spam.
+- Events are triggered by gameplay — no AI, no API calls, no telemetry.
+- Game-over screen uses contextual snake-fact roasts.
+- Legacy insult messages preserved as fallback in `LEGACY_INSULTS`.
+- Commentary does not alter score, movement, collision, replay inputs, or game state.
+- Compatible with replay playback (commentary is read-only observation).
 
 ## Differences from Python Version
 
