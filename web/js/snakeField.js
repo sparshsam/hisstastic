@@ -315,6 +315,58 @@
       ctx.globalAlpha = this.opacity * 0.4;
       ctx.stroke();
 
+      // ---- Species pattern overlay ----
+      if (this.patternType && this.patternType !== 'none' && this.patternColor) {
+        for (let i = 2; i < spine.length - 3; i += 3) {
+          const p = spine[i];
+          const t = i / (spine.length - 1);
+          const nx = -Math.sin(p.angle);
+          const ny = Math.cos(p.angle);
+          const r = bodyRadius(t) * this.baseRadius;
+          const patR = r * (0.3 + rng() * 0.2);
+
+          // Skip head and tail regions
+          if (t < 0.1 || t > 0.85) continue;
+
+          let drawPattern = false;
+          if (this.patternType === 'bands') {
+            drawPattern = (i % 6 < 2);
+          } else if (this.patternType === 'diamonds') {
+            drawPattern = (i % 5 < 1 || (i + 2) % 5 < 1);
+          } else if (this.patternType === 'spots') {
+            drawPattern = (i % 4 < 1);
+          } else if (this.patternType === 'saddles') {
+            drawPattern = (i % 5 < 2);
+          } else if (this.patternType === 'triangles') {
+            drawPattern = (i % 6 < 2);
+          } else if (this.patternType === 'blotches') {
+            drawPattern = (i % 4 < 1 && i % 2 === 0);
+          } else if (this.patternType === 'stripes') {
+            // Thin horizontal stripe along body centerline
+            ctx.beginPath();
+            const sx1 = p.x + nx * r * 0.1;
+            const sy1 = p.y + ny * r * 0.1;
+            const sx2 = p.x - nx * r * 0.1;
+            const sy2 = p.y - ny * r * 0.1;
+            ctx.moveTo(sx1, sy1);
+            ctx.lineTo(sx2, sy2);
+            ctx.strokeStyle = this.patternColor;
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = this.opacity * 0.5;
+            ctx.stroke();
+            continue;
+          }
+
+          if (drawPattern) {
+            ctx.beginPath();
+            ctx.arc(p.x + nx * patR * 0.2, p.y + ny * patR * 0.2, patR, 0, Math.PI * 2);
+            ctx.fillStyle = this.patternColor;
+            ctx.globalAlpha = this.opacity * 0.35;
+            ctx.fill();
+          }
+        }
+      }
+
       // ---- Outline stroke (top highlight ridge) ----
       for (let i = 0; i < leftPoints.length - 1; i++) {
         const p0 = leftPoints[i];
@@ -408,14 +460,35 @@
     }
   }
 
-  const SNAKE_COLORS = [
-    '#2E7D32', // main green
-    '#00695C', // teal
-    '#827717', // olive
-    '#4E342E', // dark brown
-    '#BF360C', // copper
-    '#33691E', // dark green
-    '#5D4037', // brown
+  // ---- 27 Snake Species ----
+  const SPECIES = [
+    { name:'Reticulated Python', color:'#C8A84E', pattern:'diamonds', patColor:'#4A3728', size:1.0, speed:0.35, spines:55, thick:1.0 },
+    { name:'King Cobra', color:'#5B7B3A', pattern:'none', patColor:'', size:0.9, speed:0.45, spines:50, thick:0.8, hood:true },
+    { name:'Burmese Python', color:'#6B4E2E', pattern:'blotches', patColor:'#3D2B1A', size:0.95, speed:0.3, spines:50, thick:1.1 },
+    { name:'Diamondback Rattlesnake', color:'#A0825A', pattern:'diamonds', patColor:'#5C4033', size:0.7, speed:0.4, spines:38, thick:0.85 },
+    { name:'Green Tree Python', color:'#2E8B2E', pattern:'spots', patColor:'#90EE90', size:0.6, speed:0.35, spines:35, thick:0.6 },
+    { name:'Black Mamba', color:'#2C2C2C', pattern:'none', patColor:'', size:0.8, speed:0.7, spines:55, thick:0.7 },
+    { name:'Corn Snake', color:'#D2691E', pattern:'saddles', patColor:'#8B0000', size:0.6, speed:0.4, spines:35, thick:0.65 },
+    { name:'Ball Python', color:'#3D2B1A', pattern:'blotches', patColor:'#C8A84E', size:0.55, speed:0.25, spines:28, thick:0.8 },
+    { name:'Gaboon Viper', color:'#8B5E8B', pattern:'triangles', patColor:'#4A2B4A', size:0.5, speed:0.2, spines:25, thick:1.0 },
+    { name:'Copperhead', color:'#C68E5B', pattern:'bands', patColor:'#5C3317', size:0.55, speed:0.35, spines:30, thick:0.7 },
+    { name:'Garter Snake', color:'#2C4A2C', pattern:'stripes', patColor:'#FFD700', size:0.4, speed:0.5, spines:28, thick:0.4 },
+    { name:'Boa Constrictor', color:'#A08050', pattern:'saddles', patColor:'#4A3520', size:0.85, speed:0.3, spines:45, thick:1.0 },
+    { name:'Green Anaconda', color:'#3A5A1A', pattern:'spots', patColor:'#1A2A0A', size:0.95, speed:0.2, spines:45, thick:1.3 },
+    { name:'Cottonmouth', color:'#3C2A1A', pattern:'none', patColor:'', size:0.6, speed:0.35, spines:32, thick:0.85 },
+    { name:'Milk Snake', color:'#CC3333', pattern:'bands', patColor:'#000000', size:0.4, speed:0.4, spines:28, thick:0.45 },
+    { name:'Hognose Snake', color:'#A08050', pattern:'blotches', patColor:'#2C1A0A', size:0.35, speed:0.35, spines:22, thick:0.5, hog:true },
+    { name:'Vine Snake', color:'#32CD32', pattern:'none', patColor:'', size:0.5, speed:0.45, spines:45, thick:0.3 },
+    { name:'Sea Snake', color:'#4A6B8C', pattern:'bands', patColor:'#2A3B5C', size:0.5, speed:0.35, spines:30, thick:0.55 },
+    { name:'Carpet Python', color:'#8B7355', pattern:'diamonds', patColor:'#2B1A0A', size:0.65, speed:0.35, spines:35, thick:0.7 },
+    { name:'Sidewinder', color:'#C4A882', pattern:'spots', patColor:'#6B5040', size:0.35, speed:0.5, spines:22, thick:0.5 },
+    { name:'Tiger Snake', color:'#4A3520', pattern:'bands', patColor:'#FFD700', size:0.5, speed:0.45, spines:30, thick:0.6 },
+    { name:'Bush Viper', color:'#2E8B57', pattern:'spots', patColor:'#1E5B37', size:0.35, speed:0.3, spines:22, thick:0.5 },
+    { name:'Rainbow Boa', color:'#C87A3A', pattern:'saddles', patColor:'#5A2A0A', size:0.55, speed:0.35, spines:32, thick:0.65 },
+    { name:'Sand Boa', color:'#D4A85A', pattern:'spots', patColor:'#8B6B2E', size:0.35, speed:0.25, spines:20, thick:0.7 },
+    { name:'Woma Python', color:'#C4A060', pattern:'bands', patColor:'#5C4020', size:0.55, speed:0.35, spines:32, thick:0.65 },
+    { name:'Eastern Indigo', color:'#1A2B4A', pattern:'none', patColor:'', size:0.7, speed:0.5, spines:45, thick:0.65 },
+    { name:'Rough Green Snake', color:'#5CAD5C', pattern:'none', patColor:'', size:0.3, speed:0.6, spines:25, thick:0.3 },
   ];
 
   // ---- SnakeField ----
@@ -454,53 +527,68 @@
   };
 
   /**
-   * Create 7 snakes: one large main serpent + 6 smaller companions.
+   * Create 27 snakes from the species definitions.
    */
   SnakeField.prototype._populateSnakes = function () {
     const w = this.canvas.width;
     const h = this.canvas.height;
     const safe = getSafeZone();
     const isMobile = w < 768;
+    const scale = isMobile ? 0.55 : 1;
     this.snakes = [];
 
-    // Main snake — large, full length
-    const main = new ProceduralSnake(rng, w, h, safe);
-    main.color = SNAKE_COLORS[0];
-    if (isMobile) {
-      main.baseRadius *= 0.7;
-      main.headRadius *= 0.7;
-      main.spineCount = 140;
-      main.waveAmp *= 0.7;
-    }
-    this.snakes.push(main);
+    for (let i = 0; i < SPECIES.length; i++) {
+      const sp = SPECIES[i];
+      const snake = new ProceduralSnake(rng, w, h, safe);
 
-    // 6 companion snakes — smaller, different colors, random spawn locations
-    for (let i = 1; i <= 6; i++) {
-      const comp = new ProceduralSnake(rng, w, h, safe);
-      comp.color = SNAKE_COLORS[i % SNAKE_COLORS.length];
-      // Smaller body
-      comp.baseRadius *= 0.5 + rng() * 0.15; // 50-65% of main width
-      comp.headRadius *= 0.5 + rng() * 0.15;
-      comp.spineCount = Math.floor((60 + rng() * 60) * (isMobile ? 0.6 : 1)); // 60-120
-      comp.spacing = 6 + rng() * 2; // 6-8px
-      comp.waveAmp *= 0.6 + rng() * 0.3;
-      comp.speed = rng() * 0.3 + 0.3; // 0.3-0.6
-      comp.opacity = 0.6 + rng() * 0.25; // slightly fainter
-      // Randomize initial position further
-      comp.x = rng() * w;
-      comp.y = rng() * h;
-      comp.angle = rng() * Math.PI * 2;
-      // Reset path to new position
-      comp.path = [];
-      for (let j = 0; j < comp.maxPath; j++) {
-        comp.path.push({
-          x: comp.x - Math.cos(comp.angle) * 3 * (j + 1),
-          y: comp.y - Math.sin(comp.angle) * 3 * (j + 1),
-          angle: comp.angle,
+      // Species configuration
+      snake.species = sp.name;
+      snake.color = sp.color;
+      snake.patternType = sp.pattern;
+      snake.patternColor = sp.patColor;
+      snake.baseRadius = (rng() * 3 + 7) * sp.thick * scale;  // 7-10px base × thickness multiplier
+      snake.headRadius = snake.baseRadius * (0.65 + rng() * 0.15);
+      snake.spineCount = Math.floor(sp.spines * (0.8 + rng() * 0.4) * scale);
+      snake.spacing = 5 + rng() * 3; // 5-8px
+      snake.speed = sp.speed * (0.85 + rng() * 0.3);
+      snake.opacity = 0.6 + rng() * 0.3;
+      snake.hasTongue = rng() > 0.3;
+      snake.outlineColor = this._darken(sp.color, 0.4);
+
+      // Scale down maxPath proportional to spineCount
+      snake.maxPath = Math.min(4000, Math.ceil(snake.spineCount * 6));
+      snake.waveAmp = (rng() * 8 + 8) * scale;
+
+      // Random wander personality per species
+      snake.wanderInterval = rng() * 400 + 200;
+      snake.turnSpeed = rng() * 0.004 + 0.002;
+
+      // Random spawn position
+      snake.x = rng() * w;
+      snake.y = rng() * h;
+      snake.angle = rng() * Math.PI * 2;
+      snake.wanderAngle = snake.angle;
+
+      // Rebuild path at new position
+      snake.path = [];
+      for (let j = 0; j < snake.maxPath; j++) {
+        snake.path.push({
+          x: snake.x - Math.cos(snake.angle) * 3 * (j + 1),
+          y: snake.y - Math.sin(snake.angle) * 3 * (j + 1),
+          angle: snake.angle,
         });
       }
-      this.snakes.push(comp);
+
+      this.snakes.push(snake);
     }
+  };
+
+  // Simple color darkening helper
+  SnakeField.prototype._darken = function (hex, factor) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return 'rgb(' + Math.floor(r * factor) + ',' + Math.floor(g * factor) + ',' + Math.floor(b * factor) + ')';
   };
 
   SnakeField.prototype._resize = function () {
