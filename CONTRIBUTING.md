@@ -1,0 +1,29 @@
+# Contributing
+
+Thank you for considering a contribution.
+
+## Scope
+
+This repository is currently a preserved legacy prototype. Contributions should focus on documentation, preservation quality, compatibility fixes, and clearly scoped modernization work.
+
+Do not rewrite gameplay, change mechanics, or add new features unless the change is explicitly part of an approved modernization task.
+
+## Process
+
+1. Fork the repository.
+2. Create a feature branch such as `docs/readme-alignment` or `fix/asset-loading`.
+3. Make focused changes.
+4. Run the relevant verification steps.
+5. Submit a pull request with a short summary and manual test notes.
+
+## Standards
+
+- Preserve the original prototype unless a change is explicitly requested.
+- Keep documentation restrained and accurate.
+- Avoid telemetry, engagement-pressure mechanics, or unnecessary network services.
+- Document any change that affects runtime behavior, dependencies, or data handling.
+- Follow the [ecosystem standards](https://github.com/sparshsam/ecosystem-standards).
+
+## Code of Conduct
+
+This project follows the [Code of Conduct](CODE_OF_CONDUCT.md).
