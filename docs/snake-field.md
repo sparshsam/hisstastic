@@ -1,8 +1,8 @@
-# Single Ambient Snake Prototype
+# Single Serpentine Ambient Snake
 
 ## Overview
 
-A single large decorative snake that roams the background with natural slithering motion. This is a foundation prototype — one high-quality snake before any multi-snake work.
+A single large decorative snake with full-body serpentine wave motion. The snake uses path-following for base position plus a sine wave lateral offset along the entire body length, producing natural S-curve slithering.
 
 ## Implementation
 
@@ -10,56 +10,49 @@ A single large decorative snake that roams the background with natural slitherin
 
 ### Motion Model
 
-Path-following (not segment-chasing):
+Two-phase body construction:
 
-1. The **head** moves forward with smooth organic steering (wander angle + edge avoidance + exclusion zone repulsion).
-2. Each frame, the head position is recorded at the front of a **path history array** (max 75 entries).
-3. The **body** is built by walking along the path at increasing distances:
-   - Segment 0 = head (at path[0])
-   - Segment N = position along path approximately `N × 6px` behind the head
-   - Path positions are linearly interpolated for smooth sampling
-4. The body is drawn as a **continuous thick curve** with tapered tail.
+1. **Path sampling:** Head position (with angle) is recorded each frame into a 140-entry path history. Body points are sampled from this path at increasing distances behind the head (5px spacing, 60 segments = 300px body).
 
-This produces natural slithering where the body follows the exact path the head traveled, with smooth curves and no bunching.
+2. **Serpentine wave:** Each body point receives a lateral sine-wave offset computed from:
+   - The **normal** (perpendicular to body direction) at that point
+   - A sine wave that travels along the body over time: `sin(time × waveSpeed - bodyIndex × frequency)`
+   - An **amplitude envelope** that peaks at mid-body and falls to zero at head and tail: `sin(π × t)`
+   
+   This creates visible S-curves that travel from head to tail, even when the head moves in a straight line.
 
 ### Properties
 
-| Property | Value |
-|----------|-------|
-| Head radius | 9–12px |
-| Body thickness | 6–9px (tapered to tail) |
-| Segment count | 55 (35 on mobile) |
-| Body length | ~330px |
-| Speed | 0.35–0.65 px/tick |
-| Color | Green (#2E7D32) |
-| Opacity | 0.85 |
-
-### Movement Behavior
-
-- Smooth random wander steering (wander target changes every 150–350 frames)
-- Exclusion zone avoidance (steers away from game panel, controls, commentary)
-- Edge avoidance (gentle push at 40px from viewport boundaries)
-- Screen wrap teleport if fully offscreen
+| Property | Desktop | Mobile |
+|----------|---------|--------|
+| Head radius | 10–14px | 7.5–10.5px |
+| Body thickness | 12–18px | 9–13.5px |
+| Segment count | 60 | 40 |
+| Body length | ~300px | ~200px |
+| Path history | 140 entries | 140 entries |
+| Tail min thickness | 15% of body (~2–3px) | 15% |
+| Wave amplitude | 8–18px | 5.6–12.6px |
+| Wave speed | 0.015–0.04 | 0.015–0.04 |
+| Wave frequency | 0.04–0.1 | 0.04–0.1 |
 
 ### Rendering
 
-- Body: thick smooth `CanvasRenderingContext2D` stroke with `lineCap: round`, `lineJoin: round`
-- Tapered from full body thickness at head to 8% at tail
-- Head: filled circle with highlight, two eyes facing movement direction, optional tongue flick
+Three-stroke layered rendering for depth:
+
+1. **Shadow stroke** — 3px wider than body, rgba(0,0,0,0.10), drawn first
+2. **Main body stroke** — full color (#2E7D32) at computed thickness
+3. **Highlight stroke** — 30% of body width, offset perpendicularly, rgba(255,255,255,0.12)
+
+Head features: filled circle with highlight, two eyes, optional tongue flick.
 
 ### Debug Mode
 
-Set `window.HISS_DEBUG_SNAKE = true` before page load to enable:
-- Red head marker labeled "HEAD"
-- Red dot markers every 5th body segment with index labels
+`window.HISS_DEBUG_SNAKE = true` — shows red head marker and every 5th body segment index.
 
 ### Reduced Motion
 
-When `prefers-reduced-motion: reduce` is active:
-- Snake renders as a static shape (no position updates)
+When `prefers-reduced-motion: reduce` is active — static rendering, no animation.
 
 ### Privacy
 
-- No image assets loaded from the network
-- No data transmitted
-- Purely decorative and local-only
+No image assets, no network, no data transmission. Purely decorative and local-only.

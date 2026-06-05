@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.6] - 2026-06-05
+
+### Changed
+
+- **Full-body serpentine wave added to single snake.** Replaced straight path-sampling with sine-wave lateral offset that travels the entire body length. Amplitude peaks at mid-body (sinusoidal envelope), zero at head and tail for natural S-curve slithering.
+- **Snake size increased:** head radius 10–14px (was 9–12), body thickness 12–18px (was 6–9). Tail minimum thickness raised from 8% to 15% — visible ~2–3px at tip (was <1px invisible needle).
+- **Three-stroke rendering:** shadow stroke (wider, faint), main body stroke, and highlight stroke (thin, offset) for depth and visual weight.
+- **Path history increased** to 140 entries (was 75) with angle tracking. Each path point stores `{x, y, angle}` for accurate normal computation during wave offset.
+- **Body wave parameters randomized:** wave speed 0.015–0.04, frequency 0.04–0.1, amplitude 8–18px.
+
+### Fixed
+
+- No longer looks like a straight needle with a head. Full body now has visible S-curves that travel from head to tail.
+- Body is thick for most of its length — no 1px invisible tail.
+- Wave travels continuously through the body even when the head moves in a straight line.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Commentary and game-over roasts unchanged.
+- Reduced-motion support preserved (static rendering).
+- Tab-visibility pause preserved.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+
 ## [0.4.5] - 2026-06-05
 
 ### Changed
