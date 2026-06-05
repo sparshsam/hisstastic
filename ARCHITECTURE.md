@@ -2,9 +2,10 @@
 
 ## Status
 
-Hiss-Tastic is a maintained modular Python/Pygame arcade game. The original
-single-file prototype has been split into a clean package structure while
-preserving all gameplay behavior.
+Hiss-Tastic is a maintained modular Python/Pygame arcade game with an
+experimental browser/PWA runtime. The original single-file prototype has been
+preserved, the Python runtime remains canonical, and the browser runtime is a
+playable sibling implementation under `web/`.
 
 ## Module Structure
 
@@ -133,10 +134,32 @@ verification, or game-over behavior. They are display data only.
 - The game has no network access, no user accounts, and no file uploads.
 - Replay files are local JSON only and validated before playback or ghost use.
 - Ghost replay racing adds no networking, telemetry, wallet logic, or multiplayer.
+- Browser/PWA service worker behavior is limited to offline asset caching.
+- Browser replay import/export uses local JSON files only.
 - The only external dependency is `pygame`, installed via pip.
+
+## Browser Runtime
+
+```mermaid
+graph TD
+    index["web/index.html"] --> app["js/app.js"]
+    app --> webgame["js/game.js (browser game engine)"]
+    app --> renderer["js/renderer.js (Canvas rendering)"]
+    app --> inputjs["js/input.js (keyboard, touch, dpad)"]
+    app --> audiojs["js/audio.js (Web Audio API)"]
+    app --> replayjs["js/replay.js (local import/export)"]
+    index --> manifest["manifest.webmanifest"]
+    index --> sw["sw.js (offline cache)"]
+```
+
+The browser runtime is experimental but playable. It uses JavaScript and
+Canvas, has mobile-friendly controls, and can be served from `web/` with a
+static HTTP server. It does not add a backend, telemetry, accounts, wallet
+logic, onchain logic, or multiplayer.
 
 ## Modernization History
 
 See [docs/modernization-roadmap.md](docs/modernization-roadmap.md) for the
 full modernization plan. Phases 1-5 (Stabilize, Modularize, Replay,
-Polish, Packaging) are complete.
+Polish, Packaging) are complete. Browser/PWA foundations have been integrated
+as experimental local-first runtime work.

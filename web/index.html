@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="description" content="Hiss-Tastic — a retro Snake-inspired arcade game">
+  <title>Hiss-Tastic</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Directional overlay for mobile -->
+    <div id="dpad" class="dpad">
+      <button id="btn-up" class="dpad-btn dpad-up" aria-label="Up">&#9650;</button>
+      <button id="btn-left" class="dpad-btn dpad-left" aria-label="Left">&#9664;</button>
+      <button id="btn-right" class="dpad-btn dpad-right" aria-label="Right">&#9654;</button>
+      <button id="btn-down" class="dpad-btn dpad-down" aria-label="Down">&#9660;</button>
+    </div>
+
+    <!-- Replay info overlay -->
+    <div id="replay-overlay" class="replay-overlay" style="display:none;"></div>
+
+    <!-- Bottom controls -->
+    <div id="controls" class="controls">
+      <input type="file" id="replay-upload" accept=".json" style="display:none;">
+      <button id="btn-import" class="ctrl-btn" onclick="document.getElementById('replay-upload').click()" title="Import Replay">&#128194; Import</button>
+      <button id="btn-export-replay" class="ctrl-btn" title="Export Replay">&#128190; Export</button>
+      <button id="btn-mute" class="ctrl-btn" onclick="if(window.game)window.game.muted=!window.game.muted;" title="Toggle Mute">&#128264; Mute</button>
+    </div>
+  </div>
+
+  <script src="js/game.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/replay.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

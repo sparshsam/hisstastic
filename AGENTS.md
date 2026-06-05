@@ -20,6 +20,13 @@ Hiss-Tastic is a preserved legacy AI-assisted Python/Pygame game prototype. Trea
 - Ghost replay code is visualization-only. Ghosts must never affect scoring, collisions, spawn placement, difficulty, or replay verification.
 - Update `docs/replay-ux.md`, `docs/ghost-racing.md`, and `ARCHITECTURE.md` when replay behavior changes.
 
+## Browser Runtime Rules
+
+- Treat `web/` as an experimental sibling runtime, not a replacement for canonical Python.
+- Keep PWA behavior limited to offline static asset caching unless explicitly approved.
+- Do not add telemetry, accounts, external backends, wallet/onchain logic, or multiplayer networking without explicit architecture and privacy review.
+- Update `docs/browser-runtime.md`, `docs/pwa.md`, `ARCHITECTURE.md`, and `docs/privacy-model.md` when browser behavior changes.
+
 ## Git Safety
 
 - Never force-push `main`.

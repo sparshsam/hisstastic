@@ -1,0 +1,219 @@
+/* Hiss-Tastic Browser — Mobile-first responsive styles */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: monospace;
+  background: #FFFFFF;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 8px;
+  position: relative;
+}
+
+#game-canvas {
+  display: block;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background: #FFFFFF;
+  touch-action: none;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- Directional pad (mobile) ---- */
+.dpad {
+  display: grid;
+  grid-template-columns: 60px 60px 60px;
+  grid-template-rows: 60px 60px;
+  gap: 4px;
+  margin-top: 12px;
+  justify-content: center;
+  touch-action: manipulation;
+}
+
+.dpad-btn {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #333;
+  border-radius: 12px;
+  background: #f5f5f5;
+  font-size: 22px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+
+.dpad-btn:active {
+  background: #ddd;
+}
+
+.dpad-up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.dpad-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.dpad-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.dpad-down {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* ---- Bottom controls ---- */
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ctrl-btn {
+  padding: 8px 14px;
+  border: 1px solid #999;
+  border-radius: 8px;
+  background: #f5f5f5;
+  font-family: monospace;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+
+.ctrl-btn:active {
+  background: #ddd;
+}
+
+/* ---- Replay overlay ---- */
+.replay-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.95);
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 260px;
+  max-width: 90%;
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.replay-overlay h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #FF1493;
+  text-align: center;
+}
+
+.replay-overlay table {
+  width: 100%;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.replay-overlay td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.replay-overlay td:first-child {
+  font-weight: bold;
+  color: #666;
+  width: 40%;
+}
+
+.replay-overlay button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border: 1px solid #999;
+  border-radius: 8px;
+  background: #f5f5f5;
+  font-family: monospace;
+  font-size: 13px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.1s;
+}
+
+.replay-overlay button:active {
+  background: #ddd;
+}
+
+.replay-overlay button:first-of-type {
+  background: #FF1493;
+  color: #fff;
+  border-color: #FF1493;
+}
+
+/* ---- Mobile landscape adjustments ---- */
+@media (max-height: 500px) {
+  #game-container {
+    padding: 4px;
+  }
+  .dpad {
+    grid-template-columns: 44px 44px 44px;
+    grid-template-rows: 44px 44px;
+    gap: 3px;
+    margin-top: 6px;
+  }
+  .dpad-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+  .controls {
+    margin-top: 6px;
+  }
+  .ctrl-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+}
+
+/* ---- Hide dpad on large screens ---- */
+@media (min-width: 768px) and (min-height: 600px) {
+  .dpad {
+    display: none;
+  }
+}

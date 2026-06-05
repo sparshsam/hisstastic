@@ -9,6 +9,9 @@ Before every release:
 - [ ] Game runs locally (`python main.py`)
 - [ ] Validation passes (`python validation.py`)
 - [ ] Replay validation tests pass (`python -m unittest tests.test_replay_validation`)
+- [ ] Browser/PWA static validation passes (`python validation.py`)
+- [ ] Browser files exist: `web/index.html`, `web/manifest.webmanifest`, `web/sw.js`, `web/js/app.js`, `web/js/game.js`, `web/js/replay.js`
+- [ ] Manifest JSON is valid and service worker cache paths are coherent
 - [ ] Assets are present in `assets/`
 - [ ] Replay files are NOT committed (`replays/` in .gitignore)
 - [ ] Build artifacts in `.gitignore` (`dist/`, `build/`, `*.spec`)

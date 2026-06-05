@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.3.0] - 2026-06-04
+
+### Added
+
+- **Browser runtime:** JavaScript/Canvas implementation under `web/`.
+- **Mobile controls:** touch/swipe gestures and directional-pad overlay.
+- **PWA installability:** `manifest.webmanifest`, service worker, offline cache behavior, and app icons.
+- **Browser replay import/export:** local JSON file picker, drag-and-drop, validation, and metadata display.
+- **Browser procedural audio:** Web Audio API sound effects.
+- Browser documentation: `docs/browser-runtime.md`, `docs/pwa.md`, `docs/mobile-controls.md`.
+
+### Preserved
+
+- Python runtime remains canonical and functional.
+- Existing Python replay and ghost replay foundations remain local-first.
+- No networking, telemetry, accounts, external backend, wallet/onchain logic, or multiplayer added.
+
 ## [0.2.1] - 2026-06-04
 
 ### Added
@@ -30,42 +47,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Added
 
 - **Phase 1 - Stabilize:** Runtime pip auto-install removed; game fails gracefully with clear message if pygame is missing.
-- **Phase 1 - Stabilize:** Recursive `gameLoop()` replaced with explicit state-machine (outer reset loop, no stack growth).
-- **Phase 1 - Stabilize:** Centralized `CONFIG` dict for all game constants (colors, window, grid, gameplay timing, fonts).
-- **Phase 1 - Stabilize:** Safer asset loading via `load_asset()` helper with fallback magenta placeholder surfaces.
-- **Phase 1 - Stabilize:** Spawn safety helpers (`safe_food_position`, `safe_power_up_position`, `generate_obstacles`) prevent entity overlap.
-- **Phase 1 - Stabilize:** `validation.py` smoke-test script for syntax, imports, assets, and requirements checks.
-- **Phase 2 - Modularize:** Full package structure (`hiss_tastic/`) with 12 modules: config, entities, assets, scoring, spawns, rendering, input, replay, audio, game, states, __init__.
-- **Phase 2 - Modularize:** `main.py` entry point (`python main.py` to launch).
+- **Phase 1 - Stabilize:** Recursive `gameLoop()` replaced with explicit state-machine.
+- **Phase 1 - Stabilize:** Centralized `CONFIG` dict for game constants.
+- **Phase 1 - Stabilize:** Safer asset loading with fallback placeholder surfaces.
+- **Phase 1 - Stabilize:** Spawn safety helpers prevent entity overlap.
+- **Phase 1 - Stabilize:** `validation.py` smoke-test script.
+- **Phase 2 - Modularize:** Full package structure under `hiss_tastic/`.
+- **Phase 2 - Modularize:** `main.py` entry point.
 - **Phase 3 - Replay:** Deterministic replay infrastructure with seeded RNG.
-- **Phase 3 - Replay:** `ReplayRecorder` for tick-by-tick input recording.
-- **Phase 3 - Replay:** `ReplayPlayer` for replay loading and playback.
-- **Phase 3 - Replay:** `replay_cli.py` with `record`, `play`, `verify` commands.
-- **Phase 3 - Replay:** JSON replay format with versioning (`replay/v1`).
-- **Phase 4 - Polish:** Title screen with difficulty selection (1=Easy, 2=Normal, 3=Hard).
-- **Phase 4 - Polish:** Pause/resume (P or ESC key).
-- **Phase 4 - Polish:** Polished game-over screen with all legacy insult messages preserved.
-- **Phase 4 - Polish:** Procedural audio system (eat, power-up, game-over sounds) with mute toggle (M key).
-- **Phase 4 - Polish:** Configurable difficulty presets (easy/normal/hard).
-- **Phase 5 - Packaging:** GitHub Actions CI workflow (syntax checks, import validation).
-- **Phase 5 - Packaging:** `docs/packaging.md` with PyInstaller instructions.
-- **Phase 5 - Packaging:** `RELEASE_CHECKLIST.md` for release process.
-- **Phase 5 - Packaging:** `.gitattributes` and updated `.gitignore` (replays, build artifacts).
+- **Phase 3 - Replay:** Replay CLI with `record`, `play`, and `verify` commands.
+- **Phase 4 - Polish:** Title screen, pause/resume, procedural audio, mute toggle, and difficulty presets.
+- **Phase 5 - Packaging:** CI workflow, packaging docs, release checklist, and expanded ignore rules.
 
 ### Changed
 
 - Entry point moved from `hiss_tastic.py` to `main.py`.
-- Architecture fully modularized into `hiss_tastic/` package.
-- `.gitignore` expanded for replays, build artifacts, IDE files.
-- Documentation updated: README, ARCHITECTURE, CHANGELOG, docs/modernization-roadmap.
+- Architecture modularized into the `hiss_tastic/` package.
 
 ### Preserved
 
-- All original gameplay mechanics, movement, collisions, power-ups, obstacles.
-- All legacy GPT-era scoring insult messages (`get_mean_message`).
-- "by SPARSH" watermark.
-- Original `hiss_tastic.py` kept as legacy reference (no longer primary entry point).
-- Local-first privacy posture - no networking, no telemetry, no accounts.
+- Original gameplay mechanics, movement, collisions, power-ups, obstacles, scoring messages, and watermark.
+- Original `hiss_tastic.py` retained as legacy reference.
+- Local-first privacy posture.
 
 ## [0.1.1] - 2026-06-04
 
