@@ -1,3 +1,3 @@
 """Hiss-Tastic — a retro Snake-inspired arcade game."""
 
-__version__ = "0.4.8"
+__version__ = "0.4.9"
