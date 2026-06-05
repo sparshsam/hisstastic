@@ -133,13 +133,6 @@
         targetAngle += Math.atan2(Math.sin(diff), Math.cos(diff)) * (strength / (1 + strength));
       }
 
-      // Edge avoidance
-      const edge = 60;
-      if (this.x < edge) targetAngle += 0.35;
-      if (this.x > viewW - edge) targetAngle -= 0.35;
-      if (this.y < edge) targetAngle -= 0.35;
-      if (this.y > viewH - edge) targetAngle += 0.35;
-
       // Steer
       const diff = targetAngle - this.angle;
       const maxTurn = this.turnSpeed * dt;
@@ -148,14 +141,29 @@
       // Move
       this.x += Math.cos(this.angle) * this.speed * 0.06 * dt;
       this.y += Math.sin(this.angle) * this.speed * 0.06 * dt;
-      this.x = Math.max(5, Math.min(viewW - 5, this.x));
-      this.y = Math.max(5, Math.min(viewH - 5, this.y));
 
-      // Wrap
-      if (this.x < -120) this.x = viewW + 110;
-      if (this.x > viewW + 120) this.x = -110;
-      if (this.y < -120) this.y = viewH + 110;
-      if (this.y > viewH + 120) this.y = -110;
+      // DVD-logo-style bounce off edges — immediate angle reversal
+      const bounceMargin = this.baseRadius + 5; // margin >= body half-width
+      if (this.x < bounceMargin) {
+        this.angle = Math.PI - this.angle;
+        this.x = bounceMargin;
+      }
+      if (this.x > viewW - bounceMargin) {
+        this.angle = Math.PI - this.angle;
+        this.x = viewW - bounceMargin;
+      }
+      if (this.y < bounceMargin) {
+        this.angle = -this.angle;
+        this.y = bounceMargin;
+      }
+      if (this.y > viewH - bounceMargin) {
+        this.angle = -this.angle;
+        this.y = viewH - bounceMargin;
+      }
+
+      // Keep angle in 0-2PI range
+      if (this.angle < 0) this.angle += Math.PI * 2;
+      if (this.angle > Math.PI * 2) this.angle -= Math.PI * 2;
 
       // Record path
       this.path.unshift({ x: this.x, y: this.y, angle: this.angle });
