@@ -492,7 +492,10 @@
 
       snake.headRadius = snake.baseRadius * (0.85 + rng() * 0.25); // larger head — 85-110% of body
       snake.spacing = 5 + rng() * 3;
-      snake.maxPath = Math.min(6000, Math.ceil(snake.spineCount * 15));
+      // Path must cover the full body length at movement speed
+      // bodyLen = spineCount * spacing; per-frame travel = speed * 0.06 * 16ms
+      // maxPath = bodyLen / perFrame × safety factor of 2
+      snake.maxPath = Math.min(15000, Math.ceil(snake.spineCount * snake.spacing * 2 / Math.max(0.01, snake.speed * 0.06 * 16)));
       snake.waveAmp = (rng() * 16 + 14) * scale; // 14-30px
       snake.opacity = 0.55 + rng() * 0.35;
       snake.hasTongue = rng() > 0.4;
