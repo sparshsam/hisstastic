@@ -1,58 +1,65 @@
-# Single Serpentine Ambient Snake
+# Procedural Snake Silhouette
 
 ## Overview
 
-A single large decorative snake with full-body serpentine wave motion. The snake uses path-following for base position plus a sine wave lateral offset along the entire body length, producing natural S-curve slithering.
+A single large procedural snake rendered as a filled polygon silhouette. The body is built from a spine curve with natural width profile, producing a clean continuous snake shape with proper head, tapered tail, and traveling slither wave.
 
 ## Implementation
 
 **File:** `web/js/snakeField.js`
 
-### Motion Model
+### Spine Model
 
-Two-phase body construction:
+- 100 spine samples at 5px spacing = **500px body length**
+- Sampled from a 160-entry path history with angle interpolation
+- Full-body sine wave applied laterally with mid-body amplitude peak
+- Wave fades to zero in the final 15% to prevent tail twist
+- Last 3 spine points smoothed for clean tail
 
-1. **Path sampling:** Head position (with angle) is recorded each frame into a 140-entry path history. Body points are sampled from this path at increasing distances behind the head (5px spacing, 60 segments = 300px body).
+### Body Polygon Construction
 
-2. **Serpentine wave:** Each body point receives a lateral sine-wave offset computed from:
-   - The **normal** (perpendicular to body direction) at that point
-   - A sine wave that travels along the body over time: `sin(time × waveSpeed - bodyIndex × frequency)`
-   - An **amplitude envelope** that peaks at mid-body and falls to zero at head and tail: `sin(π × t)`
-   
-   This creates visible S-curves that travel from head to tail, even when the head moves in a straight line.
+1. Compute spine curve (path sampling + sine wave)
+2. At each spine point, compute normal from stored angle
+3. Compute radius from `bodyRadius(t)` profile function
+4. Build left-edge and right-edge point arrays
+5. Draw filled closed polygon + subtle outline
 
-### Properties
+### Body Width Profile
 
-| Property | Desktop | Mobile |
-|----------|---------|--------|
-| Head radius | 10–14px | 7.5–10.5px |
-| Body thickness | 12–18px | 9–13.5px |
-| Segment count | 60 | 40 |
-| Body length | ~300px | ~200px |
-| Path history | 140 entries | 140 entries |
-| Tail min thickness | 15% of body (~2–3px) | 15% |
-| Wave amplitude | 8–18px | 5.6–12.6px |
-| Wave speed | 0.015–0.04 | 0.015–0.04 |
-| Wave frequency | 0.04–0.1 | 0.04–0.1 |
+The `bodyRadius(t)` function defines distinct anatomical regions:
+
+| Region | t range | Description |
+|--------|---------|-------------|
+| Head | 0.00–0.05 | Wedge tip, transitions to neck |
+| Neck | ~0.05–0.10 | Slightly narrower than head |
+| Mid-body | 0.10–0.60 | Full width (widest part) |
+| Rear body | 0.60–0.80 | Gentle taper |
+| Tail | 0.80–1.00 | Sharp taper to tip |
+
+Base radius: 14–18px reference. Head radius: 10–12px.
+
+### Head Design
+
+- Triangular/wedge tip extending forward from spine
+- Wider than neck, not a giant circle
+- Eyes placed on head with correct heading
+- Optional forked tongue flick
 
 ### Rendering
 
-Three-stroke layered rendering for depth:
-
-1. **Shadow stroke** — 3px wider than body, rgba(0,0,0,0.10), drawn first
-2. **Main body stroke** — full color (#2E7D32) at computed thickness
-3. **Highlight stroke** — 30% of body width, offset perpendicularly, rgba(255,255,255,0.12)
-
-Head features: filled circle with highlight, two eyes, optional tongue flick.
+- Filled body polygon (main color #2E7D32)
+- Subtle dark outline (#1B5E20, 1.5px)
+- Top highlight ridge along left edge
+- No stroked lines, no disconnected segments — real silhouette
 
 ### Debug Mode
 
-`window.HISS_DEBUG_SNAKE = true` — shows red head marker and every 5th body segment index.
+`window.HISS_DEBUG_SNAKE = true` — spine points, left/right edge polygon overlay.
 
 ### Reduced Motion
 
-When `prefers-reduced-motion: reduce` is active — static rendering, no animation.
+Static rendering when `prefers-reduced-motion: reduce` is active.
 
 ### Privacy
 
-No image assets, no network, no data transmission. Purely decorative and local-only.
+No network, no assets, no data transmission. Local-only decorative.

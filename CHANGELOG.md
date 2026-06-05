@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.7] - 2026-06-05
+
+### Changed
+
+- **Replaced stroked-line snake with procedural filled-polygon silhouette.** Complete rewrite of `ProceduralSnake` class. The snake body is now built as a closed polygon from left/right edge points along a 100-point spine, creating a clean continuous filled shape.
+- **Natural body width profile:** head 10–12px (wedge-shaped), neck 9–12px, mid-body 14–18px (widest), rear body gentle taper, tail sharp taper to 1.5–3px. Uses a `bodyRadius(t)` profile function with distinct anatomical regions.
+- **Proper head design:** triangular/wedge tip extending forward from the spine, not a circular pickle blob. Eyes placed on the head with correct orientation. Seamlessly attached to the body polygon.
+- **Tail twist eliminated:** wave amplitude fades to zero in the final 15% of the body. Last 3 spine points smoothed by averaging with neighbors. Tail follows the spine tangent cleanly.
+- **Longer body:** 100 spine samples × 5px = 500px body length (was 300px). Path history increased to 160 entries.
+- **Clean rendering:** filled polygon fill + subtle dark outline stroke + top highlight ridge. No more three-stroke line rendering — real snake silhouette.
+- **Mobile scaling:** 0.7× size, 70 spine samples, 0.65× wave amplitude.
+
+### Fixed
+
+- No longer looks like a pickle head with a thin twisted tail.
+- Body is a continuous elegant silhouette with proper proportions.
+- Head is proportionate (not a giant circle).
+- Tail tapers cleanly without kinks or twists.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Commentary and game-over roasts unchanged.
+- Reduced-motion support preserved (static rendering).
+- Tab-visibility pause preserved.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+
 ## [0.4.6] - 2026-06-05
 
 ### Changed
