@@ -74,27 +74,27 @@
       this.y = rng() * viewH * 0.25 + viewH * 0.08;
       this.angle = rng() * 0.4 + 0.15;
 
-      // Speed
-      this.speed = rng() * 0.15 + 0.25; // 0.25–0.4
+      // Speed — calm gliding for a giant serpent
+      this.speed = rng() * 0.2 + 0.4; // 0.4–0.6 (was 0.25–0.4)
 
-      // Wander
+      // Wander — slow, sweeping direction changes
       this.wanderAngle = this.angle;
       this.wanderTimer = 0;
-      this.wanderInterval = rng() * 300 + 250;
-      this.turnSpeed = rng() * 0.004 + 0.002;
+      this.wanderInterval = rng() * 500 + 400;
+      this.turnSpeed = rng() * 0.002 + 0.001; // very gentle turns
 
-      // Spine / wave
-      this.waveSpeed = rng() * 0.02 + 0.012;
-      this.waveFreq = rng() * 0.04 + 0.03;
-      this.waveAmp = rng() * 8 + 10; // 10–18 px
+      // Spine / wave — long flowing waves
+      this.waveSpeed = rng() * 0.012 + 0.006;
+      this.waveFreq = rng() * 0.02 + 0.01;  // very low = long elegant waves
+      this.waveAmp = rng() * 15 + 20;         // 20–35 px (was 10–18)
       this.wavePhase = rng() * Math.PI * 2;
 
-      // Size constants
-      this.baseRadius = rng() * 4 + 14; // 14–18 px (reference width)
-      this.headRadius = rng() * 2 + 10; // 10–12 px
-      this.spineCount = 100;            // spine samples
-      this.spacing = 5;                 // px between spine points
-      this.maxPath = 160;               // path history length
+      // Size constants — dramatically longer
+      this.baseRadius = rng() * 4 + 14;       // 14–18 px
+      this.headRadius = rng() * 2 + 10;       // 10–12 px
+      this.spineCount = 240;                  // 240 × 8px = 1920px body (was 500px)
+      this.spacing = 8;                       // px between spine points
+      this.maxPath = 4000;                    // path history — supports the full body length
 
       // Path with angle tracking
       this.path = [];
@@ -451,8 +451,8 @@
     if (w < 768) {
       this.snake.baseRadius *= 0.7;
       this.snake.headRadius *= 0.7;
-      this.snake.spineCount = 70;
-      this.snake.waveAmp *= 0.65;
+      this.snake.spineCount = 140;  // 140 × 8 = 1120px (still long)
+      this.snake.waveAmp *= 0.7;
     }
   };
 
