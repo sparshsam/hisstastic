@@ -1,0 +1,14 @@
+# Auto detect text files
+* text=auto
+
+# Python
+*.py text diff=python
+
+# Assets
+*.png binary
+
+# Replays
+*.json text
+
+# Documentation
+*.md text
