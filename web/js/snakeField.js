@@ -1,20 +1,17 @@
 /**
- * Hiss-Tastic Snake Field — animated decorative background snakes.
+ * Hiss-Tastic Snake Border — decorative animated snake frame around the game panel.
  *
- * Each snake is a proper body-following-head creature with:
- *   - head position + heading angle + velocity
- *   - sinusoidal lateral undulation for natural slithering
- *   - trail-based body that follows the head path
- *   - tapered body, rounded head, tiny eyes
+ * Each snake is a compact curled/slithering creature confined to a small
+ * bounding area near the viewport perimeter. No straight-line body trails,
+ * no full-screen traversal, no noise artifacts.
  *
- * Rendered on a fixed background Canvas 2D layer behind the game panel.
- * No external dependencies, no image assets.
+ * Canvas 2D, no external deps, no image assets.
  */
 
 (function () {
   'use strict';
 
-  // ---- Seeded PRNG (mulberry32) ----
+  // ---- Seeded PRNG ----
   function createRNG(seed) {
     let s = seed | 0;
     return function () {
@@ -28,237 +25,250 @@
   const SEED = 42;
   const rng = createRNG(SEED);
 
-  // ---- Rich colour palette (snake-like greens, browns, earthy tones) ----
+  // ---- Snake-like palette ----
   const COLORS = [
-    // Greens (most snake-like)
-    '#2E7D32', '#388E3C', '#4CAF50', '#43A047', '#1B5E20',
-    '#66BB6A', '#81C784', '#2E7D32', '#558B2F', '#33691E',
-    '#689F38', '#7CB342', '#8BC34A', '#9CCC65',
-    // Olive / brown-greens
-    '#827717', '#9E9D24', '#AFB42B', '#C0CA33',
-    '#6D4C41', '#5D4037', '#4E342E', '#3E2723',
-    // Copper / tan (corn snake-like)
-    '#BF360C', '#D84315', '#E64A19', '#F57C00',
-    '#FF8F00', '#FF6F00', '#E65100',
-    // Teal / blue-green (tree snake-like)
+    '#2E7D32', '#388E3C', '#4CAF50', '#43A047', '#1B5E20', '#558B2F',
+    '#827717', '#9E9D24', '#AFB42B', '#C0CA33', '#689F38',
+    '#BF360C', '#D84315', '#E64A19', '#F57C00', '#E65100', '#FF8F00',
     '#00695C', '#00796B', '#00897B', '#26A69A',
-    '#4DB6AC', '#80CBC4', '#B2DFDB',
+    '#4E342E', '#5D4037', '#3E2723', '#33691E',
+    '#827D6E', '#A4A07C', '#B8B294',
   ];
 
-  // ---- Exclusion zone (center panel area) ----
-  function getExclusionZone() {
-    // The game container is centered, max-width ~600px.
-    // We reserve a generous clear zone around it.
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+  /**
+   * BorderSnake — a compact decorative snake near a viewport edge.
+   * Body is an S-curve within a small bounding circle so it never strays
+   * far from its anchor point.
+   */
+  class BorderSnake {
+    constructor(rng, viewW, viewH, safe) {
+      this.zone = this._pickZone(rng);
 
-    // Center region — roughly where the game panel + controls sit
-    const cx = w / 2;
-    const cy = h / 2;
-    const zoneW = Math.min(660, w * 0.7);
-    const zoneH = Math.min(520, h * 0.65);
-
-    return {
-      x: cx - zoneW / 2,
-      y: cy - zoneH / 2,
-      w: zoneW,
-      h: zoneH,
-    };
-  }
-
-  function isInExclusion(x, y, zone) {
-    return x >= zone.x && x <= zone.x + zone.w &&
-           y >= zone.y && y <= zone.y + zone.h;
-  }
-
-  // ---- FieldSnake class ----
-  class FieldSnake {
-    constructor(rng, bounds) {
-      const w = bounds.w;
-      const h = bounds.h;
-
-      // Position in pixel coords — spawn in the visible area but outside exclusion
-      this.x = rng() * w;
-      this.y = rng() * h;
-
-      // Heading angle (radians)
-      this.angle = rng() * Math.PI * 2;
-
-      // Speed (px per frame)
-      this.speed = rng() * 1.8 + 0.6;
-
-      // Body length in segments
-      this.length = Math.floor(rng() * 20) + 8; // 8–28
-
-      // Body thickness (px)
-      this.baseThickness = rng() * 3.5 + 2.0; // 2.0–5.5
-
-      // Sinusoidal undulation parameters
-      this.phase = rng() * Math.PI * 2;
-      this.waveSpeed = rng() * 0.04 + 0.015; // how fast undulation oscillates
-      this.turnStrength = rng() * 1.2 + 0.6; // how sharp the turns are
-
-      // Turn bias — gentle persistent drift so snakes curve naturally
-      this.turnBias = (rng() - 0.5) * 0.3;
-
-      // Color
+      // Physical
+      this.bodyLength = rng() * 50 + 40;    // 40–90 px (compact!)
+      this.thickness = rng() * 4 + 4;       // 4–8 px
       this.color = COLORS[Math.floor(rng() * COLORS.length)];
+      this.opacity = rng() * 0.2 + 0.65;    // 0.65–0.85
 
-      // Opacity — higher than before for visibility
-      this.opacity = rng() * 0.35 + 0.35; // 0.35–0.70
+      // Curl parameters — body naturally loops into an S/coil
+      this.curlRadius = rng() * 18 + 14;     // 14–32 px curl radius
+      this.curlTurns = rng() * 0.8 + 0.6;    // 0.6–1.4 turns
+      this.curlStretch = rng() * 0.3 + 0.6;  // 0.6–0.9 (vertical squash)
+      this.phase = rng() * Math.PI * 2;
+      this.speed = rng() * 0.012 + 0.006;
 
-      // Scale variation for size diversity
-      this.scale = rng() * 0.5 + 0.7; // 0.7–1.2
+      // Head
+      this.headSize = this.thickness * 0.85;
 
-      // Trail — history of head positions for body following
-      this.trail = [];
+      // Details
+      this.banded = rng() > 0.6;
+      this.bandColor = this._bandColor(rng);
+      this.tongueFlick = rng() > 0.4;
+      this.tonguePhase = rng() * Math.PI * 2;
 
-      // Steering-away from exclusion zone
-      this.steerAway = 0;
+      // Anchor in a safe border zone
+      this.anchorX = 0;
+      this.anchorY = 0;
+      this._placeInZone(viewW, viewH, safe, rng);
+    }
 
-      // Ensure initial spawn is outside exclusion (with retries)
-      const exclusion = getExclusionZone();
-      let attempts = 0;
-      while (isInExclusion(this.x, this.y, exclusion) && attempts < 50) {
-        this.x = rng() * w;
-        this.y = rng() * h;
-        attempts++;
-      }
+    _pickZone(rng) {
+      const zones = ['top', 'bottom', 'left', 'right', 'topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
+      return zones[Math.floor(rng() * zones.length)];
+    }
 
-      // Pre-fill trail with initial position
-      for (let i = 0; i < this.length; i++) {
-        this.trail.push({ x: this.x, y: this.y });
-      }
+    _bandColor(rng) {
+      const d = ['#1A1A1A', '#222', '#2C2C2C', '#111'];
+      const y = ['#FFD600', '#FFEA00', '#FDD835'];
+      const c = ['#E0E0E0', '#BDBDBD', '#D7CCC8'];
+      const p = rng() > 0.5 ? d : (rng() > 0.5 ? y : c);
+      return p[Math.floor(rng() * p.length)];
     }
 
     /**
-     * Update snake position and trail.
+     * Place the snake in a border zone, away from the central game area.
      */
-    update(dt, bounds) {
-      // Sinusoidal lateral undulation — the key to natural slithering
-      this.phase += this.waveSpeed * dt;
+    _placeInZone(viewW, viewH, safe, rng) {
+      const margin = 15;
+      const zoneW = Math.max(10, safe.x - margin);
+      const zoneH = Math.max(10, safe.y - margin);
 
-      // Compute undulation offset
-      const wave = Math.sin(this.phase) * this.turnStrength;
-
-      // Add gentle persistent turn bias for natural curvature
-      const bias = this.turnBias * 0.15;
-
-      // Steer away from exclusion zone center
-      const exclusion = getExclusionZone();
-      const exCenterX = exclusion.x + exclusion.w / 2;
-      const exCenterY = exclusion.y + exclusion.h / 2;
-      const distToCenter = Math.hypot(this.x - exCenterX, this.y - exCenterY);
-      const steerRadius = Math.max(exclusion.w, exclusion.h) * 0.8;
-
-      let steerX = 0;
-      let steerY = 0;
-      if (distToCenter < steerRadius) {
-        // Gentle push away from center
-        const strength = (1 - distToCenter / steerRadius) * 0.4;
-        steerX = ((this.x - exCenterX) / distToCenter) * strength;
-        steerY = ((this.y - exCenterY) / distToCenter) * strength;
+      switch (this.zone) {
+        case 'top':
+          this.anchorX = safe.x + margin + rng() * Math.max(10, safe.w - margin * 2);
+          this.anchorY = margin + rng() * zoneH * 0.6;
+          break;
+        case 'bottom':
+          this.anchorX = safe.x + margin + rng() * Math.max(10, safe.w - margin * 2);
+          this.anchorY = safe.y + safe.h + margin + rng() * Math.max(10, viewH - safe.y - safe.h - margin * 2);
+          break;
+        case 'left':
+          this.anchorX = margin + rng() * zoneW * 0.6;
+          this.anchorY = safe.y + margin + rng() * Math.max(10, safe.h - margin * 2);
+          break;
+        case 'right':
+          this.anchorX = safe.x + safe.w + margin + rng() * Math.max(10, viewW - safe.x - safe.w - margin * 2);
+          this.anchorY = safe.y + margin + rng() * Math.max(10, safe.h - margin * 2);
+          break;
+        case 'topLeft':
+          this.anchorX = margin + rng() * zoneW * 0.7;
+          this.anchorY = margin + rng() * zoneH * 0.7;
+          break;
+        case 'topRight':
+          this.anchorX = safe.x + safe.w + margin + rng() * Math.max(10, viewW - safe.x - safe.w - margin * 2) * 0.7;
+          this.anchorY = margin + rng() * zoneH * 0.7;
+          break;
+        case 'bottomLeft':
+          this.anchorX = margin + rng() * zoneW * 0.7;
+          this.anchorY = safe.y + safe.h + margin + rng() * Math.max(10, viewH - safe.y - safe.h - margin * 2) * 0.7;
+          break;
+        case 'bottomRight':
+          this.anchorX = safe.x + safe.w + margin + rng() * Math.max(10, viewW - safe.x - safe.w - margin * 2) * 0.7;
+          this.anchorY = safe.y + safe.h + margin + rng() * Math.max(10, viewH - safe.y - safe.h - margin * 2) * 0.7;
+          break;
       }
 
-      // Compute steering angle from push
-      const steerAngle = Math.atan2(steerY, steerX);
-
-      // Combine: undulation + bias + steering
-      this.angle += (wave + bias) * (dt * 0.06) + steerAngle * (dt * 0.04);
-
-      // Move head forward in heading direction
-      const moveX = Math.cos(this.angle) * this.speed * dt * 0.06;
-      const moveY = Math.sin(this.angle) * this.speed * dt * 0.06;
-      this.x += moveX;
-      this.y += moveY;
-
-      // Wrap around screen edges
-      if (this.x > bounds.w + 20) this.x = -20;
-      if (this.x < -20) this.x = bounds.w + 20;
-      if (this.y > bounds.h + 20) this.y = -20;
-      if (this.y < -20) this.y = bounds.h + 20;
-
-      // Prepend new head position to trail
-      this.trail.unshift({ x: this.x, y: this.y });
-
-      // Trim trail to snake length
-      if (this.trail.length > this.length) {
-        this.trail.length = this.length;
-      }
+      this.anchorX = Math.max(margin, Math.min(viewW - margin, this.anchorX));
+      this.anchorY = Math.max(margin, Math.min(viewH - margin, this.anchorY));
     }
 
     /**
-     * Draw the snake from tail to head with tapered body.
+     * Get body points forming a compact S-curve / coil around the anchor.
+     * The body naturally curves back on itself, staying within ~curlRadius × 2.
      */
-    draw(ctx) {
-      if (this.trail.length < 2) return;
+    getBodyPoints(time) {
+      const steps = 16;
+      const points = [];
+      const tPhase = this.phase + time * this.speed * 8;
+      const curlR = this.curlRadius;
+      const turns = this.curlTurns;
+      const stretch = this.curlStretch;
 
-      const trail = this.trail;
-      const len = trail.length;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps; // 0 = tail, 1 = head
+
+        // Parametric S-curve: angle sweeps from -turns*PI to +turns*PI
+        const angle = (t - 0.5) * turns * Math.PI * 2 + tPhase * 0.3;
+
+        // Radius shrinks toward head (tapered coil)
+        const r = curlR * (0.3 + 0.7 * (1 - t * 0.5));
+
+        // S-curve: horizontal figure-8-ish path
+        const bx = this.anchorX + Math.sin(angle) * r;
+        const by = this.anchorY + Math.cos(angle * 1.2) * r * stretch + Math.sin(t * Math.PI) * 6;
+
+        // Extra wiggle for liveliness
+        const wiggle = Math.sin(tPhase + t * 5) * 2;
+        const fx = bx + Math.cos(angle + tPhase) * wiggle * 0.3;
+        const fy = by + Math.sin(angle * 0.7 + tPhase) * wiggle * 0.3;
+
+        points.push({ x: fx, y: fy });
+      }
+
+      return points;
+    }
+
+    draw(ctx, time) {
+      const points = this.getBodyPoints(time);
+      if (points.length < 2) return;
 
       ctx.save();
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
 
-      // Draw body segments from tail to head
-      for (let i = len - 2; i >= 0; i--) {
-        const seg = trail[i];
-        const next = trail[i + 1];
-        const t = i / (len - 1); // 0 = tail, 1 = head
+      // ---- Body from tail to head ----
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const t = i / (points.length - 1);
 
-        // Taper: head is thickest, tail is thinnest
-        const thickness = this.baseThickness * this.scale * (0.15 + 0.85 * t);
+        const lineW = this.thickness * (0.15 + 0.85 * t);
 
         ctx.beginPath();
-        ctx.moveTo(seg.x, seg.y);
-        ctx.lineTo(next.x, next.y);
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
         ctx.strokeStyle = this.color;
-        ctx.lineWidth = thickness;
+        ctx.lineWidth = lineW;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         ctx.globalAlpha = this.opacity;
         ctx.stroke();
+
+        // Banded pattern
+        if (this.banded && i > 1 && i < points.length - 3 && i % 3 === 0) {
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.strokeStyle = this.bandColor;
+          ctx.lineWidth = lineW * 0.5;
+          ctx.globalAlpha = this.opacity * 0.35;
+          ctx.stroke();
+        }
       }
 
-      // Draw head — distinct circle/ellipse
-      const head = trail[len - 1];
-      if (head) {
-        const headSize = this.baseThickness * this.scale * 0.9;
+      // ---- Head ----
+      const head = points[points.length - 1];
+      const prev = points[points.length - 2] || head;
+      const headAngle = Math.atan2(head.y - prev.y, head.x - prev.x);
+      const headR = this.headSize;
 
-        // Head circle
+      // Head circle
+      ctx.beginPath();
+      ctx.arc(head.x, head.y, headR, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = Math.min(1, this.opacity * 1.15);
+      ctx.fill();
+
+      // Highlight
+      ctx.beginPath();
+      ctx.arc(head.x - headR * 0.2, head.y - headR * 0.25, headR * 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fill();
+
+      // Eyes
+      const eyeR = Math.max(1.5, headR * 0.22);
+      const eDist = headR * 0.45;
+      for (let s = -1; s <= 1; s += 2) {
         ctx.beginPath();
-        ctx.arc(head.x, head.y, headSize, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
+        ctx.arc(
+          head.x + Math.cos(headAngle) * eDist * 0.4 + Math.sin(headAngle) * s * eDist * 0.6,
+          head.y + Math.sin(headAngle) * eDist * 0.4 - Math.cos(headAngle) * s * eDist * 0.6,
+          eyeR, 0, Math.PI * 2
+        );
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
         ctx.globalAlpha = Math.min(1, this.opacity * 1.3);
         ctx.fill();
+      }
 
-        // Head highlight (tiny shine)
-        ctx.beginPath();
-        ctx.arc(head.x - headSize * 0.25, head.y - headSize * 0.25, headSize * 0.3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-        ctx.fill();
+      // ---- Tongue flick ----
+      if (this.tongueFlick) {
+        const flick = Math.sin(time * this.speed * 4 + this.tonguePhase);
+        if (flick > 0.7) {
+          const tLen = headR * 1.2;
+          const fA = 0.3;
+          const tx = head.x + Math.cos(headAngle) * (headR + 2);
+          const ty = head.y + Math.sin(headAngle) * (headR + 2);
+          const alpha = this.opacity * 0.7 * ((flick - 0.7) / 0.3);
 
-        // Eyes — two tiny dots
-        if (this.baseThickness * this.scale > 2.5) {
-          const eyeOffset = headSize * 0.4;
-          const eyeSize = Math.max(1.2, headSize * 0.22);
+          ctx.strokeStyle = '#CC4444';
+          ctx.lineWidth = 1.2;
+          ctx.globalAlpha = alpha;
 
-          // Eye direction hint from heading
-          const ex = Math.cos(this.angle) * eyeOffset;
-          const ey = Math.sin(this.angle) * eyeOffset;
+          // Tongue stem
+          ctx.beginPath();
+          ctx.moveTo(head.x + Math.cos(headAngle) * headR * 0.7, head.y + Math.sin(headAngle) * headR * 0.7);
+          ctx.lineTo(tx, ty);
+          ctx.stroke();
 
-          for (let side = -1; side <= 1; side += 2) {
-            const perpX = -Math.sin(this.angle) * side * eyeOffset * 0.5;
-            const perpY = Math.cos(this.angle) * side * eyeOffset * 0.5;
+          // Fork left
+          ctx.beginPath();
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(tx + Math.cos(headAngle - fA) * tLen * 0.6, ty + Math.sin(headAngle - fA) * tLen * 0.6);
+          ctx.stroke();
 
-            ctx.beginPath();
-            ctx.arc(
-              head.x + ex * 0.5 + perpX,
-              head.y + ey * 0.5 + perpY,
-              eyeSize, 0, Math.PI * 2
-            );
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            ctx.globalAlpha = Math.min(1, this.opacity * 1.5);
-            ctx.fill();
-          }
+          // Fork right
+          ctx.beginPath();
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(tx + Math.cos(headAngle + fA) * tLen * 0.6, ty + Math.sin(headAngle + fA) * tLen * 0.6);
+          ctx.stroke();
         }
       }
 
@@ -266,26 +276,40 @@
     }
   }
 
-  // ---- Snake Field ----
+  // ---- Safe zone: central game area ----
+  function getSafeZone() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const panelW = Math.min(600, w * 0.85);
+    const panelH = Math.min(400, h * 0.45);
+
+    const cx = w / 2;
+    const cy = h / 2;
+
+    return {
+      x: cx - panelW / 2 - 15,
+      y: cy - panelH / 2 - 60,
+      w: panelW + 30,
+      h: panelH + 140,
+    };
+  }
+
+  // ---- Main ----
   function SnakeField() {
     this.canvas = null;
     this.ctx = null;
     this.snakes = [];
-    this.targetCount = 0;
-    this.currentCount = 0;
     this.animFrame = null;
     this.running = false;
     this.reducedMotion = false;
     this.visible = true;
-    this.handleVisibility = this._onVisibilityChange.bind(this);
-    this.lastTime = 0;
+    this.startTime = 0;
+    this.handleVis = this._onVisibilityChange.bind(this);
   }
 
   SnakeField.prototype.init = function () {
-    // Check reduced motion preference
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Create background canvas
     this.canvas = document.createElement('canvas');
     this.canvas.id = 'bg-snake-field';
     this.canvas.style.position = 'fixed';
@@ -298,96 +322,60 @@
     this.canvas.style.background = 'transparent';
     this.ctx = this.canvas.getContext('2d');
 
-    // Insert as first child of body so it's behind everything
     document.body.insertBefore(this.canvas, document.body.firstChild);
 
-    // Resize and create snakes
     this._resize();
-
-    // Start animation
     this.running = true;
-    this.lastTime = performance.now();
-    this._animate(this.lastTime);
+    this.startTime = performance.now();
+    this._animate(this.startTime);
 
-    // Listen for resize
     window.addEventListener('resize', this._resize.bind(this));
-
-    // Tab visibility
-    document.addEventListener('visibilitychange', this.handleVisibility);
+    document.addEventListener('visibilitychange', this.handleVis);
   };
 
   SnakeField.prototype._resize = function () {
     if (!this.canvas) return;
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    this._updateTargetCount();
     this._populateSnakes();
   };
 
-  SnakeField.prototype._updateTargetCount = function () {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const area = w * h;
+  SnakeField.prototype._populateSnakes = function () {
+    const w = this.canvas.width;
+    const h = this.canvas.height;
     const isMobile = w < 768;
     const isTablet = w >= 768 && w < 1024;
-    const density = this.reducedMotion ? 0.12 : 1;
+    const density = this.reducedMotion ? 0.5 : 1;
 
-    if (isMobile) {
-      this.targetCount = Math.floor((35 + (area / 300000) * 35) * density);
-    } else if (isTablet) {
-      this.targetCount = Math.floor((70 + (area / 600000) * 50) * density);
-    } else {
-      this.targetCount = Math.floor((120 + (area / 1000000) * 100) * density);
-    }
+    let count;
+    if (isMobile) count = Math.floor((4 + Math.random() * 4) * density);
+    else if (isTablet) count = Math.floor((6 + Math.random() * 6) * density);
+    else count = Math.floor((10 + Math.random() * 8) * density);
 
-    this.targetCount = Math.max(this.targetCount, this.reducedMotion ? 8 : 20);
-    this.targetCount = Math.min(this.targetCount, 350);
-  };
-
-  SnakeField.prototype._populateSnakes = function () {
-    const bounds = {
-      w: this.canvas.width,
-      h: this.canvas.height,
-    };
-
+    const safe = getSafeZone();
     this.snakes = [];
-    for (let i = 0; i < this.targetCount; i++) {
-      this.snakes.push(new FieldSnake(rng, bounds));
+    for (let i = 0; i < count; i++) {
+      this.snakes.push(new BorderSnake(rng, w, h, safe));
     }
-    this.currentCount = this.snakes.length;
   };
 
   SnakeField.prototype._animate = function (timestamp) {
     if (!this.running) return;
-
-    // Pause when tab hidden
     if (!this.visible) {
-      this.lastTime = timestamp;
+      this.startTime = timestamp;
       this.animFrame = requestAnimationFrame(this._animate.bind(this));
       return;
     }
 
-    const dt = Math.min(timestamp - this.lastTime, 50); // cap dt to 50ms
-    this.lastTime = timestamp;
-
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
+    const elapsed = (timestamp - this.startTime) / 1000;
 
-    // Clear
     ctx.clearRect(0, 0, w, h);
 
-    // Update and draw each snake
-    const bounds = { w: w, h: h };
-
     for (let i = 0; i < this.snakes.length; i++) {
-      const snake = this.snakes[i];
-
-      if (!this.reducedMotion) {
-        snake.update(dt, bounds);
-      }
-      // Always draw (even static in reduced-motion mode)
-      snake.draw(ctx);
+      this.snakes[i].draw(ctx, this.reducedMotion ? 0 : elapsed);
     }
 
     this.animFrame = requestAnimationFrame(this._animate.bind(this));
@@ -403,12 +391,11 @@
       cancelAnimationFrame(this.animFrame);
       this.animFrame = null;
     }
-    document.removeEventListener('visibilitychange', this.handleVisibility);
+    document.removeEventListener('visibilitychange', this.handleVis);
     if (this.canvas && this.canvas.parentNode) {
       this.canvas.parentNode.removeChild(this.canvas);
     }
   };
 
-  // Export
   window.SnakeField = SnakeField;
 })();

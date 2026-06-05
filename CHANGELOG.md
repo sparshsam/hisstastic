@@ -4,6 +4,32 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.2] - 2026-06-05
+
+### Changed
+
+- **Replaced full-screen snake swarm with curated snake border system.** Removed the FieldSnake swarm and replaced it with a BorderSnake frame that renders 12–24 (desktop) decorative snakes along the perimeter edges and corners of the viewport.
+
+### Fixed
+
+- No longer looks like broken display artifacts, worm trails, or confetti across the entire screen. The old full-screen swarm was removed entirely.
+- Snakes now have clear snake-like visual identity: thick bodies (4–9px), tapered tails, distinct rounded heads with eyes, optional banded patterns, and periodic tongue flicks.
+- Motion is now slow, periodic, and localized — snakes undulate along short local paths rather than traversing the entire screen.
+- Central UI area remains pristine with calculated safe zone that excludes game panel, controls, dpad, and commentary box.
+
+### Removed
+
+- Full-screen FieldSnake swarm (hundreds of tiny snakes across entire viewport). Replaced with curated border system.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Reduced-motion support preserved (50% count reduction, static rendering).
+- Tab-visibility pause preserved.
+- Commentary and game-over roasts unchanged.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+- Python runtime remains canonical and unaffected.
+
 ## [0.4.1] - 2026-06-05
 
 ### Changed
