@@ -4,6 +4,28 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.3.0] — 2026-06-04
+
+### Added
+
+- **Browser runtime** (`web/`) — JavaScript/Canvas reimplementation of Hiss-Tastic.
+- **Mobile controls** — touch/swipe gestures and 4-button directional pad overlay.
+- **PWA installability** — manifest.webmanifest, service worker with offline caching, app icons.
+- **Replay import/export** in browser — file picker, drag-and-drop, JSON validation, metadata display.
+- **Procedural audio** using Web Audio API (eat, power-up, game-over sounds).
+- Responsive canvas scaling for mobile and desktop viewports.
+- Documentation: `docs/browser-runtime.md`, `docs/pwa.md`, `docs/mobile-controls.md`.
+
+### Changed
+
+- README updated with browser runtime setup, PWA, and mobile controls documentation.
+
+### Preserved
+
+- Python runtime untouched and fully functional (`python main.py` still works).
+- All existing features, replay format, and gameplay intact.
+- No networking, telemetry, accounts, or multiplayer added.
+
 ## [0.2.0] — 2026-06-04
 
 ### Added

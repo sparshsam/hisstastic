@@ -35,6 +35,9 @@ the original personality and gameplay.
 - **Pause/resume** (P or ESC)
 - **Procedural audio** with mute toggle (M key)
 - **Deterministic replay system** — record, play back, and verify game sessions
+- **Browser runtime** (`web/`) — playable in any modern browser
+- **Mobile-friendly** touch controls with directional pad
+- **PWA installable** — offline play, no telemetry
 - Legacy scoring messages preserved
 
 ## Architecture
@@ -110,6 +113,30 @@ Play back a replay:
 ```bash
 python -m hiss_tastic.replay_cli play replays/replay_12345_20260604.json
 ```
+
+## Browser Runtime
+
+A lightweight JavaScript/Canvas reimplementation is available in `web/`.
+
+### Running
+
+```bash
+python -m http.server 8080 --directory web/
+# or
+npx serve web/
+```
+
+Then open http://localhost:8080 in a browser.
+
+### Features
+
+- **Canvas rendering** — matches Python gameplay (grid, scoring, obstacles, power-ups)
+- **Mobile controls** — touch/swipe + directional pad, no keyboard required
+- **PWA** — installable, offline play, no telemetry, no accounts
+- **Replay import/export** — drag-and-drop or file picker for replay JSON files
+
+See [docs/browser-runtime.md](docs/browser-runtime.md), [docs/mobile-controls.md](docs/mobile-controls.md),
+and [docs/pwa.md](docs/pwa.md) for details.
 
 ## Validation
 
