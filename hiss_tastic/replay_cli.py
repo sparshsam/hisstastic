@@ -120,7 +120,10 @@ def main():
 
     command = sys.argv[1]
 
-    if command == 'record':
+    if command in ('--help', '-h', 'help'):
+        print(__doc__)
+        return 0
+    elif command == 'record':
         return cmd_record()
     elif command == 'play' and len(sys.argv) >= 3:
         return cmd_play(sys.argv[2])
