@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.5] - 2026-06-05
+
+### Changed
+
+- **Reset to single-snake prototype.** Stripped out all multi-snake density logic and replaced with ONE large `PrototypeSnake` using path-following body model. The snake has a 330px body sampled from a path history array, producing smooth continuous curves with natural tapering.
+- **Path-following body model (not segment-chasing).** Head position is recorded in a path history array each frame. Body segments sample positions at increasing distances along this path. This produces cleaner, more natural slithering than the previous segment-chasing approach.
+- **Large single snake:** head radius 9–12px, body thickness 6–9px, 55 segments = 330px body length. Speed 0.35–0.65, smooth wander steering with exclusion-zone avoidance.
+- **Debug mode:** set `window.HISS_DEBUG_SNAKE = true` before page load for head marker, segment index markers, and path visualization.
+- **Mobile scaling:** single snake scales down on mobile (0.7× size, 35 segments).
+
+### Removed
+
+- All multi-snake density logic (three-tier system, AmbientSnake class, segment-chasing following).
+- Swarm/confetti/worm artifacts completely eliminated — one snake only.
+
+### Preserved
+
+- All existing gameplay, scoring, collision, power-up, and replay mechanics unchanged.
+- Commentary and game-over roasts unchanged.
+- Reduced-motion support preserved (static rendering).
+- Tab-visibility pause preserved.
+- No telemetry, no external APIs, no AI/LLM calls, no backend, no wallet/onchain logic, no multiplayer added.
+- Python runtime remains canonical and unaffected.
+
 ## [0.4.4] - 2026-06-05
 
 ### Fixed
