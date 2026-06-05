@@ -1,18 +1,12 @@
-# Snake Border Background
+# Animated Ambient Snake Background
 
 ## Overview
 
-A decorative animated snake border that frames the central game panel. Snakes live along the perimeter edges — top, bottom, left, right, and corners — creating a polished arcade habitat frame rather than a full-screen swarm.
+Decorative smooth Snake.io-style ambient snakes that glide around the perimeter of the game panel. Each snake uses a proper segmented-following movement model — the head moves continuously with smooth steering, and each body segment follows the one in front, creating living snake-like locomotion.
 
-## Design Philosophy
+## Design
 
-Replace full-screen random swarm with a curated border system:
-
-- **Fewer, larger snakes** — 12–24 desktop, 8–16 tablet, 4–8 mobile
-- **Perimeter-focused** — snakes stay near edges and corners
-- **Clearly snake-like** — thick bodies, distinct heads with eyes, tapered tails, optional banded patterns and tongue flicks
-- **Polished** — slow periodic motion, no chaotic traversal, no noise artifacts
-- **Central UI pristine** — the game panel, buttons, and commentary area remain clean
+Rather than static border marks or full-screen particle swarms, the background features 10–18 (desktop) smooth segmented snakes that roam the edge zones of the viewport with autonomous steering behavior.
 
 ## Implementation
 
@@ -21,72 +15,78 @@ Replace full-screen random swarm with a curated border system:
 ### Architecture
 
 - Full-viewport fixed canvas behind the game panel (`z-index: 0`, `pointer-events: none`).
-- Each snake is a `BorderSnake` instance assigned to one of 8 zones: `top`, `bottom`, `left`, `right`, `topLeft`, `topRight`, `bottomLeft`, `bottomRight`.
-- Snakes are placed outside a calculated safe zone that covers the game panel, dpad, controls, and commentary box.
-- Body rendered as 14-point polyline from tail to head, with sinusoidal lateral undulation.
-- `requestAnimationFrame`-driven with tab-visibility pause.
+- Each snake is an `AmbientSnake` instance with:
+  - Head position (x, y) and angle
+  - Smooth steering via sinusoidal oscillation + bias + exclusion avoidance
+  - Body segments array (12–30 segments per snake)
+  - Distance-constraint following: each segment moves to maintain `spacing` distance from the segment ahead of it
+- Rendered as overlapping filled circles for smooth capsule-like bodies
+- `requestAnimationFrame`-driven with tab-visibility pause
 
-### BorderSnake Properties
+### Movement Model
+
+```
+Head moves forward at speed in current angle direction:
+  head.x += cos(angle) * speed * dt
+  head.y += sin(angle) * speed * dt
+
+Angle changes smoothly:
+  angle += (sin(phase) * amplitude + bias + steering) * dt
+
+Each body segment follows the previous:
+  dx = prev.x - curr.x
+  dy = prev.y - curr.y
+  dist = hypot(dx, dy)
+  curr.x += (dx / dist) * (dist - spacing)  // pull to spacing distance
+  curr.y += (dy / dist) * (dist - spacing)
+```
+
+This produces Snake.io / Slither.io-style smooth segmented locomotion.
+
+### Visual Properties
 
 | Property | Range | Description |
 |----------|-------|-------------|
-| Body length | 60–160 px | Total snake size |
-| Thickness | 4–9 px | Body diameter (tapered tail→head) |
-| Color | 30 colors | Greens, olives, coppers, teals, creams |
-| Opacity | 0.65–0.85 | Strong but decorative |
-| Speed | 0.008–0.023 | Undulation rate |
-| Amplitude | 6–18 px | Lateral sway |
-| Head size | ~thickness × 0.9 | Rounded head circle |
-| Banded | 40% chance | Dark/yellow/cream stripe patterns |
-| Tongue flick | 60% chance | Periodic forked tongue |
+| Segments | 12–30 | Body length in circles |
+| Segment spacing | 4–8 px | Gap between segment centers |
+| Head radius | 5–9 px | Larger front circle |
+| Body radius | 3–6 px | Tapers toward tail |
+| Color | 26 colors | Greens, olives, coppers, teals |
+| Opacity | 0.7–0.9 | Strong but decorative |
+| Speed | 0.4–1.0 px/tick | Gliding pace |
+| Accent stripes | 55% chance | Every 3rd or 4th segment |
+| Eyes | Always | Two dark dots on head |
+| Tongue flick | 50% chance | Red forked tongue |
 
-### Safe Zone
+### Boundary Behavior
 
-A calculated exclusion rectangle surrounds the game panel area:
-- Centered on viewport
-- Covers game canvas, dpad, control buttons, and commentary box
-- Snakes are placed outside this zone
-- The game container's white background also masks anything behind the panel
+- Snakes spawn in border zones (top, bottom, left, right, corners)
+- Exclusion zone around game panel, controls, and commentary
+- Snakes smoothly steer away from the exclusion zone (no hard snapping)
+- Soft edge repulsion pushes snakes away from viewport boundaries
+- Hard teleport wrap only if a snake fully exits the viewport (prevents loss)
 
 ### Snake Count Tiers
 
 | Screen | Count | Notes |
 |--------|-------|-------|
-| Desktop (≥1024px) | 12–24 | Small random variation per session |
-| Tablet (768–1023px) | 8–16 | Reduced |
+| Desktop (≥1024px) | 10–18 | Smooth roaming |
+| Tablet (768–1023px) | 6–12 | Reduced count |
 | Mobile (<768px) | 4–8 | Minimal |
-
-### Edge Zones
-
-- **Top snakes:** hang from the top edge, facing downward
-- **Bottom snakes:** rest along the bottom, facing upward
-- **Left snakes:** positioned on the left side, facing right
-- **Right snakes:** positioned on the right side, facing left
-- **Corner snakes:** placed in the four viewport corners
-
-### Visual Details
-
-Each snake features:
-- **Tapered body** — drawn from tail (thin) to head (thick) using 14 interpolation steps
-- **Sinusoidal undulation** — lateral sine wave for natural slithering
-- **Tail coil** — slight curl at the tail tip
-- **Rounded head** — circle with highlight
-- **Eyes** — two dark dots aligned with head direction
-- **Banded pattern** — optional contrasting stripes (dark, yellow, or cream)
-- **Tongue flick** — optional periodic red forked tongue
-
-### Reduced Motion
-
-When `prefers-reduced-motion: reduce` is active:
-- Snake count halved (0.5× multiplier)
-- Snakes render as static shapes (no movement, no tongue flick)
 
 ### Performance
 
 - One canvas, no DOM-per-snake
 - No external libraries or image assets
+- No per-frame allocations after initialization
 - Pauses when tab hidden
-- Because there are dramatically fewer snakes than the previous swarm, this is significantly lighter
+- Delta-time capped at 33ms for stability
+
+### Reduced Motion
+
+When `prefers-reduced-motion: reduce` is active:
+- Snake count reduced (0.4× multiplier)
+- Snakes render as static shapes (no movement, no tongue flick)
 
 ### Privacy
 
