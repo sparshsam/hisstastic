@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [0.4.9] - 2026-06-05
+
+### Added
+
+- **6 companion snakes join the main serpent.** Total of 7 snakes now roam the background. Main snake stays large (1920px body, full detail). Companions are 50–65% scale, 300–960px body, in varied colors (teal, olive, copper, brown, dark green). Companions spawn at random positions across the viewport.
+
+### Changed
+
+- **Smoother tail taper.** Replaced sharp linear tail drop (`return 0.5 - (t-0.8)*2.0`) with a quadratic eased taper. The tail now narrows gradually from 75% body width at t=0.75 to ~9% at the tip, creating a more natural serpentine finish.
+- **Refactored SnakeField** to support multiple snakes — `this.snakes` array replaces `this.snake`.
+
+### Preserved
+
+- Same procedural polygon rendering, head, eyes, tongue, wave model.
+- Main snake unchanged (size, speed, wave params, wander behavior).
+- All gameplay, commentary, PWA unchanged. No telemetry/API/backend/AI/wallet/multiplayer.
+
 ## [0.4.8] - 2026-06-05
 
 ### Changed
