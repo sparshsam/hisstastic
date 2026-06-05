@@ -12,7 +12,7 @@ from hiss_tastic.input import process_events
 from hiss_tastic.rendering import (
     our_snake, draw_obstacles, draw_food, draw_power_up,
     display_score, draw_watermark, draw_game_over,
-    draw_title_screen, draw_pause_overlay,
+    draw_title_screen, draw_pause_overlay, draw_ghost,
 )
 from hiss_tastic.scoring import get_quadratic_score, get_mean_message
 from hiss_tastic.audio import init as init_audio, play_eat, play_powerup, play_gameover
@@ -68,6 +68,7 @@ class Game:
 
         # Replay recorder (set externally by replay_cli)
         self.replay_recorder = None
+        self.ghost_session = None
 
     # ---- Input helpers ----
 
@@ -142,6 +143,9 @@ class Game:
         immune_start_time = 0
         score = 0
         food_count = 0
+
+        if self.ghost_session:
+            self.ghost_session.reset()
 
         # Setup replay recorder
         if self.replay_recorder:
@@ -235,6 +239,7 @@ class Game:
 
             # Record tick for replay
             if self.replay_recorder:
+                self.replay_recorder.record_frame(snake, score)
                 self.replay_recorder.tick()
 
             # ---- Render ----
@@ -242,6 +247,13 @@ class Game:
             draw_food(self.surface, food.position, self.assets['food'])
             if power_up.active:
                 draw_power_up(self.surface, power_up.position, self.assets['power_up'])
+            if self.ghost_session:
+                draw_ghost(
+                    self.surface,
+                    self.ghost_session.current_payload(),
+                    self.block_size,
+                )
+                self.ghost_session.advance()
             our_snake(self.surface, snake.body, self.assets['snake'])
             draw_obstacles(self.surface, obstacle_positions, self.assets['obstacle'])
             display_score(self.surface, score, self.score_font, CONFIG['colors']['black'])

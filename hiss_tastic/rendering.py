@@ -11,6 +11,33 @@ def our_snake(surface, snake_list, snake_img):
         surface.blit(snake_img, (x[0], x[1]))
 
 
+def draw_ghost(surface, ghost_payload, block_size):
+    """Draw a non-scoring translucent ghost replay path."""
+    if not ghost_payload:
+        return
+
+    ghost_surface = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+    body_color = (80, 120, 255, 70)
+    head_color = (80, 120, 255, 115)
+
+    for segment in ghost_payload["body"]:
+        pygame.draw.rect(
+            ghost_surface,
+            body_color,
+            pygame.Rect(segment[0], segment[1], block_size, block_size),
+            border_radius=3,
+        )
+
+    head = ghost_payload["head"]
+    pygame.draw.rect(
+        ghost_surface,
+        head_color,
+        pygame.Rect(head[0], head[1], block_size, block_size),
+        border_radius=3,
+    )
+    surface.blit(ghost_surface, (0, 0))
+
+
 def draw_obstacles(surface, obstacles, obstacle_img):
     """Draw all obstacles."""
     for obs in obstacles:

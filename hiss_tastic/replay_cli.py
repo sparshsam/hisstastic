@@ -3,6 +3,7 @@
 Usage:
     python -m hiss_tastic.replay_cli play <replay_file>
     python -m hiss_tastic.replay_cli verify <replay_file>
+    python -m hiss_tastic.replay_cli ghost-check <replay_file>
 """
 
 import sys
@@ -28,6 +29,7 @@ def cmd_play(filepath):
     print(f"  Seed: {player.seed}")
     print(f"  Expected score: {player.expected_score}")
     print(f"  Inputs: {result['input_count']}")
+    print(f"  Ghost frames: {result['frame_count']}")
 
     # We can't fully auto-playback in the current architecture (needs display),
     # but we can validate the replay structure and metadata
@@ -57,6 +59,7 @@ def cmd_verify(filepath):
         print(f"  Seed: {result['seed']}")
         print(f"  Expected score: {result['expected_score']}")
         print(f"  Inputs recorded: {result['input_count']}")
+        print(f"  Ghost frames recorded: {result['frame_count']}")
         return 0
     else:
         print(f"Replay verification: [FAIL] {result.get('error', 'unknown error')}")
@@ -87,6 +90,29 @@ def cmd_record():
     return 0
 
 
+def cmd_ghost_check(filepath):
+    """Run local-only ghost replay sanity validation."""
+    from hiss_tastic.ghost import GhostReplay
+    from hiss_tastic.replay import ReplayValidationError
+
+    if not os.path.isfile(filepath):
+        print(f"Error: File not found: {filepath}")
+        return 1
+
+    try:
+        ghost = GhostReplay(filepath)
+        result = ghost.sanity_check()
+    except ReplayValidationError as exc:
+        print(f"Ghost replay validation: [FAIL] {exc}")
+        return 1
+
+    print("Ghost replay validation: [PASS]")
+    print(f"  Expected score: {result['expected_score']}")
+    print(f"  Duration ticks: {result['duration_ticks']}")
+    print(f"  Visual frames: {result['has_visual_frames']}")
+    return 0
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -100,6 +126,8 @@ def main():
         return cmd_play(sys.argv[2])
     elif command == 'verify' and len(sys.argv) >= 3:
         return cmd_verify(sys.argv[2])
+    elif command == 'ghost-check' and len(sys.argv) >= 3:
+        return cmd_ghost_check(sys.argv[2])
     else:
         print(f"Unknown command: {command}")
         print(__doc__)

@@ -18,9 +18,11 @@ graph TD
     game --> spawns["spawns.py (safe entity placement)"]
     game --> scoring["scoring.py (quadratic scoring, messages)"]
     game --> replay["replay.py (Recorder, Player, verify)"]
+    game --> ghost["ghost.py (local ghost replay sync)"]
     game --> audio["audio.py (procedural sound effects)"]
     game --> states["states.py (TITLE, PLAYING, PAUSED, GAME_OVER, EXIT)"]
     rendering --> config
+    rendering --> ghost
     spawns --> config
     spawns --> entities
     audio --> config
@@ -38,7 +40,8 @@ graph TD
 | `spawns.py` | Safe grid-aligned entity placement with seeded RNG support |
 | `rendering.py` | All Pygame drawing functions (snake, obstacles, UI, overlays) |
 | `input.py` | Pygame event processing into InputAction objects |
-| `replay.py` | Deterministic replay recording, playback, and verification |
+| `replay.py` | Deterministic replay recording, schema validation, playback, and verification |
+| `ghost.py` | Local-only ghost replay loading, sanity validation, tick synchronization, and visualization payloads |
 | `audio.py` | Procedural sine-wave sound effects with graceful failure |
 | `states.py` | Game state constants |
 | `game.py` | Main Game class — state machine orchestrating title, play, pause, game-over |
@@ -89,6 +92,7 @@ flowchart TD
 - Configuration is read from the `CONFIG` dict in `config.py`.
 - Assets are loaded once by `assets.py` at game startup.
 - Replay files are written to `replays/` as JSON, local storage only.
+- Ghost replay data is read from local replay JSON and exposed as renderer-safe, non-scoring payloads.
 - No data is sent over the network.
 
 ## Replay System
@@ -96,22 +100,39 @@ flowchart TD
 ```mermaid
 flowchart LR
     A["Game session"] --> B["ReplayRecorder"]
-    B -->|tick, direction| C["replay.json"]
+    B -->|tick, direction, metadata, optional frames| C["replay.json"]
     C --> D["ReplayPlayer"]
-    D --> E["Playback and verify"]
-    E --> F{"Score match?"}
+    C --> G["GhostReplay"]
+    D --> E["Schema validation and metadata"]
+    G --> H["GhostRaceSession"]
+    H --> I["draw_ghost visualization hook"]
 ```
 
 The replay system uses a seeded `random.Random` instance. All random
 operations (obstacle generation, food placement, power-up respawn) use
 the same seeded RNG. Player inputs are recorded tick-by-tick with their
-direction changes. Playback applies the same seed and inputs to reproduce
-the same score.
+direction changes. New replay files also include metadata and local frame
+snapshots for ghost visualization.
+
+Replay validation checks required fields, replay version compatibility,
+seed and score types, sorted tick-indexed input events, valid directions,
+frame shape, and local-only metadata.
+
+## Ghost Racing Foundation
+
+Ghost racing is local-only and visualization-only. `GhostReplay` loads a
+validated replay file, `GhostRaceSession` synchronizes the ghost by active
+game tick, and `draw_ghost()` renders translucent frame snapshots when a
+replay contains them.
+
+Ghosts never affect scoring, collisions, spawn placement, difficulty, replay
+verification, or game-over behavior. They are display data only.
 
 ## Security Boundaries
 
 - The game has no network access, no user accounts, and no file uploads.
-- Replay files are local JSON only, no parsing of untrusted data.
+- Replay files are local JSON only and validated before playback or ghost use.
+- Ghost replay racing adds no networking, telemetry, wallet logic, or multiplayer.
 - The only external dependency is `pygame`, installed via pip.
 
 ## Modernization History
