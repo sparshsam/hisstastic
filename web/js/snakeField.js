@@ -471,26 +471,26 @@
 
       // Varied sizes: index determines size tier
       if (i < 5) {
-        // Large snakes (indices 0-4)
-        snake.baseRadius = (8 + rng() * 4) * scale;
-        snake.spineCount = Math.floor((45 + rng() * 20) * scale);
+        // Large snakes (indices 0-4) — like the original main serpent
+        snake.baseRadius = (12 + rng() * 6) * scale;   // 12-18px
+        snake.spineCount = Math.floor((100 + rng() * 80) * scale); // 100-180 spines = 500-1440px body
         snake.speed = 0.25 + rng() * 0.2;
       } else if (i < 14) {
         // Medium snakes (indices 5-13)
-        snake.baseRadius = (6 + rng() * 3) * scale;
-        snake.spineCount = Math.floor((30 + rng() * 20) * scale);
+        snake.baseRadius = (8 + rng() * 5) * scale;     // 8-13px
+        snake.spineCount = Math.floor((55 + rng() * 50) * scale); // 55-105 spines
         snake.speed = 0.3 + rng() * 0.3;
       } else {
         // Small snakes (indices 14-26)
-        snake.baseRadius = (4 + rng() * 2.5) * scale;
-        snake.spineCount = Math.floor((18 + rng() * 15) * scale);
+        snake.baseRadius = (5 + rng() * 4) * scale;     // 5-9px
+        snake.spineCount = Math.floor((30 + rng() * 30) * scale); // 30-60 spines
         snake.speed = 0.35 + rng() * 0.35;
       }
 
-      snake.headRadius = snake.baseRadius * (0.6 + rng() * 0.15);
+      snake.headRadius = snake.baseRadius * (0.7 + rng() * 0.15);
       snake.spacing = 5 + rng() * 3;
-      snake.maxPath = Math.min(4000, Math.ceil(snake.spineCount * 8));
-      snake.waveAmp = (rng() * 10 + 10) * scale;
+      snake.maxPath = Math.min(5000, Math.ceil(snake.spineCount * 10));
+      snake.waveAmp = (rng() * 14 + 12) * scale; // 12-26px
       snake.opacity = 0.55 + rng() * 0.35;
       snake.hasTongue = rng() > 0.4;
       snake.wanderInterval = rng() * 400 + 200;
