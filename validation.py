@@ -6,6 +6,7 @@ Checks:
   2. Required imports resolve (os, sys, random, time, pygame).
   3. assets/ directory contains all expected files.
   4. requirements.txt exists and declares pygame.
+  5. Replay schema and ghost replay sanity utilities pass.
 
 Does NOT import or run the game (no pygame display initialisation).
 Exit code 0 = all pass; 1 = any fail.
@@ -14,6 +15,8 @@ import py_compile
 import sys
 import os
 import importlib.util
+import json
+import tempfile
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "assets")
@@ -94,10 +97,80 @@ def check_requirements():
         fail("requirements.txt does NOT contain pygame")
         return False
 
+def check_replay_schema():
+    header("5. Replay schema")
+    try:
+        from hiss_tastic.ghost import GhostReplay
+        from hiss_tastic.replay import validate_replay_data, verify_replay
+    except ImportError as exc:
+        fail(f"Replay modules cannot be imported: {exc}")
+        return False
+
+    replay = {
+        "version": "1.0.0",
+        "game": "hiss-tastic",
+        "metadata": {
+            "deterministic": True,
+            "local_only": True,
+            "networked": False,
+            "mode": "solo",
+            "duration_ticks": 1,
+        },
+        "seed": 123,
+        "timestamp": "2026-06-04T00:00:00Z",
+        "score": 0,
+        "snake_length": 1,
+        "inputs": [{"tick": 0, "direction": "RIGHT"}],
+        "frames": [{
+            "tick": 0,
+            "head": [300, 200],
+            "body": [[300, 200]],
+            "score": 0,
+            "snake_length": 1,
+            "alive": True,
+        }],
+    }
+
+    try:
+        validate_replay_data(replay)
+    except Exception as exc:
+        fail(f"Replay schema validation failed: {exc}")
+        return False
+
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as fh:
+        json.dump(replay, fh)
+        replay_path = fh.name
+
+    try:
+        result = verify_replay(replay_path)
+        ghost_result = GhostReplay(replay_path).sanity_check()
+    finally:
+        try:
+            os.remove(replay_path)
+        except OSError:
+            pass
+
+    if not result.get("match"):
+        fail(f"Replay verify failed: {result.get('error')}")
+        return False
+    if not ghost_result.get("valid"):
+        fail("Ghost replay sanity check failed")
+        return False
+
+    ok("Replay schema validation passes")
+    ok("Ghost replay sanity validation passes")
+    return True
+
 def main():
     print("Hiss-Tastic Validation Suite")
     print("=" * 40)
-    results = [check_compile(), check_imports(), check_assets(), check_requirements()]
+    results = [
+        check_compile(),
+        check_imports(),
+        check_assets(),
+        check_requirements(),
+        check_replay_schema(),
+    ]
     passed = sum(results)
     total = len(results)
     print(f"\n{'=' * 40}")
