@@ -168,7 +168,7 @@ php -S localhost:8080 -t web/
 
 ### Local Static / Production-Style Preview
 
-For a production-like experience (service worker caching, PWA), serve from the `web/` directory:
+To preview the game as it would appear in production, serve from the `web/` directory:
 
 ```bash
 # Start server
@@ -176,14 +176,22 @@ python -m http.server 8080 --directory web/
 
 # Open in a browser
 open http://localhost:8080
-
-# Once loaded, the service worker caches all assets.
-# Disconnect from the internet — the game still runs from cache.
 ```
 
-**Service worker note:** During local development on plain HTTP, the service worker is
-skipped automatically to avoid stale-cache confusion. It activates on `https://` or when
-deployed to Vercel/PWA contexts.
+**Important:** On plain HTTP `localhost`, the service worker is intentionally skipped to
+avoid stale-cache confusion during local development. You can play and test everything on
+localhost without issues — this is the recommended local workflow.
+
+To test full PWA offline caching and service worker behavior, deploy to a secure context
+(HTTPS) such as:
+
+- Vercel preview deployment (`vercel --preview`)
+- GitHub Pages
+- Any HTTPS-enabled hosting
+- A local HTTPS server (e.g. `mkcert` for a trusted local cert)
+
+When deployed to HTTPS, the service worker caches all assets and the game remains
+playable offline.
 
 ---
 
@@ -219,7 +227,8 @@ bash scripts/serve.sh
 # 5. Background music toggle works (🎵 Music button)
 # 6. Music credit link opens YouTube source
 # 7. PWA manifest loads (check DevTools → Application → Manifest)
-# 8. Service worker registers (check DevTools → Application → Service Workers)
+# 8. Service worker state (check DevTools → Application → Service Workers;
+#    on localhost it won't register — expected. Verify on HTTPS/preview.)
 # 9. Import/Export replay buttons work
 # 10. Mobile D-pad controls respond on touch devices
 ```
