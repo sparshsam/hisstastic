@@ -53,6 +53,29 @@
       exportBtn.addEventListener('click', () => replay.exportCurrent());
     }
 
+    // Music toggle button
+    const musicBtn = document.getElementById('btn-music');
+    if (musicBtn) {
+      musicBtn.addEventListener('click', () => {
+        const on = audio.toggleBgMusic();
+        musicBtn.textContent = on ? '\uD83C\uDFB5 Music' : '\uD83D\uDD07 Music';
+        musicBtn.classList.toggle('music-on', on);
+      });
+      // Reflect initial state
+      if (audio.bgMusicEnabled) {
+        musicBtn.classList.add('music-on');
+      }
+    }
+
+    // Resume background music on first user interaction (autoplay policy)
+    const resumeMusic = () => {
+      audio.resumeBgMusic();
+      document.removeEventListener('pointerdown', resumeMusic);
+      document.removeEventListener('keydown', resumeMusic);
+    };
+    document.addEventListener('pointerdown', resumeMusic);
+    document.addEventListener('keydown', resumeMusic);
+
     // Start main loop
     lastTick = performance.now();
     mainLoop(lastTick);
