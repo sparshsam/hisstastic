@@ -56,6 +56,19 @@
     // Music toggle button
     const musicBtn = document.getElementById('btn-music');
     if (musicBtn) {
+      // Check if background music file is available after a short delay
+      // (the Audio element fires 'canplaythrough' or 'error' asynchronously)
+      setTimeout(() => {
+        if (!audio.bgMusicReady) {
+          // Audio file didn't load; disable the button
+          musicBtn.disabled = true;
+          musicBtn.textContent = '\uD83D\uDD07 Music';
+          musicBtn.title = 'Background music file not available';
+          musicBtn.classList.remove('music-on');
+          return;
+        }
+      }, 3000);
+
       musicBtn.addEventListener('click', () => {
         const on = audio.toggleBgMusic();
         musicBtn.textContent = on ? '\uD83C\uDFB5 Music' : '\uD83D\uDD07 Music';
@@ -83,6 +96,12 @@
 
   function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) {
+      return;
+    }
+    // Skip service worker registration on plain HTTP localhost
+    // to avoid developer confusion with stale caches during dev.
+    // Service worker still registers on HTTPS or secure contexts.
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       return;
     }
     window.addEventListener('load', () => {

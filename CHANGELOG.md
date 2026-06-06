@@ -4,7 +4,52 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
-## [0.4.9] - 2026-06-05
+## [0.5.0] - 2026-06-05
+
+### Added
+
+- **Local Runtime & Deployment Independence.** Hiss-Tastic can now be fully developed,
+  tested, and played locally without any reliance on Vercel or external services.
+- **Graceful audio/asset degradation.** Background music detects load failures and
+  disables itself gracefully. The game never crashes on missing audio files.
+- **Local dev health check.** `scripts/check-local.sh` verifies all Python runtime,
+  browser runtime, game assets, and documentation files in one command.
+- **Dev server script.** `scripts/serve.sh` starts the built-in Python HTTP server
+  on any port with a single command.
+
+### Changed
+
+- **Service worker rewritten (v2).** Now uses `Promise.allSettled` for per-asset
+  caching — a single missing asset can't block the entire install. Assets list
+  includes `assets/background-music.mp3`. Cache name bumped to `hiss-tastic-v2`.
+- **Service worker guarded on localhost.** App.js skips SW registration on plain
+  HTTP localhost to prevent stale-cache confusion during development. SW still
+  activates on HTTPS (PWA/Vercel deployments).
+- **BackgroundMusic class hardened.** Handles audio file load errors via
+  `canplaythrough` / `error` events. Toggle is a no-op when the audio file is
+  unavailable. Constructor wrapped in try/catch for environments without audio
+  support.
+- **README rewritten** with comprehensive Local Development section:
+  Python runtime setup, browser runtime setup, three server options, testing guide,
+  asset verification table, and troubleshooting for common local issues.
+- **Web runtime removed from Vercel deployment dependency.** All testing and
+  development paths documented for fully offline/local workflows.
+
+### Added (completed from #15)
+
+- **Looping background music** with 🎵 Music On/Off toggle, low default volume (0.15),
+  localStorage persistence (`hissTasticBgMusic` key), and YouTube credit link.
+- **Music credit link** in game footer: "Music credit" → YouTube source.
+- **Service worker caches background music** for offline playback.
+
+### Preserved
+
+- Python runtime unchanged (canonical).
+- All gameplay, scoring, collision, power-up, replay, ghost, commentary, snake field,
+  and PWA mechanics unchanged.
+- No telemetry, no accounts, no external backend, no wallet/onchain logic, no multiplayer.
+- All v0.4.9 functionality confirmed operational.
+- Background music work from #15 merged and included.
 
 ### Added
 

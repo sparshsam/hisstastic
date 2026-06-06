@@ -3,6 +3,7 @@
  * Uses Web Audio API to generate simple sound effects.
  * Also manages looping background music via HTMLAudioElement.
  * Silently disables if AudioContext is unavailable.
+ * Gracefully handles missing audio files — game never crashes.
  */
 (function() {
 'use strict';
@@ -12,6 +13,8 @@ const LS_KEY = 'hissTasticBgMusic';
 class BackgroundMusic {
   constructor() {
     this.audio = null;
+    this._ready = false;       // true once audio file loaded successfully
+    this._loadError = false;   // true if audio file failed to load
     this._enabled = this._loadPreference();
     this._init();
   }
@@ -35,19 +38,37 @@ class BackgroundMusic {
   }
 
   _init() {
-    this.audio = new Audio('assets/background-music.mp3');
-    this.audio.loop = true;
-    this.audio.volume = 0.15;  // low default volume
-    this.audio.preload = 'metadata';
-    // If user previously had music on, start paused until first interaction
-    if (this._enabled) {
-      // Audio won't play until user gesture, but we mark it as enabled
+    try {
+      this.audio = new Audio();
+      this.audio.loop = true;
+      this.audio.volume = 0.15;  // low default volume
+      this.audio.preload = 'auto';
+
+      // Detect load success / failure
+      this.audio.addEventListener('canplaythrough', () => {
+        this._ready = true;
+      }, { once: true });
+      this.audio.addEventListener('error', () => {
+        this._loadError = true;
+        this._ready = false;
+        this._enabled = false;  // disable if file missing
+      }, { once: true });
+
+      // Set source last to trigger loading
+      this.audio.src = 'assets/background-music.mp3';
+    } catch (_) {
+      // Audio not supported at all; disable gracefully
+      this._loadError = true;
+      this._ready = false;
+      this._enabled = false;
+      this.audio = null;
     }
   }
 
   /** Resume audio context / start playback. Called on first user interaction. */
   resume() {
     if (!this._enabled || !this.audio) return;
+    if (!this._ready) return;   // not loaded yet — silently skip
     if (this.audio.paused) {
       this.audio.play().catch(() => {
         // Browser may still block; silently fail
@@ -60,15 +81,29 @@ class BackgroundMusic {
     return this._enabled;
   }
 
+  /** @returns {boolean} whether the audio file loaded successfully. */
+  get ready() {
+    return this._ready;
+  }
+
   /** Toggle background music on/off. Returns the new state. */
   toggle() {
+    if (!this.audio || this._loadError) {
+      // Audio file unavailable; toggle is a no-op
+      this._enabled = false;
+      this._savePreference();
+      return false;
+    }
+
     this._enabled = !this._enabled;
     this._savePreference();
 
     if (this._enabled) {
-      this.audio.volume = 0.15;
-      this.audio.currentTime = 0;
-      this.audio.play().catch(() => {});
+      if (this._ready && this.audio) {
+        this.audio.volume = 0.15;
+        this.audio.currentTime = 0;
+        this.audio.play().catch(() => {});
+      }
     } else {
       if (this.audio) {
         this.audio.pause();
@@ -153,6 +188,11 @@ class GameAudio {
   /** @returns {boolean} whether background music is currently enabled. */
   get bgMusicEnabled() {
     return this.bgMusic.enabled;
+  }
+
+  /** @returns {boolean} whether background music file loaded successfully. */
+  get bgMusicReady() {
+    return this.bgMusic.ready;
   }
 
   /** Resume background music after user gesture. */
