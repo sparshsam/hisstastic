@@ -120,6 +120,31 @@ html, body {
   background: #ddd;
 }
 
+.ctrl-btn.music-on {
+  background: #FF1493;
+  color: #fff;
+  border-color: #FF1493;
+}
+
+/* ---- Music credit link ---- */
+.music-credit {
+  text-align: center;
+  margin-top: 6px;
+}
+
+.music-credit a {
+  font-family: monospace;
+  font-size: 10px;
+  color: #999;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.music-credit a:hover {
+  color: #FF1493;
+  text-decoration: underline;
+}
+
 /* ---- Replay overlay ---- */
 .replay-overlay {
   position: absolute;
