@@ -13,8 +13,9 @@ const LS_KEY = 'hissTasticBgMusic';
 class BackgroundMusic {
   constructor() {
     this.audio = null;
-    this._ready = false;       // true once audio file loaded successfully
-    this._loadError = false;   // true if audio file failed to load
+    this._ready = false;         // true once audio file loaded successfully
+    this._loadError = false;     // true if audio file failed to load
+    this._pendingStart = false;  // true if user toggled on before file loaded
     this._enabled = this._loadPreference();
     this._init();
   }
@@ -41,17 +42,26 @@ class BackgroundMusic {
     try {
       this.audio = new Audio();
       this.audio.loop = true;
-      this.audio.volume = 0.15;  // low default volume
+      this.audio.volume = 0.25;  // audible but not loud
       this.audio.preload = 'auto';
 
-      // Detect load success / failure
+      // Detect load success
       this.audio.addEventListener('canplaythrough', () => {
         this._ready = true;
+        // If user already toggled music on before file finished loading,
+        // start playback now.
+        if (this._pendingStart && this._enabled) {
+          this._pendingStart = false;
+          this._playInternal();
+        }
       }, { once: true });
+
+      // Detect load failure
       this.audio.addEventListener('error', () => {
         this._loadError = true;
         this._ready = false;
-        this._enabled = false;  // disable if file missing
+        this._enabled = false;
+        this._pendingStart = false;
       }, { once: true });
 
       // Set source last to trigger loading
@@ -61,19 +71,32 @@ class BackgroundMusic {
       this._loadError = true;
       this._ready = false;
       this._enabled = false;
+      this._pendingStart = false;
       this.audio = null;
     }
   }
 
-  /** Resume audio context / start playback. Called on first user interaction. */
-  resume() {
-    if (!this._enabled || !this.audio) return;
-    if (!this._ready) return;   // not loaded yet — silently skip
+  /** Internal: start playback (assumes audio is ready and enabled). */
+  _playInternal() {
+    if (!this.audio || this._loadError) return;
     if (this.audio.paused) {
+      this.audio.currentTime = 0;
       this.audio.play().catch(() => {
-        // Browser may still block; silently fail
+        // Browser may block; silently fail
       });
     }
+  }
+
+  /** Resume playback after user gesture. Called on first user interaction. */
+  resume() {
+    if (!this._enabled || !this.audio) return;
+    // If the file hasn't finished loading yet, mark pending so it plays
+    // as soon as it's ready.
+    if (!this._ready) {
+      this._pendingStart = true;
+      return;
+    }
+    this._playInternal();
   }
 
   /** @returns {boolean} whether background music is currently enabled. */
@@ -99,12 +122,15 @@ class BackgroundMusic {
     this._savePreference();
 
     if (this._enabled) {
-      if (this._ready && this.audio) {
-        this.audio.volume = 0.15;
-        this.audio.currentTime = 0;
-        this.audio.play().catch(() => {});
+      this.audio.volume = 0.25;
+      if (this._ready) {
+        this._playInternal();
+      } else {
+        // File hasn't loaded yet — it will auto-play via canplaythrough
+        this._pendingStart = true;
       }
     } else {
+      this._pendingStart = false;
       if (this.audio) {
         this.audio.pause();
         this.audio.currentTime = 0;
@@ -137,6 +163,16 @@ class GameAudio {
 
     // Background music instance
     this.bgMusic = new BackgroundMusic();
+  }
+
+  /** Resume AudioContext (for sound effects) and background music. */
+  resumeAll() {
+    // Resume AudioContext if suspended (browser autoplay policy)
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    // Resume background music
+    this.bgMusic.resume();
   }
 
   _playTone(frequency, duration, type) {

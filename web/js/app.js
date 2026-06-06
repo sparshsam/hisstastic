@@ -56,38 +56,26 @@
     // Music toggle button
     const musicBtn = document.getElementById('btn-music');
     if (musicBtn) {
-      // Check if background music file is available after a short delay
-      // (the Audio element fires 'canplaythrough' or 'error' asynchronously)
-      setTimeout(() => {
-        if (!audio.bgMusicReady) {
-          // Audio file didn't load; disable the button
-          musicBtn.disabled = true;
-          musicBtn.textContent = '\uD83D\uDD07 Music';
-          musicBtn.title = 'Background music file not available';
-          musicBtn.classList.remove('music-on');
-          return;
-        }
-      }, 3000);
-
       musicBtn.addEventListener('click', () => {
         const on = audio.toggleBgMusic();
         musicBtn.textContent = on ? '\uD83C\uDFB5 Music' : '\uD83D\uDD07 Music';
         musicBtn.classList.toggle('music-on', on);
       });
-      // Reflect initial state
+      // Reflect initial state from localStorage
       if (audio.bgMusicEnabled) {
         musicBtn.classList.add('music-on');
       }
     }
 
-    // Resume background music on first user interaction (autoplay policy)
-    const resumeMusic = () => {
-      audio.resumeBgMusic();
-      document.removeEventListener('pointerdown', resumeMusic);
-      document.removeEventListener('keydown', resumeMusic);
+    // Resume AudioContext (sound effects) and background music on first user
+    // interaction, satisfying browser autoplay policy.
+    const resumeAll = () => {
+      audio.resumeAll();
+      document.removeEventListener('pointerdown', resumeAll);
+      document.removeEventListener('keydown', resumeAll);
     };
-    document.addEventListener('pointerdown', resumeMusic);
-    document.addEventListener('keydown', resumeMusic);
+    document.addEventListener('pointerdown', resumeAll);
+    document.addEventListener('keydown', resumeAll);
 
     // Start main loop
     lastTick = performance.now();
