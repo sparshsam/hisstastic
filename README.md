@@ -46,14 +46,20 @@ hiss_tastic/       # Python/Pygame package (canonical)
   game.py           — Game class, state machine
   config.py         — CONFIG dict, difficulty presets
   entities.py       — Snake, Food, Obstacle, PowerUp
-  audio.py          — Procedural sound effects
-  replay.py         — Deterministic replay infrastructure
-  ghost.py          — Local ghost replay sync
-  ...
+  audio.py          — Procedural sound effects with graceful fallback
+  assets.py         — Asset loading with placeholder fallbacks
+  input.py          — Event-to-action mapping
+  rendering.py      — All Pygame draw functions
+  scoring.py        — Quadratic scoring and legacy messages
+  spawns.py         — Safe grid-aligned entity placement
+  states.py         — Game state constants
+  replay.py         — Deterministic replay recording and validation
+  replay_cli.py     — Command-line replay tools
+  ghost.py          — Local ghost replay sync and visualization
 
 web/               # Browser/PWA runtime (experimental, playable)
   index.html
-  js/               — Game engine, audio, renderer, input, replay, commentary
+  js/               — Game engine, audio, renderer, input, replay, commentary, snake field, snake facts
   css/style.css
   assets/           — Background music, images
   sw.js             — Service worker (offline caching)
