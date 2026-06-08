@@ -365,3 +365,25 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 This repository follows the [ecosystem standards](https://github.com/sparshsam/ecosystem-standards).
+
+---
+
+*Last updated: June 2026*
+
+## Tech Stack
+
+| Layer | Choice |
+|-------|--------|
+| Language | Python |
+| Framework | Pygame |
+| Web dashboard | Flask (HTML/CSS/JS) |
+| Testing | pytest |
+
+## Screenshots
+
+> Screenshots to be added.
+
+```
+assets/screenshots/
+└── (to be captured)
+```
