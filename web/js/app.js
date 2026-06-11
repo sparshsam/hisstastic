@@ -61,20 +61,21 @@
         musicBtn.textContent = on ? '\uD83C\uDFB5 Music' : '\uD83D\uDD07 Music';
         musicBtn.classList.toggle('music-on', on);
       });
-      // Reflect initial state
+      // Reflect initial state from localStorage
       if (audio.bgMusicEnabled) {
         musicBtn.classList.add('music-on');
       }
     }
 
-    // Resume background music on first user interaction (autoplay policy)
-    const resumeMusic = () => {
-      audio.resumeBgMusic();
-      document.removeEventListener('pointerdown', resumeMusic);
-      document.removeEventListener('keydown', resumeMusic);
+    // Resume AudioContext (sound effects) and background music on first user
+    // interaction, satisfying browser autoplay policy.
+    const resumeAll = () => {
+      audio.resumeAll();
+      document.removeEventListener('pointerdown', resumeAll);
+      document.removeEventListener('keydown', resumeAll);
     };
-    document.addEventListener('pointerdown', resumeMusic);
-    document.addEventListener('keydown', resumeMusic);
+    document.addEventListener('pointerdown', resumeAll);
+    document.addEventListener('keydown', resumeAll);
 
     // Start main loop
     lastTick = performance.now();
@@ -83,6 +84,12 @@
 
   function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) {
+      return;
+    }
+    // Skip service worker registration on plain HTTP localhost
+    // to avoid developer confusion with stale caches during dev.
+    // Service worker still registers on HTTPS or secure contexts.
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       return;
     }
     window.addEventListener('load', () => {
