@@ -1,6 +1,7 @@
 # Hiss-Tastic
 
-A retro Snake-inspired arcade game built with Python and Pygame, with an experimental browser/PWA runtime.
+A retro Snake-inspired arcade game built with Python and Pygame, with a browser/PWA runtime.
+Fully local-first — no accounts, telemetry, or backend required.
 
 [![License](https://img.shields.io/github/license/sparshsam/hiss-tastic?style=flat-square)](LICENSE)
 [![Status: Maintained](https://img.shields.io/badge/status-maintained-2ea44f?style=flat-square)](#status)
@@ -8,20 +9,12 @@ A retro Snake-inspired arcade game built with Python and Pygame, with an experim
 
 ## Status
 
-**Maintained prototype.** The Python runtime remains the canonical preserved runtime. The codebase has been stabilized, modularized, and extended with deterministic replay, local ghost replay foundations, UI polish, audio, packaging notes, and CI validation.
+**Maintained prototype (v0.5.0).** The Python runtime remains the canonical preserved runtime.
+The browser runtime under `web/` is experimental but fully playable.
 
-The browser runtime under `web/` is experimental but playable. It is a local-first JavaScript/Canvas implementation with PWA offline cache behavior only.
-
-This repository preserves an original AI-assisted Python/Pygame prototype from the early ChatGPT/GPT-4o era while preparing it for careful modernization.
-
-## Project Metadata
-
-- Category: creative prototype
-- Class: archive -> maintained
-- Maturity: M2 maintained / Stage 2 stabilized
-- Data posture: local runtime only; no accounts, telemetry, external backend, wallet logic, or persistent network services
-- Research themes: AI-assisted software preservation, local-first software, human-centered computing, deterministic replay
-- ORCID: https://orcid.org/0009-0007-1585-6927
+This release focuses on **Local Runtime & Deployment Independence** — ensuring the game
+can be played, tested, and developed entirely on a local machine without relying on Vercel
+or any external service.
 
 ## Features
 
@@ -31,92 +24,274 @@ This repository preserves an original AI-assisted Python/Pygame prototype from t
 - Immunity power-up with timed invulnerability
 - Title screen with difficulty selection
 - Pause/resume
-- Procedural audio with mute toggle
+- Procedural audio with sound effects
+- **Looping background music** with Music On/Off toggle, low default volume, and localStorage persistence
 - Deterministic replay recording, playback, and verification
 - Local-only ghost replay foundations
-- Experimental browser runtime in `web/`
-- Mobile-friendly touch controls
-- PWA installability and offline cache behavior
+- Browser/PWA runtime in `web/`
+- Mobile-friendly touch controls and D-pad
 - Animated decorative snake field background (canvas-based, reduced-motion aware)
-- Live snake-fact roast commentary system (local-only, deterministic, no AI/API)
-- Legacy scoring messages preserved with snake-fact game-over roasts
+- Live snake-fact roast commentary system (local-only, deterministic)
+- PWA installability and offline cache behavior
+- Graceful degradation: game never crashes on missing audio or assets
+- Fully local-first: no accounts, telemetry, external APIs, backend, wallet logic, or multiplayer
 
 ## Architecture
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full module structure and data flow.
 
-Python package:
-
-```text
-hiss_tastic/
-  config.py
-  entities.py
-  assets.py
-  scoring.py
-  spawns.py
-  rendering.py
-  input.py
-  game.py
-  replay.py
-  ghost.py
-  audio.py
-  states.py
-main.py
 ```
+hiss_tastic/       # Python/Pygame package (canonical)
+  main.py           — Entry point
+  game.py           — Game class, state machine
+  config.py         — CONFIG dict, difficulty presets
+  entities.py       — Snake, Food, Obstacle, PowerUp
+  audio.py          — Procedural sound effects
+  replay.py         — Deterministic replay infrastructure
+  ghost.py          — Local ghost replay sync
+  ...
 
-Browser runtime:
-
-```text
-web/
+web/               # Browser/PWA runtime (experimental, playable)
   index.html
-  manifest.webmanifest
-  sw.js
+  js/               — Game engine, audio, renderer, input, replay, commentary
   css/style.css
-  js/app.js
-  js/game.js
-  js/replay.js
-  js/snakeFacts.js
-  js/commentary.js
-  js/snakeField.js
+  assets/           — Background music, images
+  sw.js             — Service worker (offline caching)
+  manifest.webmanifest
 ```
 
-## Python Setup
+---
 
-Create a virtual environment:
+## Local Development
+
+Hiss-Tastic has two runtimes. **Neither requires Vercel, a backend, or any external service.**
+
+### Prerequisites
+
+- **Python 3.9+** ([python.org](https://python.org))
+- **Git** ([git-scm.com](https://git-scm.com))
+- **A modern browser** (Chrome, Firefox, Edge, Safari)
+- **pygame** (for the Python runtime only)
+
+### Quick Start
 
 ```bash
+# Clone the repo
+git clone https://github.com/sparshsam/hiss-tastic.git
+cd hiss-tastic
+
+# Or use the dev server script
+bash scripts/serve.sh
+# Opens at http://localhost:8080 — the browser game, no build step required
+```
+
+---
+
+### Python Runtime Setup
+
+The Python/Pygame version is the canonical runtime.
+
+```bash
+# Create and activate a virtual environment
 python -m venv .venv
-```
 
-Activate it on macOS/Linux:
-
-```bash
+# macOS / Linux:
 source .venv/bin/activate
-```
 
-Activate it on Windows:
-
-```powershell
+# Windows (PowerShell):
 .venv\Scripts\activate
-```
 
-Install dependencies:
-
-```bash
+# Install pygame
 pip install pygame
-```
 
-Run the canonical Python game:
-
-```bash
+# Run the game
 python main.py
 ```
 
-The legacy preserved entry point is retained:
+**Legacy entry point** (preserved, unchanged):
 
 ```bash
 python hiss_tastic.py
 ```
+
+**Troubleshooting:**
+
+| Problem | Fix |
+|---------|-----|
+| `ModuleNotFoundError: No module named 'pygame'` | Run `pip install pygame` |
+| `pygame.error: video system not initialized` | Ensure you have a display (no `DISPLAY` in SSH) |
+| `pygame.error: No available video device` | Install X server or use headless mode (see below) |
+
+**Headless/WSL (no display):**
+
+On WSL or headless servers, the Python runtime won't produce a window. This is expected.
+Use the browser runtime instead — it's the primary local dev workflow.
+
+---
+
+### Browser Runtime Setup
+
+The browser runtime is a zero-config static site. No build step, no framework, no Node.js required.
+
+#### Option A: Quick Dev Server (Recommended)
+
+```bash
+bash scripts/serve.sh
+# Opens at http://localhost:8080
+```
+
+Or with a custom port:
+
+```bash
+bash scripts/serve.sh 3000
+# Opens at http://localhost:3000
+```
+
+#### Option B: Python HTTP Server (Manual)
+
+```bash
+python -m http.server 8080 --directory web/
+# Opens at http://localhost:8080
+```
+
+#### Option C: Any Static Server
+
+```bash
+# Node (if installed)
+npx serve web/ -p 8080
+
+# PHP
+php -S localhost:8080 -t web/
+```
+
+---
+
+### Local Static / Production-Style Preview
+
+To preview the game as it would appear in production, serve from the `web/` directory:
+
+```bash
+# Start server
+python -m http.server 8080 --directory web/
+
+# Open in a browser
+open http://localhost:8080
+```
+
+**Important:** On plain HTTP `localhost`, the service worker is intentionally skipped to
+avoid stale-cache confusion during local development. You can play and test everything on
+localhost without issues — this is the recommended local workflow.
+
+To test full PWA offline caching and service worker behavior, deploy to a secure context
+(HTTPS) such as:
+
+- Vercel preview deployment (`vercel --preview`)
+- GitHub Pages
+- Any HTTPS-enabled hosting
+- A local HTTPS server (e.g. `mkcert` for a trusted local cert)
+
+When deployed to HTTPS, the service worker caches all assets and the game remains
+playable offline.
+
+---
+
+### Testing the Python Runtime
+
+```bash
+# Validation suite (checks assets, schema, imports, etc.)
+python validation.py
+
+# Unit tests
+python -m unittest discover -v
+
+# Replay system
+python -m hiss_tastic.replay_cli record
+python -m hiss_tastic.replay_cli verify replays/replay_*.json
+python -m hiss_tastic.replay_cli play replays/replay_*.json
+```
+
+### Testing the Browser Runtime
+
+```bash
+# Local health check — verifies all files, assets, and dependencies
+bash scripts/check-local.sh
+
+# Start the server and open http://localhost:8080
+bash scripts/serve.sh
+
+# Manual smoke tests:
+# 1. Game loads without JS console errors
+# 2. Title screen displays with difficulty selection
+# 3. Gameplay: snake moves, eats food, collides with obstacles
+# 4. Sound effects play on eat/power-up/game-over
+# 5. Background music toggle works (🎵 Music button)
+# 6. Music credit link opens YouTube source
+# 7. PWA manifest loads (check DevTools → Application → Manifest)
+# 8. Service worker state (check DevTools → Application → Service Workers;
+#    on localhost it won't register — expected. Verify on HTTPS/preview.)
+# 9. Import/Export replay buttons work
+# 10. Mobile D-pad controls respond on touch devices
+```
+
+---
+
+### Verifying All Assets Load Locally
+
+| Asset | Path | How to Verify |
+|-------|------|---------------|
+| **Browser HTML** | `web/index.html` | Load `http://localhost:8080` |
+| **CSS** | `web/css/style.css` | DevTools → Network → style.css |
+| **JS files** | `web/js/*.js` | DevTools → Sources → js/ |
+| **Background music** | `web/assets/background-music.mp3` | Click 🎵 Music button; should play at low volume |
+| **PWA manifest** | `web/manifest.webmanifest` | DevTools → Application → Manifest |
+| **Service worker** | `web/sw.js` | DevTools → Application → Service Workers |
+| **PWA icons** | `web/icons/icon-{192,512}.png` | DevTools → Application → Manifest |
+| **Python assets** | `assets/snake.png, rodent.png, danger.png, power_up.png, icon.png` | `ls assets/` or `python validation.py` |
+
+**Graceful degradation:** If the background music file is missing or fails to load, the
+Music button becomes disabled and the game continues without crashing.
+
+---
+
+### Common Local Issues
+
+#### "The service worker keeps serving old files!"
+
+During development, the service worker caches aggressively. If you see stale content:
+
+1. Open DevTools → Application → Service Workers
+2. Click **"Unregister"**
+3. Hard-reload (`Ctrl+Shift+R` or `Cmd+Shift+R`)
+
+Or, run an incognito/private window where no service worker is registered.
+
+#### "Background music doesn't play!"
+
+- **Browser autoplay policy:** The music only starts after your first click/tap on the page.
+  Click anywhere on the game first.
+- **File not found:** Check that `web/assets/background-music.mp3` exists.
+  If missing, the Music button will be disabled.
+- **Volume too low:** Default volume is 0.15. Ensure your system volume is turned up.
+
+#### "The Python game doesn't start / black screen on WSL"
+
+WSL doesn't have a native display. The Python/Pygame runtime requires a window server.
+Use the browser runtime instead (`bash scripts/serve.sh` then open in Windows browser).
+
+#### "Page looks wrong / assets not loading"
+
+Make sure you're accessing the game through an HTTP server, not by opening the HTML file directly
+(`file:///` path). Browsers block many features (service workers, audio, fetch) on `file://` URLs.
+
+```bash
+# Correct:
+python -m http.server 8080 --directory web/
+# Then open http://localhost:8080
+
+# Incorrect: double-clicking web/index.html (file:///path/to/index.html)
+```
+
+---
 
 ## Replay System
 
@@ -138,25 +313,11 @@ Play back a replay:
 python -m hiss_tastic.replay_cli play replays/replay_12345_20260604.json
 ```
 
-Check ghost replay compatibility:
-
-```bash
-python -m hiss_tastic.replay_cli ghost-check replays/replay_12345_20260604.json
-```
-
 See [docs/replay-ux.md](docs/replay-ux.md) and [docs/ghost-racing.md](docs/ghost-racing.md).
 
 ## Browser Runtime
 
 A lightweight JavaScript/Canvas implementation is available in `web/`.
-
-Run it locally:
-
-```bash
-python -m http.server 8080 --directory web/
-```
-
-Then open `http://localhost:8080` in a browser.
 
 Browser runtime capabilities:
 
@@ -164,17 +325,20 @@ Browser runtime capabilities:
 - Touch/swipe and directional-pad controls
 - PWA manifest and service worker for offline cache behavior
 - Replay import/export with local JSON files
-- No telemetry, accounts, external backend, wallet/onchain logic, or multiplayer
+- Looping background music with toggle and credit link
+- No telemetry, accounts, external backend, wallet logic, or multiplayer
 
 See [docs/browser-runtime.md](docs/browser-runtime.md), [docs/mobile-controls.md](docs/mobile-controls.md), and [docs/pwa.md](docs/pwa.md).
 
 ## Validation
 
-Run the local validation suite:
-
 ```bash
+# Python validation suite
 python validation.py
-python -m unittest
+python -m unittest discover -v
+
+# Local health check (browser assets + Python)
+bash scripts/check-local.sh
 ```
 
 ## Packaging
@@ -184,28 +348,42 @@ See [docs/packaging.md](docs/packaging.md) for standalone executable instruction
 ## Limitations
 
 - Python remains canonical; browser runtime is experimental.
-- There is no online multiplayer, online leaderboard, telemetry, account system, backend, or wallet/onchain logic.
+- There is no online multiplayer, leaderboard, telemetry, account system, backend, or wallet/onchain logic.
 - Replay files are local JSON artifacts only when explicitly recorded, imported, or exported.
 - Ghost racing is local-only and score-neutral.
 - PWA support is limited to installability and offline asset caching.
-- Audio uses procedural generation.
 
 ## Ecosystem Role
 
-Hiss-Tastic is part of Sparsh Sam's broader public software ecosystem as a preserved AI-assisted game prototype and modernization candidate.
-
-## Future Roadmap
-
-See [docs/modernization-roadmap.md](docs/modernization-roadmap.md) for the full modernization plan.
+Hiss-Tastic is part of Sparsh Sam's broader public software ecosystem as a preserved AI-assisted
+game prototype and modernization candidate.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 
-## Citation
-
-This repository is not currently DOI-backed or citation-ready. Citation metadata may be added if the project later reaches publication-ready maturity.
-
 ---
 
 This repository follows the [ecosystem standards](https://github.com/sparshsam/ecosystem-standards).
+
+---
+
+*Last updated: June 2026*
+
+## Tech Stack
+
+| Layer | Choice |
+|-------|--------|
+| Language | Python |
+| Framework | Pygame |
+| Web dashboard | Flask (HTML/CSS/JS) |
+| Testing | pytest |
+
+## Screenshots
+
+> Screenshots to be added.
+
+```
+assets/screenshots/
+└── (to be captured)
+```

@@ -1,10 +1,11 @@
 /**
  * Hiss-Tastic Service Worker
  * Provides offline caching for the browser game.
+ * Gracefully handles missing assets so local dev is never blocked.
  * No telemetry, no analytics, no networking beyond cache.
  */
 
-const CACHE_NAME = 'hiss-tastic-v1';
+const CACHE_NAME = 'hiss-tastic-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -21,13 +22,23 @@ const ASSETS_TO_CACHE = [
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './assets/background-music.mp3',
 ];
 
-// Install: cache all assets
+// Install: cache all assets, skip failures gracefully
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      // Use cache.addAll for atomic caching, but wrap in a per-item catch
+      // so a single missing asset (e.g. background-music.mp3) doesn't
+      // prevent the entire service worker from installing.
+      return Promise.allSettled(
+        ASSETS_TO_CACHE.map((url) =>
+          cache.add(url).catch(() => {
+            // Silently skip assets that fail to cache
+          })
+        )
+      );
     }).then(() => {
       return self.skipWaiting();
     })

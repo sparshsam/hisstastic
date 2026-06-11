@@ -1,17 +1,16 @@
-# Support
+# Hiss-Tastic Support
 
-Hiss-Tastic is a maintained prototype preserving and modernizing a Snake-inspired Python/Pygame game with an experimental browser runtime.
+## Where to get help
 
-## Before Opening An Issue
+- **Bug reports** — Open a [GitHub Issue](https://github.com/sparshsam/hiss-tastic/issues/new)
+- **Feature requests** — Open a [GitHub Issue](https://github.com/sparshsam/hiss-tastic/issues/new) with the `enhancement` label
+- **Documentation** — See [docs/](docs/) for architecture and design docs
 
-- Check the [README](README.md), [ARCHITECTURE.md](ARCHITECTURE.md), and existing issues.
-- Include your operating system, Python version, dependency versions, and runtime path.
-- For browser issues, include the browser name and whether PWA/offline behavior is involved.
+## Before opening an issue
 
-## Good Issue Reports
+1. Check [existing issues](https://github.com/sparshsam/hiss-tastic/issues) for duplicates
+2. Confirm you are on the latest release version
 
-- Provide reproduction steps.
-- Include expected and actual behavior.
-- Attach replay data only if it does not contain private information.
+## Response times
 
-For security concerns, follow [SECURITY.md](SECURITY.md).
+This is a side project. Issues are typically addressed within a week.
