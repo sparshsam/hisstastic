@@ -13,21 +13,45 @@ class Renderer {
     this.gw = CONFIG.grid.width;
     this.gh = CONFIG.grid.height;
     this.bs = CONFIG.grid.blockSize;
+
+    // DPR / resize tracking
+    this.dpr = 1;
+    this.scale = 1;
+    this._needsResize = true;
+
+    // Render-skip tracking: only redraw when state actually changes
+    this._lastState = null;
+    this._lastTickCount = -1;
   }
 
-  // ---- Scale canvas to container ----
+  // ---- Mark canvas as needing resize on next render ----
+  markDirty() {
+    this._needsResize = true;
+  }
+
+  // ---- Scale canvas to container (with devicePixelRatio support) ----
   resize() {
     this.gw = this.game.getGridWidth();
     this.gh = this.game.getGridHeight();
+    const dpr = window.devicePixelRatio || 1;
+    this.dpr = dpr;
     const parent = this.canvas.parentElement;
     const maxW = parent.clientWidth;
     const maxH = window.innerHeight * 0.7;
     const scale = Math.min(maxW / this.gw, maxH / this.gh, 1.5);
-    this.canvas.width = this.gw;
-    this.canvas.height = this.gh;
+
+    // Only re-allocate buffer when dimensions actually change (avoid churn)
+    const bufW = Math.round(this.gw * dpr);
+    const bufH = Math.round(this.gh * dpr);
+    if (this.canvas.width !== bufW || this.canvas.height !== bufH) {
+      this.canvas.width = bufW;
+      this.canvas.height = bufH;
+    }
     this.canvas.style.width = (this.gw * scale) + 'px';
     this.canvas.style.height = (this.gh * scale) + 'px';
+
     this.scale = scale;
+    this._needsResize = false;
   }
 
   // ---- Clear ----
@@ -53,30 +77,34 @@ class Renderer {
   drawSnake() {
     const ctx = this.ctx;
     const s = this.game.snake;
-    if (!s) return;
+    if (!s || s.body.length === 0) return;
     const bs = this.bs;
     const gap = 1;
+    const body = s.body;
+    const len = body.length;
 
-    s.body.forEach((seg, i) => {
-      const isHead = i === s.body.length - 1;
-      ctx.fillStyle = isHead ? CONFIG.colors.snakeHead : CONFIG.colors.snake;
-      const radius = isHead ? 3 : 2;
-      this._roundRect(seg[0] + gap, seg[1] + gap, bs - gap * 2, bs - gap * 2, radius);
-    });
+    // Body segments (all except head) — use for loop to avoid per-frame closure allocation
+    ctx.fillStyle = CONFIG.colors.snake;
+    for (let i = 0; i < len - 1; i++) {
+      const seg = body[i];
+      this._roundRect(seg.x + gap, seg.y + gap, bs - gap * 2, bs - gap * 2, 2);
+    }
+
+    // Head
+    const head = body[len - 1];
+    ctx.fillStyle = CONFIG.colors.snakeHead;
+    this._roundRect(head.x + gap, head.y + gap, bs - gap * 2, bs - gap * 2, 3);
 
     // Eyes on head
-    if (s.body.length > 0) {
-      const head = s.head;
-      ctx.fillStyle = '#FFF';
-      const eyeSize = 3;
-      let ex1, ey1, ex2, ey2;
-      if (s.directionX > 0) { ex1 = head[0] + 14; ey1 = head[1] + 4; ex2 = head[0] + 14; ey2 = head[1] + 13; }
-      else if (s.directionX < 0) { ex1 = head[0] + 3; ey1 = head[1] + 4; ex2 = head[0] + 3; ey2 = head[1] + 13; }
-      else if (s.directionY > 0) { ex1 = head[0] + 4; ey1 = head[1] + 14; ex2 = head[0] + 13; ey2 = head[1] + 14; }
-      else { ex1 = head[0] + 4; ey1 = head[1] + 3; ex2 = head[0] + 13; ey2 = head[1] + 3; }
-      ctx.beginPath(); ctx.arc(ex1, ey1, eyeSize, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex2, ey2, eyeSize, 0, Math.PI * 2); ctx.fill();
-    }
+    ctx.fillStyle = '#FFF';
+    const eyeSize = 3;
+    let ex1, ey1, ex2, ey2;
+    if (s.directionX > 0) { ex1 = head.x + 14; ey1 = head.y + 4; ex2 = head.x + 14; ey2 = head.y + 13; }
+    else if (s.directionX < 0) { ex1 = head.x + 3; ey1 = head.y + 4; ex2 = head.x + 3; ey2 = head.y + 13; }
+    else if (s.directionY > 0) { ex1 = head.x + 4; ey1 = head.y + 14; ex2 = head.x + 13; ey2 = head.y + 14; }
+    else { ex1 = head.x + 4; ey1 = head.y + 3; ex2 = head.x + 13; ey2 = head.y + 3; }
+    ctx.beginPath(); ctx.arc(ex1, ey1, eyeSize, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex2, ey2, eyeSize, 0, Math.PI * 2); ctx.fill();
   }
 
   _roundRect(x, y, w, h, r) {
@@ -113,18 +141,20 @@ class Renderer {
 
   // ---- Draw obstacles ----
   drawObstacles() {
-    if (!this.game.obstacles) return;
+    const obs = this.game.obstacles;
+    if (!obs || obs.length === 0) return;
     const ctx = this.ctx;
     const bs = this.bs;
-    this.game.obstacles.forEach(([x, y]) => {
+    for (let i = 0; i < obs.length; i++) {
+      const ob = obs[i];
       ctx.fillStyle = CONFIG.colors.obstacle;
-      ctx.fillRect(x + 1, y + 1, bs - 2, bs - 2);
+      ctx.fillRect(ob.x + 1, ob.y + 1, bs - 2, bs - 2);
       // X pattern
       ctx.strokeStyle = '#444';
       ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x + 3, y + 3); ctx.lineTo(x + bs - 3, y + bs - 3); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x + bs - 3, y + 3); ctx.lineTo(x + 3, y + bs - 3); ctx.stroke();
-    });
+      ctx.beginPath(); ctx.moveTo(ob.x + 3, ob.y + 3); ctx.lineTo(ob.x + bs - 3, ob.y + bs - 3); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ob.x + bs - 3, ob.y + 3); ctx.lineTo(ob.x + 3, ob.y + bs - 3); ctx.stroke();
+    }
   }
 
   // ---- Draw power-up ----
@@ -347,7 +377,22 @@ class Renderer {
 
   // ---- Full frame render ----
   render() {
-    this.resize();
+    // Only resize when layout actually changes (avoids costly buffer re-allocation)
+    if (this._needsResize) {
+      this.resize();
+    }
+
+    // Skip re-render when game state hasn't changed (saves GPU on static screens)
+    if (this.game.state === 'PLAYING') {
+      if (this.game.state === this._lastState && this.game.currentTick === this._lastTickCount) return;
+    } else {
+      if (this.game.state === this._lastState) return;
+    }
+    this._lastState = this.game.state;
+    this._lastTickCount = this.game.currentTick;
+
+    // Apply DPR transform so all drawing stays in logical coordinates
+    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
 
     if (this.game.state === 'TITLE') {
       this.drawTitle();

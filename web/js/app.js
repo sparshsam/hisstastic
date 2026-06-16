@@ -25,6 +25,10 @@
   let animFrame = null;
   let _running = false;
 
+  // ---- Debug FPS counter ----
+  let frameCount = 0;
+  let fpsTimer = 0;
+
   // ---- Page navigation ----
 
   function showPage(pageId) {
@@ -76,6 +80,15 @@
     if (!_running) return;
     const dt = timestamp - lastTick;
     lastTick = timestamp;
+
+    // Debug FPS counter (logged every second; uncomment console to enable)
+    frameCount++;
+    fpsTimer += dt;
+    if (fpsTimer >= 1000) {
+      // console.log(`FPS: ${frameCount}`);
+      frameCount = 0;
+      fpsTimer = 0;
+    }
 
     if (game.state === 'PLAYING') {
       tickAccumulator += dt;
@@ -424,9 +437,13 @@
       hideOverlay('overlay-scores');
     });
 
-    // ---- Window resize (orientation change) ----
+    // ---- Window resize (orientation change, throttled) ----
+    let resizeTimer;
     window.addEventListener('resize', () => {
-      if (renderer) renderer.resize();
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (renderer) renderer.markDirty();
+      }, 100);
     });
 
     // ---- KEYBOARD SHORTCUTS (global) ----

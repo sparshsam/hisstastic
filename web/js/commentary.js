@@ -110,8 +110,8 @@
     const self = this;
     game.tick = function (dt) {
       // Track before original tick
-      const prevHead = game.snake ? game.snake.head.slice() : null;
-      const prevFood = game.food ? [game.food.x, game.food.y] : null;
+      const prevHead = game.snake ? { x: game.snake.head.x, y: game.snake.head.y } : null;
+      const prevFood = game.food ? { x: game.food.x, y: game.food.y } : null;
 
       origTick(dt);
 
@@ -134,7 +134,7 @@
       const gw = CONFIG.grid.width;
       const gh = CONFIG.grid.height;
 
-      if (head[0] >= gw || head[0] < 0 || head[1] >= gh || head[1] < 0) {
+      if (head.x >= gw || head.x < 0 || head.y >= gh || head.y < 0) {
         stats.wallCollisions++;
         // Don't trigger commentary on death wall hit — game-over handles it
         if (game.state === 'PLAYING') {
@@ -161,13 +161,13 @@
     // Track missed food (food was nearby but snake didn't get it)
     if (game.food && game.snake) {
       const head = game.snake.head;
-      const dx = Math.abs(head[0] - game.food.x);
-      const dy = Math.abs(head[1] - game.food.y);
+      const dx = Math.abs(head.x - game.food.x);
+      const dy = Math.abs(head.y - game.food.y);
 
       // If snake passed within 2 blocks of food without eating it
       if (dx <= 40 && dy <= 40 && prevFood) {
-        const prevDx = Math.abs(prevHead ? prevHead[0] - prevFood[0] : 999);
-        const prevDy = Math.abs(prevHead ? prevHead[1] - prevFood[1] : 999);
+        const prevDx = Math.abs(prevHead ? prevHead.x - prevFood.x : 999);
+        const prevDy = Math.abs(prevHead ? prevHead.y - prevFood.y : 999);
         // Snake was close and moved away
         if ((dx + dy) < 80 && (dx + dy) > 0 && (prevDx + prevDy) <= (dx + dy)) {
           stats.missedFoodCount++;

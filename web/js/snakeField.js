@@ -14,6 +14,11 @@
 
   const DEBUG = window.HISS_DEBUG_SNAKE === true;
 
+  // ---- Low-end device detection ----
+  function isLowEndDevice() {
+    return navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+  }
+
   // ---- Seeded PRNG ----
   function createRNG(seed) {
     let s = seed | 0;
@@ -428,11 +433,14 @@
     this.reducedMotion = false;
     this.visible = true;
     this.startTime = 0;
+    this._lowEndMode = false;
+    this._frameSkip = 0;
     this.handleVis = this._onVisibilityChange.bind(this);
   }
 
   SnakeField.prototype.init = function () {
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._lowEndMode = isLowEndDevice();
     this.canvas = document.createElement('canvas');
     this.canvas.id = 'bg-snake-field';
     this.canvas.style.position = 'fixed';
@@ -531,6 +539,16 @@
   SnakeField.prototype._animate = function (timestamp) {
     if (!this.running) return;
     if (!this.visible) { this.startTime = timestamp; this.animFrame = requestAnimationFrame(this._animate.bind(this)); return; }
+
+    // Frame-skip for low-end devices: run at ~20fps instead of 60fps
+    if (this._lowEndMode) {
+      this._frameSkip++;
+      if (this._frameSkip % 3 !== 0) {
+        this.animFrame = requestAnimationFrame(this._animate.bind(this));
+        return;
+      }
+    }
+
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;

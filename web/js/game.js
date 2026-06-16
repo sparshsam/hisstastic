@@ -122,7 +122,7 @@ function getQuadraticScore(n) {
 // ---- Snake ----
 class Snake {
   constructor(x, y) {
-    this.body = [[x, y]];
+    this.body = [{ x, y }];
     this.length = 1;
     this.directionX = 0;
     this.directionY = 0;
@@ -141,8 +141,8 @@ class Snake {
   }
 
   move() {
-    const [hx, hy] = this.head;
-    this.body.push([hx + this.directionX, hy + this.directionY]);
+    const hx = this.head.x, hy = this.head.y;
+    this.body.push({ x: hx + this.directionX, y: hy + this.directionY });
     if (this.body.length > this.length) {
       this.body.shift();
     }
@@ -155,13 +155,13 @@ class Snake {
   collidesWithSelf() {
     const h = this.head;
     for (let i = 0; i < this.body.length - 1; i++) {
-      if (this.body[i][0] === h[0] && this.body[i][1] === h[1]) return true;
+      if (this.body[i].x === h.x && this.body[i].y === h.y) return true;
     }
     return false;
   }
 
   isOn(x, y) {
-    return this.body.some(seg => seg[0] === x && seg[1] === y);
+    return this.body.some(seg => seg.x === x && seg.y === y);
   }
 }
 
@@ -201,11 +201,11 @@ function randomGridPosition(bs, gw, gh, rng) {
 }
 
 function isOnSnake(x, y, snakeBody) {
-  return snakeBody.some(seg => seg[0] === x && seg[1] === y);
+  return snakeBody.some(seg => seg.x === x && seg.y === y);
 }
 
 function isOnObstacles(x, y, obstacles) {
-  return obstacles.some(o => o[0] === x && o[1] === y);
+  return obstacles.some(o => o.x === x && o.y === y);
 }
 
 function safeFoodPosition(bs, gw, gh, snakeBody, obstacles, rng, maxAttempts) {
@@ -232,8 +232,8 @@ function generateObstacles(count, bs, gw, gh, snakeHead, rng, maxAttempts) {
   for (let i = 0; i < count; i++) {
     for (let j = 0; j < maxAttempts; j++) {
       const [x, y] = randomGridPosition(bs, gw, gh, rng);
-      if (!obs.some(o => o[0] === x && o[1] === y) && !(x === snakeHead[0] && y === snakeHead[1])) {
-        obs.push([x, y]);
+      if (!obs.some(o => o.x === x && o.y === y) && !(x === snakeHead.x && y === snakeHead.y)) {
+        obs.push({ x, y });
         break;
       }
     }
@@ -436,7 +436,7 @@ class HissTastic {
     const gh = this.getGridHeight();
 
     // Check wall collision BEFORE moving
-    const [hx, hy] = this.snake.head;
+    const hx = this.snake.head.x, hy = this.snake.head.y;
     if (hx >= gw || hx < 0 || hy >= gh || hy < 0) {
       if (this.shielded) {
         this.shielded = false;
@@ -469,7 +469,7 @@ class HissTastic {
 
     // Obstacle collision
     for (const o of this.obstacles) {
-      if (this.snake.head[0] === o[0] && this.snake.head[1] === o[1]) {
+      if (this.snake.head.x === o.x && this.snake.head.y === o.y) {
         if (this.shielded) {
           this.shielded = false;
           // Shield consumed — survive this collision
@@ -485,7 +485,7 @@ class HissTastic {
     }
 
     // Food collection
-    if (this.snake.head[0] === this.food.x && this.snake.head[1] === this.food.y) {
+    if (this.snake.head.x === this.food.x && this.snake.head.y === this.food.y) {
       const [fx, fy] = safeFoodPosition(bs, gw, gh, this.snake.body, this.obstacles, this.rng);
       this.food = new Food(fx, fy);
       this.snake.grow();
@@ -498,8 +498,8 @@ class HissTastic {
 
     // Power-up collection
     if (this.powerUp.active &&
-        this.snake.head[0] === this.powerUp.x &&
-        this.snake.head[1] === this.powerUp.y) {
+        this.snake.head.x === this.powerUp.x &&
+        this.snake.head.y === this.powerUp.y) {
       this.powerUp.deactivate();
       const type = this.powerUp.powerUpType;
 
