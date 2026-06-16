@@ -5,7 +5,7 @@
  */
 
 // ---- Game version ----
-const GAME_VERSION = '0.5.2';
+const GAME_VERSION = '0.6.0';
 
 // ---- Constants ----
 const CONFIG = {
@@ -32,6 +32,9 @@ const CONFIG = {
     immunityDuration: 3.8,
     obstacleCount: 5,
     powerUpRespawnChance: 50,
+    speedBoostDuration: 4.0,
+    scoreMultiplierDuration: 5.0,
+    powerUpTypes: ['immunity', 'speed_boost', 'shield', 'score_multiplier'],
   },
   difficulty: {
     mode: 'normal',
@@ -39,6 +42,52 @@ const CONFIG = {
       easy: { initialSpeed: 4, speedIncrement: 1, obstacleCount: 3, immunityDuration: 5.0 },
       normal: { initialSpeed: 5, speedIncrement: 1, obstacleCount: 5, immunityDuration: 3.8 },
       hard: { initialSpeed: 7, speedIncrement: 2, obstacleCount: 8, immunityDuration: 2.5 },
+    },
+  },
+  themes: {
+    classic: {
+      name: 'Classic',
+      bg: '#FFFFFF',
+      snake: '#4CAF50',
+      snakeHead: '#2E7D32',
+      food: '#FF4444',
+      obstacle: '#666666',
+      powerUp: '#FFD700',
+      accent: '#4CAF50',
+      gridLine: '#F0F0F0',
+    },
+    midnight: {
+      name: 'Midnight',
+      bg: '#1a1a2e',
+      snake: '#00d2ff',
+      snakeHead: '#0099cc',
+      food: '#ff6b6b',
+      obstacle: '#4a4a6a',
+      powerUp: '#ffd93d',
+      accent: '#00d2ff',
+      gridLine: '#2a2a4e',
+    },
+    desert: {
+      name: 'Desert',
+      bg: '#f4e4c1',
+      snake: '#c4843a',
+      snakeHead: '#8b5e2b',
+      food: '#e74c3c',
+      obstacle: '#a0845c',
+      powerUp: '#f39c12',
+      accent: '#c4843a',
+      gridLine: '#e8d5a3',
+    },
+    ocean: {
+      name: 'Ocean',
+      bg: '#e8f4f8',
+      snake: '#1a8a9e',
+      snakeHead: '#0d5c6e',
+      food: '#ff6f61',
+      obstacle: '#5a8a9e',
+      powerUp: '#ffd700',
+      accent: '#1a8a9e',
+      gridLine: '#d0e8f0',
     },
   },
 };
@@ -127,14 +176,20 @@ class Food {
 
 // ---- PowerUp ----
 class PowerUp {
-  constructor(x, y) {
+  constructor(x, y, powerUpType) {
     this.x = x;
     this.y = y;
     this.active = true;
+    this.powerUpType = powerUpType || 'immunity';
   }
   get position() { return [this.x, this.y]; }
   deactivate() { this.active = false; }
-  reactivate(x, y) { this.x = x; this.y = y; this.active = true; }
+  reactivate(x, y, powerUpType) {
+    this.x = x;
+    this.y = y;
+    this.active = true;
+    if (powerUpType) this.powerUpType = powerUpType;
+  }
 }
 
 // ---- Spawn helpers ----
@@ -203,6 +258,7 @@ class HissTastic {
     this.state = 'TITLE';  // TITLE, PLAYING, PAUSED, GAME_OVER
     this.difficultyMode = CONFIG.difficulty.mode;
     this.muted = false;
+    this.currentTheme = 'classic';
     this.score = 0;
     this.foodCount = 0;
     this.snakeSpeed = CONFIG.gameplay.initialSpeed;
@@ -218,10 +274,33 @@ class HissTastic {
     this._listeners = {};
     this._lastCollisionType = null;
 
+    // Gameplay stats tracking
+    this.stats = {
+      gamesPlayed: 0,
+      totalFood: 0,
+      totalScore: 0,
+      longestSnake: 1,
+      highestScore: 0,
+      lastTenScores: [],
+    };
+
     // DOM references (set by app.js)
     this.canvas = null;
     this.ctx = null;
     this.overlay = null;
+  }
+
+  // ---- Portrait mode detection ----
+  isPortrait() {
+    return window.innerHeight > window.innerWidth;
+  }
+
+  getGridWidth() {
+    return this.isPortrait() ? 280 : CONFIG.grid.width;
+  }
+
+  getGridHeight() {
+    return this.isPortrait() ? 460 : CONFIG.grid.height;
   }
 
   on(event, callback) {
@@ -233,6 +312,22 @@ class HissTastic {
     (this._listeners[event] || []).forEach(cb => cb(data));
   }
 
+  // ---- Theme ----
+  setTheme(name) {
+    const theme = CONFIG.themes[name];
+    if (!theme) return;
+    this.currentTheme = name;
+    CONFIG.colors.brightWhite = theme.bg;
+    CONFIG.colors.neonPink = theme.accent;
+    CONFIG.colors.snake = theme.snake;
+    CONFIG.colors.snakeHead = theme.snakeHead;
+    CONFIG.colors.food = theme.food;
+    CONFIG.colors.obstacle = theme.obstacle;
+    CONFIG.colors.powerUp = theme.powerUp;
+    CONFIG.colors.gridLine = theme.gridLine;
+    localStorage.setItem('hissTasticTheme', name);
+  }
+
   // ---- Game session ----
   startGame(seed) {
     const preset = CONFIG.difficulty.presets[this.difficultyMode] || CONFIG.difficulty.presets.normal;
@@ -241,8 +336,8 @@ class HissTastic {
     const rng = createRNG(seed);
 
     const bs = CONFIG.grid.blockSize;
-    const gw = CONFIG.grid.width;
-    const gh = CONFIG.grid.height;
+    const gw = this.getGridWidth();
+    const gh = this.getGridHeight();
 
     this.rng = rng;
     this.snake = new Snake(gw / 2, gh / 2);
@@ -262,14 +357,22 @@ class HissTastic {
     this.food = new Food(fx, fy);
 
     const [px, py] = safePowerUpPosition(bs, gw, gh, this.obstacles, rng);
-    this.powerUp = new PowerUp(px, py);
+    const types = CONFIG.gameplay.powerUpTypes;
+    const type = types[Math.floor(rng() * types.length)];
+    this.powerUp = new PowerUp(px, py, type);
 
     this.immune = false;
     this.immuneStartTime = 0;
+    this.speedBoostActive = false;
+    this.speedBoostStartTime = 0;
+    this.shielded = false;
+    this.scoreMultiplier = 1;
+    this.scoreMultiplierStartTime = 0;
     this.lastDirection = null;
     this._lastCollisionType = null;
 
     this.state = 'PLAYING';
+    this.stats.gamesPlayed++;
     this.emit(EVENTS.START, { seed });
   }
 
@@ -280,8 +383,8 @@ class HissTastic {
     const rng = createRNG(seed);
 
     const bs = CONFIG.grid.blockSize;
-    const gw = CONFIG.grid.width;
-    const gh = CONFIG.grid.height;
+    const gw = this.getGridWidth();
+    const gh = this.getGridHeight();
 
     this.rng = rng;
     this.snake = new Snake(gw / 2, gh / 2);
@@ -299,10 +402,17 @@ class HissTastic {
     this.food = new Food(fx, fy);
 
     const [px, py] = safePowerUpPosition(bs, gw, gh, this.obstacles, rng);
-    this.powerUp = new PowerUp(px, py);
+    const types = CONFIG.gameplay.powerUpTypes;
+    const type = types[Math.floor(rng() * types.length)];
+    this.powerUp = new PowerUp(px, py, type);
 
     this.immune = false;
     this.immuneStartTime = 0;
+    this.speedBoostActive = false;
+    this.speedBoostStartTime = 0;
+    this.shielded = false;
+    this.scoreMultiplier = 1;
+    this.scoreMultiplierStartTime = 0;
     this.lastDirection = null;
     this._lastCollisionType = null;
 
@@ -322,35 +432,51 @@ class HissTastic {
     if (this.state !== 'PLAYING') return;
 
     const bs = CONFIG.grid.blockSize;
-    const gw = CONFIG.grid.width;
-    const gh = CONFIG.grid.height;
+    const gw = this.getGridWidth();
+    const gh = this.getGridHeight();
 
     // Check wall collision BEFORE moving
     const [hx, hy] = this.snake.head;
     if (hx >= gw || hx < 0 || hy >= gh || hy < 0) {
-      this.state = 'GAME_OVER';
-      this._lastCollisionType = 'wall';
-      this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'wall' });
-      return;
+      if (this.shielded) {
+        this.shielded = false;
+        // Shield consumed — survive this collision
+      } else {
+        this.state = 'GAME_OVER';
+        this._lastCollisionType = 'wall';
+        this._recordGameOverStats();
+        this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'wall' });
+        return;
+      }
     }
 
     // Move
     this.snake.move();
 
     // Self collision
-    if (this.snake.collidesWithSelf() && !this.immune) {
-      this.state = 'GAME_OVER';
-      this._lastCollisionType = 'self';
-      this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'self' });
-      return;
+    if (this.snake.collidesWithSelf()) {
+      if (this.shielded) {
+        this.shielded = false;
+        // Shield consumed — survive this collision
+      } else if (!this.immune) {
+        this.state = 'GAME_OVER';
+        this._lastCollisionType = 'self';
+        this._recordGameOverStats();
+        this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'self' });
+        return;
+      }
     }
 
     // Obstacle collision
     for (const o of this.obstacles) {
       if (this.snake.head[0] === o[0] && this.snake.head[1] === o[1]) {
-        if (!this.immune) {
+        if (this.shielded) {
+          this.shielded = false;
+          // Shield consumed — survive this collision
+        } else if (!this.immune) {
           this.state = 'GAME_OVER';
           this._lastCollisionType = 'obstacle';
+          this._recordGameOverStats();
           this.emit(EVENTS.QUIT, { score: this.score, collisionType: 'obstacle' });
           return;
         }
@@ -365,7 +491,8 @@ class HissTastic {
       this.snake.grow();
       this.snakeSpeed += CONFIG.gameplay.speedIncrement;
       this.foodCount++;
-      this.score += getQuadraticScore(this.foodCount);
+      this.stats.totalFood++;
+      this.score += getQuadraticScore(this.foodCount) * this.scoreMultiplier;
       this.emit(EVENTS.DIRECTION, { type: 'eat' });
     }
 
@@ -374,9 +501,27 @@ class HissTastic {
         this.snake.head[0] === this.powerUp.x &&
         this.snake.head[1] === this.powerUp.y) {
       this.powerUp.deactivate();
-      this.immune = true;
-      this.immuneStartTime = performance.now();
-      this.emit(EVENTS.DIRECTION, { type: 'powerup' });
+      const type = this.powerUp.powerUpType;
+
+      switch (type) {
+        case 'immunity':
+          this.immune = true;
+          this.immuneStartTime = performance.now();
+          break;
+        case 'speed_boost':
+          this.speedBoostActive = true;
+          this.speedBoostStartTime = performance.now();
+          break;
+        case 'shield':
+          this.shielded = true;
+          break;
+        case 'score_multiplier':
+          this.scoreMultiplier = 2;
+          this.scoreMultiplierStartTime = performance.now();
+          break;
+      }
+
+      this.emit(EVENTS.DIRECTION, { type: 'powerup', powerUpType: type });
     }
 
     // Immunity timeout
@@ -384,10 +529,22 @@ class HissTastic {
       this.immune = false;
     }
 
+    // Speed boost timeout
+    if (this.speedBoostActive && (performance.now() - this.speedBoostStartTime) > CONFIG.gameplay.speedBoostDuration * 1000) {
+      this.speedBoostActive = false;
+    }
+
+    // Score multiplier timeout
+    if (this.scoreMultiplier > 1 && (performance.now() - this.scoreMultiplierStartTime) > CONFIG.gameplay.scoreMultiplierDuration * 1000) {
+      this.scoreMultiplier = 1;
+    }
+
     // Power-up respawn
     if (!this.powerUp.active && this.rng() < 1 / CONFIG.gameplay.powerUpRespawnChance) {
       const [px, py] = safePowerUpPosition(bs, gw, gh, this.obstacles, this.rng);
-      this.powerUp.reactivate(px, py);
+      const types = CONFIG.gameplay.powerUpTypes;
+      const type = types[Math.floor(this.rng() * types.length)];
+      this.powerUp.reactivate(px, py, type);
     }
 
     // Replay playback
@@ -426,6 +583,10 @@ class HissTastic {
     };
   }
 
+  get effectiveSpeed() {
+    return this.snakeSpeed + (this.speedBoostActive ? 3 : 0);
+  }
+
   _directionToName(dir) {
     if (!dir) return null;
     if (dir[0] === -1 && dir[1] === 0) return 'LEFT';
@@ -438,6 +599,14 @@ class HissTastic {
   _directionFromName(name) {
     const map = { LEFT: [-1, 0], RIGHT: [1, 0], UP: [0, -1], DOWN: [0, 1] };
     return map[name] || null;
+  }
+
+  _recordGameOverStats() {
+    this.stats.totalScore += this.score;
+    this.stats.longestSnake = Math.max(this.stats.longestSnake, this.snake.length);
+    this.stats.highestScore = Math.max(this.stats.highestScore, this.score);
+    this.stats.lastTenScores.push(this.score);
+    if (this.stats.lastTenScores.length > 10) this.stats.lastTenScores.shift();
   }
 
   getMeanMessage() {

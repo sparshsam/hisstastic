@@ -8,6 +8,16 @@
 (function() {
   'use strict';
 
+  /**
+   * Trigger haptic vibration if the device supports it.
+   * Accepts a single number (duration in ms) or an array pattern.
+   */
+  function vibrate(pattern) {
+    if (navigator.vibrate) {
+      try { navigator.vibrate(pattern); } catch (_) {}
+    }
+  }
+
   let game, renderer, input, audio, replay, commentary, snakeField;
   let lastTick = 0;
   let tickAccumulator = 0;
@@ -69,7 +79,7 @@
 
     if (game.state === 'PLAYING') {
       tickAccumulator += dt;
-      tickRate = 1000 / game.snakeSpeed;
+      tickRate = 1000 / game.effectiveSpeed;
       while (tickAccumulator >= tickRate) {
         game.tick(tickRate);
         tickAccumulator -= tickRate;
@@ -107,6 +117,19 @@
     return score > scores[scores.length - 1].score;
   }
 
+  // ---- Stats persistence ----
+
+  function saveStats() {
+    try { localStorage.setItem('hissTasticStats', JSON.stringify(game.stats)); } catch (_) {}
+  }
+
+  function loadStats() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('hissTasticStats'));
+      if (saved) Object.assign(game.stats, saved);
+    } catch (_) {}
+  }
+
   function renderHighScores() {
     const list = document.getElementById('scores-list');
     const empty = document.getElementById('scores-empty');
@@ -125,6 +148,37 @@
         '<span class="score-meta">' + s.difficulty + '</span>' +
       '</div>'
     ).join('');
+
+    // Add stats below scores
+    const stats = game.stats;
+    if (stats.gamesPlayed > 0) {
+      const statsHtml = `
+        <div style="margin-top:12px;padding-top:8px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;">
+          ${stats.gamesPlayed} games · ${stats.totalFood} food eaten · Avg ${Math.round(stats.totalScore / stats.gamesPlayed)}/game
+        </div>
+      `;
+      list.insertAdjacentHTML('afterend', statsHtml);
+    }
+  }
+
+  // ---- Theme helpers ----
+
+  function applyTheme(name) {
+    game.setTheme(name);
+    const theme = CONFIG.themes[name];
+    if (theme) {
+      const pageHome = document.getElementById('page-home');
+      if (pageHome) pageHome.style.background = theme.bg;
+      const canvas = document.getElementById('game-canvas');
+      if (canvas) canvas.style.background = theme.bg;
+    }
+  }
+
+  function loadTheme() {
+    const saved = localStorage.getItem('hissTasticTheme') || 'classic';
+    const select = document.getElementById('settings-theme');
+    if (select) select.value = saved;
+    applyTheme(saved);
   }
 
   // ---- Difficulty helpers ----
@@ -178,6 +232,13 @@
       hsEl.style.display = 'none';
     }
 
+    // Game-over stats line
+    const stats = game.stats;
+    const statsEl = document.getElementById('go-stats');
+    if (statsEl && stats.gamesPlayed > 0) {
+      statsEl.textContent = 'Game #' + stats.gamesPlayed + ' · Avg ' + Math.round(stats.totalScore / stats.gamesPlayed) + '/game';
+    }
+
     showOverlay('overlay-gameover');
   }
 
@@ -206,6 +267,7 @@
 
     game = new HissTastic();
     game.canvas = canvas;
+    loadStats();
 
     renderer = new Renderer(canvas, game);
     input = new InputHandler(game);
@@ -226,11 +288,13 @@
 
     // ---- Audio events ----
     game.on('direction', (data) => {
-      if (data.type === 'eat') audio.playEat();
-      if (data.type === 'powerup') audio.playPowerUp();
+      if (data.type === 'eat') { audio.playEat(); vibrate(10); }
+      if (data.type === 'powerup') { audio.playPowerUp(data.powerUpType); vibrate([15, 10, 15]); }
     });
     game.on('quit', (data) => {
       audio.playGameOver();
+      vibrate([30, 20, 50]);
+      saveStats();
       handleGameOver(data || {});
     });
 
@@ -348,10 +412,21 @@
       }
     });
 
+    // Settings theme select
+    const themeSelect = document.getElementById('settings-theme');
+    themeSelect.addEventListener('change', () => {
+      applyTheme(themeSelect.value);
+    });
+
     // ---- SCORES OVERLAY ----
 
     document.getElementById('btn-close-scores').addEventListener('click', () => {
       hideOverlay('overlay-scores');
+    });
+
+    // ---- Window resize (orientation change) ----
+    window.addEventListener('resize', () => {
+      if (renderer) renderer.resize();
     });
 
     // ---- KEYBOARD SHORTCUTS (global) ----
@@ -384,6 +459,9 @@
 
     // Initial difficulty sync
     syncDifficultyFromGame();
+
+    // Load saved theme
+    loadTheme();
 
     // Show home page, no main loop yet
     showPage('home');

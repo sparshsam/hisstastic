@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#4CAF50">
+  <meta name="x5-orientation" content="portrait">
+  <meta name="screen-orientation" content="portrait">
   <meta name="description" content="Hiss-Tastic — a retro Snake-inspired arcade game">
   <title>Hiss-Tastic</title>
   <link rel="manifest" href="manifest.webmanifest">
@@ -33,7 +35,7 @@
         <button id="btn-open-scores" class="home-link">&#127942; Scores</button>
       </div>
 
-      <p class="home-version">v0.5.2</p>
+      <p class="home-version">v0.6.0</p>
     </div>
   </div>
 
@@ -83,6 +85,16 @@
       </div>
 
       <div class="setting-row">
+        <label>Theme</label>
+        <select id="settings-theme" class="theme-select">
+          <option value="classic">Classic</option>
+          <option value="midnight">Midnight</option>
+          <option value="desert">Desert</option>
+          <option value="ocean">Ocean</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
         <label>Sound Effects</label>
         <button id="settings-sound" class="toggle-btn">On</button>
       </div>
@@ -97,7 +109,7 @@
         <a href="https://www.youtube.com/watch?v=ahgcD1xjRiQ&list=RDahgcD1xjRiQ&start_radio=1" target="_blank" rel="noopener noreferrer" class="settings-link">YouTube source</a>
       </div>
 
-      <p class="settings-version">Hiss-Tastic v0.5.2</p>
+      <p class="settings-version">Hiss-Tastic v0.6.0</p>
     </div>
   </div>
 
@@ -108,6 +120,7 @@
       <p class="go-score">Score: <span id="go-score-value">0</span></p>
       <p id="go-highscore" class="go-highscore" style="display:none;">&#127942; New High Score!</p>
       <p id="go-roast" class="go-roast"></p>
+      <p id="go-stats" class="go-stats"></p>
       <button id="btn-retry" class="overlay-btn primary">&#9654; Play Again</button>
       <button id="btn-save-score" class="overlay-btn">&#128190; Save Score</button>
       <button id="btn-home-from-go" class="overlay-btn">&#8962; Home</button>

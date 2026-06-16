@@ -17,6 +17,8 @@ class Renderer {
 
   // ---- Scale canvas to container ----
   resize() {
+    this.gw = this.game.getGridWidth();
+    this.gh = this.game.getGridHeight();
     const parent = this.canvas.parentElement;
     const maxW = parent.clientWidth;
     const maxH = window.innerHeight * 0.7;
@@ -130,12 +132,28 @@ class Renderer {
     if (!this.game.powerUp || !this.game.powerUp.active) return;
     const ctx = this.ctx;
     const bs = this.bs;
-    ctx.fillStyle = CONFIG.colors.powerUp;
+
+    const typeColors = {
+      immunity: '#FFD700',
+      speed_boost: '#2196F3',
+      shield: '#9E9E9E',
+      score_multiplier: '#9C27B0',
+    };
+
+    const typeGlow = {
+      immunity: '#FFEE44',
+      speed_boost: '#64B5F6',
+      shield: '#BDBDBD',
+      score_multiplier: '#CE93D8',
+    };
+
+    const puType = this.game.powerUp.powerUpType;
+    ctx.fillStyle = typeColors[puType] || CONFIG.colors.powerUp;
     ctx.beginPath();
     ctx.arc(this.game.powerUp.x + bs / 2, this.game.powerUp.y + bs / 2, bs / 2 - 2, 0, Math.PI * 2);
     ctx.fill();
-    // Star-burst glow
-    ctx.fillStyle = '#FFEE44';
+    // Inner glow
+    ctx.fillStyle = typeGlow[puType] || '#FFEE44';
     ctx.beginPath();
     ctx.arc(this.game.powerUp.x + bs / 2, this.game.powerUp.y + bs / 2, bs / 4, 0, Math.PI * 2);
     ctx.fill();
@@ -150,9 +168,21 @@ class Renderer {
     ctx.textAlign = 'left';
     ctx.fillText('Score: ' + this.game.score, 8, 20);
 
-    if (this.game.immune) {
-      ctx.fillStyle = CONFIG.colors.powerUp;
-      ctx.fillText('IMMUNE', this.gw - 80, 20);
+    // Active power-up indicators
+    const indicators = [];
+    if (this.game.immune) indicators.push({ text: 'IMMUNE', color: '#FFD700' });
+    if (this.game.speedBoostActive) indicators.push({ text: 'SPEED', color: '#2196F3' });
+    if (this.game.shielded) indicators.push({ text: 'SHIELD', color: '#9E9E9E' });
+    if (this.game.scoreMultiplier > 1) indicators.push({ text: 'x' + this.game.scoreMultiplier + ' SCORE', color: '#9C27B0' });
+
+    let xPos = this.gw - 8;
+    for (let i = indicators.length - 1; i >= 0; i--) {
+      const ind = indicators[i];
+      ctx.fillStyle = ind.color;
+      ctx.textAlign = 'right';
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText(ind.text, xPos, 20);
+      xPos -= ctx.measureText(ind.text).width + 10;
     }
   }
 

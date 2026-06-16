@@ -199,9 +199,29 @@ class GameAudio {
     this._playTone(440, 0.1, 'sine');
   }
 
-  playPowerUp() {
-    this._playTone(660, 0.2, 'sine');
-    setTimeout(() => this._playTone(880, 0.15, 'sine'), 100);
+  playPowerUp(type) {
+    switch (type) {
+      case 'immunity':
+        this._playTone(660, 0.2, 'sine');
+        setTimeout(() => this._playTone(880, 0.15, 'sine'), 100);
+        break;
+      case 'speed_boost':
+        this._playTone(880, 0.08, 'sine');
+        setTimeout(() => this._playTone(1100, 0.08, 'sine'), 60);
+        setTimeout(() => this._playTone(1320, 0.1, 'sine'), 120);
+        break;
+      case 'shield':
+        this._playTone(330, 0.3, 'triangle');
+        break;
+      case 'score_multiplier':
+        this._playTone(523, 0.12, 'sine');
+        setTimeout(() => this._playTone(659, 0.12, 'sine'), 80);
+        setTimeout(() => this._playTone(784, 0.15, 'sine'), 160);
+        break;
+      default:
+        this._playTone(660, 0.2, 'sine');
+        setTimeout(() => this._playTone(880, 0.15, 'sine'), 100);
+    }
   }
 
   playGameOver() {

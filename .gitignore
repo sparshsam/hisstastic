@@ -25,3 +25,5 @@ python-*.exe
 python-*.pkg
 replays/
 venv/
+node_modules/
+android/
