@@ -11,7 +11,7 @@ const GAME_VERSION = '0.5.2';
 const CONFIG = {
   colors: {
     brightWhite: '#FFFFFF',
-    neonPink: '#FF1493',
+    neonPink: '#4CAF50',
     black: '#000000',
     fadedBlack: 'rgba(0,0,0,0.08)',
     gridLine: '#F0F0F0',

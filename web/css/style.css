@@ -121,9 +121,9 @@ html, body {
 }
 
 .ctrl-btn.music-on {
-  background: #FF1493;
+  background: #4CAF50;
   color: #fff;
-  border-color: #FF1493;
+  border-color: #4CAF50;
 }
 
 /* ---- Music credit link ---- */
@@ -141,7 +141,7 @@ html, body {
 }
 
 .music-credit a:hover {
-  color: #FF1493;
+  color: #4CAF50;
   text-decoration: underline;
 }
 
@@ -164,7 +164,7 @@ html, body {
 .replay-overlay h3 {
   font-size: 18px;
   margin-bottom: 12px;
-  color: #FF1493;
+  color: #4CAF50;
   text-align: center;
 }
 
@@ -205,9 +205,9 @@ html, body {
 }
 
 .replay-overlay button:first-of-type {
-  background: #FF1493;
+  background: #4CAF50;
   color: #fff;
-  border-color: #FF1493;
+  border-color: #4CAF50;
 }
 
 /* ---- Commentary box (live snake-fact roasts) ---- */
@@ -320,7 +320,7 @@ html, body {
 .home-title {
   font-family: monospace;
   font-size: 36px;
-  color: #FF1493;
+  color: #4CAF50;
   text-align: center;
   letter-spacing: 2px;
   margin-bottom: 0;
@@ -338,9 +338,9 @@ html, body {
   font-family: monospace;
   font-size: 22px;
   padding: 16px 56px;
-  border: 3px solid #FF1493;
+  border: 3px solid #4CAF50;
   border-radius: 60px;
-  background: #FF1493;
+  background: #4CAF50;
   color: #fff;
   cursor: pointer;
   touch-action: manipulation;
@@ -380,9 +380,9 @@ html, body {
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 .diff-btn.active {
-  background: #FF1493;
+  background: #4CAF50;
   color: #fff;
-  border-color: #FF1493;
+  border-color: #4CAF50;
 }
 .diff-btn:active {
   opacity: 0.7;
@@ -407,7 +407,7 @@ html, body {
   transition: color 0.15s;
 }
 .home-link:active {
-  color: #FF1493;
+  color: #4CAF50;
 }
 
 .home-version {
@@ -501,7 +501,7 @@ html, body {
 .overlay-title {
   font-family: monospace;
   font-size: 24px;
-  color: #FF1493;
+  color: #4CAF50;
   text-align: center;
   margin: 0;
 }
@@ -517,7 +517,7 @@ html, body {
 .go-highscore {
   font-family: monospace;
   font-size: 16px;
-  color: #FF1493;
+  color: #4CAF50;
   margin: 0;
   animation: pulse 1s ease-in-out infinite alternate;
 }
@@ -556,9 +556,9 @@ html, body {
   background: #ddd;
 }
 .overlay-btn.primary {
-  background: #FF1493;
+  background: #4CAF50;
   color: #fff;
-  border-color: #FF1493;
+  border-color: #4CAF50;
 }
 .overlay-btn.primary:active {
   background: #e0127e;
@@ -663,7 +663,7 @@ html, body {
 .settings-link {
   font-family: monospace;
   font-size: 13px;
-  color: #FF1493;
+  color: #4CAF50;
   text-decoration: none;
 }
 
