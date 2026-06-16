@@ -39,12 +39,6 @@
 
   <!-- ====== GAME PAGE ====== -->
   <div id="page-game" class="page">
-    <div class="game-hud">
-      <button id="btn-pause" class="hud-btn pause-btn">&#9208;</button>
-      <span id="hud-score" class="hud-score">Score: 0</span>
-      <span id="hud-difficulty" class="hud-diff"></span>
-    </div>
-
     <div id="game-container">
       <canvas id="game-canvas"></canvas>
 
@@ -62,6 +56,7 @@
       <!-- Bottom controls -->
       <div id="controls" class="controls">
         <input type="file" id="replay-upload" accept=".json" style="display:none;">
+        <button id="btn-pause" class="ctrl-btn" title="Pause">&#9208; Pause</button>
         <button id="btn-import" class="ctrl-btn" onclick="document.getElementById('replay-upload').click()" title="Import Replay">&#128194; Import</button>
         <button id="btn-export-replay" class="ctrl-btn" title="Export Replay">&#128190; Export</button>
         <button id="btn-music" class="ctrl-btn" title="Toggle Background Music">&#127925; Music</button>

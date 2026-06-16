@@ -134,8 +134,6 @@
     document.querySelectorAll('.diff-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.diff === mode);
     });
-    const label = document.getElementById('hud-difficulty');
-    if (label) label.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
   }
 
   function syncDifficultyFromGame() {
