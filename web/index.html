@@ -12,29 +12,129 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="game-container">
-    <canvas id="game-canvas"></canvas>
 
-    <!-- Directional overlay for mobile -->
-    <div id="dpad" class="dpad">
-      <button id="btn-up" class="dpad-btn dpad-up" aria-label="Up">&#9650;</button>
-      <button id="btn-left" class="dpad-btn dpad-left" aria-label="Left">&#9664;</button>
-      <button id="btn-right" class="dpad-btn dpad-right" aria-label="Right">&#9654;</button>
-      <button id="btn-down" class="dpad-btn dpad-down" aria-label="Down">&#9660;</button>
+  <!-- ====== HOME PAGE ====== -->
+  <div id="page-home" class="page active">
+    <div class="home-content">
+      <h1 class="home-title">HISS-TASTIC</h1>
+      <p class="home-subtitle">by SPARSH</p>
+
+      <button id="btn-play" class="play-btn">▶ PLAY</button>
+
+      <div class="home-difficulty">
+        <span class="diff-label">Difficulty:</span>
+        <button class="diff-btn" data-diff="easy">Easy</button>
+        <button class="diff-btn active" data-diff="normal">Normal</button>
+        <button class="diff-btn" data-diff="hard">Hard</button>
+      </div>
+
+      <div class="home-links">
+        <button id="btn-open-settings" class="home-link">&#9881; Settings</button>
+        <button id="btn-open-scores" class="home-link">&#127942; Scores</button>
+      </div>
+
+      <p class="home-version">v0.5.2</p>
+    </div>
+  </div>
+
+  <!-- ====== GAME PAGE ====== -->
+  <div id="page-game" class="page">
+    <div class="game-hud">
+      <button id="btn-pause" class="hud-btn pause-btn">&#9208;</button>
+      <span id="hud-score" class="hud-score">Score: 0</span>
+      <span id="hud-difficulty" class="hud-diff"></span>
     </div>
 
-    <!-- Replay info overlay -->
-    <div id="replay-overlay" class="replay-overlay" style="display:none;"></div>
+    <div id="game-container">
+      <canvas id="game-canvas"></canvas>
 
-    <!-- Bottom controls -->
-    <div id="controls" class="controls">
-      <input type="file" id="replay-upload" accept=".json" style="display:none;">
-      <button id="btn-import" class="ctrl-btn" onclick="document.getElementById('replay-upload').click()" title="Import Replay">&#128194; Import</button>
-      <button id="btn-export-replay" class="ctrl-btn" title="Export Replay">&#128190; Export</button>
-      <button id="btn-music" class="ctrl-btn" title="Toggle Background Music">&#127925; Music</button>
+      <!-- Directional overlay for mobile -->
+      <div id="dpad" class="dpad">
+        <button id="btn-up" class="dpad-btn dpad-up" aria-label="Up">&#9650;</button>
+        <button id="btn-left" class="dpad-btn dpad-left" aria-label="Left">&#9664;</button>
+        <button id="btn-right" class="dpad-btn dpad-right" aria-label="Right">&#9654;</button>
+        <button id="btn-down" class="dpad-btn dpad-down" aria-label="Down">&#9660;</button>
+      </div>
+
+      <!-- Replay info overlay -->
+      <div id="replay-overlay" class="replay-overlay" style="display:none;"></div>
+
+      <!-- Bottom controls -->
+      <div id="controls" class="controls">
+        <input type="file" id="replay-upload" accept=".json" style="display:none;">
+        <button id="btn-import" class="ctrl-btn" onclick="document.getElementById('replay-upload').click()" title="Import Replay">&#128194; Import</button>
+        <button id="btn-export-replay" class="ctrl-btn" title="Export Replay">&#128190; Export</button>
+        <button id="btn-music" class="ctrl-btn" title="Toggle Background Music">&#127925; Music</button>
+      </div>
+      <div class="music-credit">
+        <a href="https://www.youtube.com/watch?v=ahgcD1xjRiQ&amp;list=RDahgcD1xjRiQ&amp;start_radio=1" target="_blank" rel="noopener noreferrer" title="Background music credit">Music credit</a>
+      </div>
     </div>
-    <div class="music-credit">
-      <a href="https://www.youtube.com/watch?v=ahgcD1xjRiQ&amp;list=RDahgcD1xjRiQ&amp;start_radio=1" target="_blank" rel="noopener noreferrer" title="Background music credit">Music credit</a>
+  </div>
+
+  <!-- ====== SETTINGS MODAL ====== -->
+  <div id="modal-settings" class="modal" style="display:none;">
+    <div class="modal-content">
+      <button id="btn-close-settings" class="modal-close-btn">&#10005;</button>
+      <h2 class="modal-title">&#9881; Settings</h2>
+
+      <div class="setting-row">
+        <label>Difficulty</label>
+        <div class="settings-diff">
+          <button class="diff-btn" data-diff="easy">Easy</button>
+          <button class="diff-btn active" data-diff="normal">Normal</button>
+          <button class="diff-btn" data-diff="hard">Hard</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <label>Sound Effects</label>
+        <button id="settings-sound" class="toggle-btn">On</button>
+      </div>
+
+      <div class="setting-row">
+        <label>Background Music</label>
+        <button id="settings-music" class="toggle-btn">Off</button>
+      </div>
+
+      <div class="setting-row">
+        <label>Music Credit</label>
+        <a href="https://www.youtube.com/watch?v=ahgcD1xjRiQ&list=RDahgcD1xjRiQ&start_radio=1" target="_blank" rel="noopener noreferrer" class="settings-link">YouTube source</a>
+      </div>
+
+      <p class="settings-version">Hiss-Tastic v0.5.2</p>
+    </div>
+  </div>
+
+  <!-- ====== GAME OVER OVERLAY ====== -->
+  <div id="overlay-gameover" class="overlay" style="display:none;">
+    <div class="overlay-content">
+      <h2 class="overlay-title">GAME OVER</h2>
+      <p class="go-score">Score: <span id="go-score-value">0</span></p>
+      <p id="go-highscore" class="go-highscore" style="display:none;">&#127942; New High Score!</p>
+      <p id="go-roast" class="go-roast"></p>
+      <button id="btn-retry" class="overlay-btn primary">&#9654; Play Again</button>
+      <button id="btn-save-score" class="overlay-btn">&#128190; Save Score</button>
+      <button id="btn-home-from-go" class="overlay-btn">&#8962; Home</button>
+    </div>
+  </div>
+
+  <!-- ====== PAUSE OVERLAY ====== -->
+  <div id="overlay-pause" class="overlay" style="display:none;">
+    <div class="overlay-content">
+      <h2 class="overlay-title">PAUSED</h2>
+      <button id="btn-resume" class="overlay-btn primary">&#9654; Resume</button>
+      <button id="btn-home-from-pause" class="overlay-btn">&#8962; Home</button>
+    </div>
+  </div>
+
+  <!-- ====== HIGH SCORES OVERLAY ====== -->
+  <div id="overlay-scores" class="overlay" style="display:none;">
+    <div class="overlay-content">
+      <h2 class="overlay-title">&#127942; High Scores</h2>
+      <div id="scores-list" class="scores-list"></div>
+      <p id="scores-empty" class="scores-empty">No scores yet. Play a game!</p>
+      <button id="btn-close-scores" class="overlay-btn">Close</button>
     </div>
   </div>
 

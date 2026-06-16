@@ -281,3 +281,467 @@ html, body {
     display: none;
   }
 }
+
+/* =============================================
+   Page system — v0.5.2
+   ============================================= */
+.page {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.page.active {
+  display: flex;
+}
+
+/* =============================================
+   Home page
+   ============================================= */
+#page-home {
+  z-index: 2;
+  background: #FFFFFF;
+}
+
+.home-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.home-title {
+  font-family: monospace;
+  font-size: 36px;
+  color: #FF1493;
+  text-align: center;
+  letter-spacing: 2px;
+  margin-bottom: 0;
+}
+
+.home-subtitle {
+  font-family: monospace;
+  font-size: 14px;
+  color: #666;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+.play-btn {
+  font-family: monospace;
+  font-size: 22px;
+  padding: 16px 56px;
+  border: 3px solid #FF1493;
+  border-radius: 60px;
+  background: #FF1493;
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, box-shadow 0.1s;
+  letter-spacing: 1px;
+}
+.play-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
+}
+
+.home-difficulty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.diff-label {
+  font-family: monospace;
+  font-size: 12px;
+  color: #666;
+}
+
+.diff-btn {
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background: #f5f5f5;
+  color: #555;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.diff-btn.active {
+  background: #FF1493;
+  color: #fff;
+  border-color: #FF1493;
+}
+.diff-btn:active {
+  opacity: 0.7;
+}
+
+.home-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.home-link {
+  font-family: monospace;
+  font-size: 13px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  padding: 6px 10px;
+  transition: color 0.15s;
+}
+.home-link:active {
+  color: #FF1493;
+}
+
+.home-version {
+  font-family: monospace;
+  font-size: 10px;
+  color: #ccc;
+  margin-top: 12px;
+}
+
+/* =============================================
+   Game HUD (score, pause, difficulty label)
+   ============================================= */
+.game-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 600px;
+  padding: 6px 12px;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.hud-btn {
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f5f5f5;
+  color: #555;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+}
+.hud-btn:active {
+  background: #ddd;
+}
+
+.hud-score {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+  text-align: center;
+}
+
+.hud-diff {
+  font-family: monospace;
+  font-size: 11px;
+  color: #999;
+}
+
+/* =============================================
+   Overlay system (game over, pause, scores)
+   ============================================= */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 24px;
+  border: 2px solid #eee;
+  border-radius: 16px;
+  background: #fff;
+  min-width: 260px;
+  max-width: 90%;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.overlay-title {
+  font-family: monospace;
+  font-size: 24px;
+  color: #FF1493;
+  text-align: center;
+  margin: 0;
+}
+
+.go-score {
+  font-family: monospace;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.go-highscore {
+  font-family: monospace;
+  font-size: 16px;
+  color: #FF1493;
+  margin: 0;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
+.go-roast {
+  font-family: monospace;
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  max-width: 260px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.overlay-btn {
+  font-family: monospace;
+  font-size: 15px;
+  width: 200px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #f5f5f5;
+  color: #555;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s, color 0.1s;
+  text-align: center;
+}
+.overlay-btn:active {
+  background: #ddd;
+}
+.overlay-btn.primary {
+  background: #FF1493;
+  color: #fff;
+  border-color: #FF1493;
+}
+.overlay-btn.primary:active {
+  background: #e0127e;
+}
+
+/* =============================================
+   Settings modal
+   ============================================= */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: auto;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 24px;
+  border: 2px solid #eee;
+  border-radius: 16px;
+  background: #fff;
+  min-width: 280px;
+  max-width: 90%;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  padding: 4px 8px;
+}
+
+.modal-title {
+  font-family: monospace;
+  font-size: 20px;
+  color: #333;
+  text-align: center;
+  margin: 0 0 4px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: monospace;
+  font-size: 14px;
+  color: #555;
+}
+
+.setting-row label {
+  min-width: 100px;
+}
+
+.toggle-btn {
+  font-family: monospace;
+  font-size: 13px;
+  padding: 6px 16px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  background: #f5f5f5;
+  color: #555;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 56px;
+  transition: background 0.1s, color 0.1s;
+}
+.toggle-btn.on {
+  background: #4CAF50;
+  color: #fff;
+  border-color: #4CAF50;
+}
+
+.settings-diff {
+  display: flex;
+  gap: 4px;
+}
+.settings-diff .diff-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.settings-link {
+  font-family: monospace;
+  font-size: 13px;
+  color: #FF1493;
+  text-decoration: none;
+}
+
+.settings-version {
+  font-family: monospace;
+  font-size: 10px;
+  color: #ccc;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* =============================================
+   High Scores list
+   ============================================= */
+.scores-list {
+  width: 100%;
+  font-family: monospace;
+  font-size: 14px;
+  color: #333;
+}
+
+.score-entry {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.score-entry:last-child {
+  border-bottom: none;
+}
+
+.score-entry .score-rank {
+  color: #999;
+  min-width: 24px;
+}
+
+.score-entry .score-val {
+  font-weight: bold;
+}
+
+.score-entry .score-meta {
+  color: #999;
+  font-size: 11px;
+}
+
+.scores-empty {
+  font-family: monospace;
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* =============================================
+   Mobile adjustments for pages
+   ============================================= */
+@media (max-height: 500px) {
+  .home-title {
+    font-size: 24px;
+  }
+  .play-btn {
+    font-size: 18px;
+    padding: 12px 40px;
+  }
+  .home-content {
+    gap: 6px;
+  }
+  .overlay-content {
+    padding: 18px 16px;
+    gap: 8px;
+  }
+  .overlay-btn {
+    width: 160px;
+    padding: 8px;
+    font-size: 13px;
+  }
+  .go-score {
+    font-size: 22px;
+  }
+}

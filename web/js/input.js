@@ -1,6 +1,9 @@
 /**
  * Input handler for Hiss-Tastic browser game.
- * Supports keyboard, touch/swipe, and directional overlay.
+ * Supports keyboard, touch/swipe (anywhere on screen), and directional overlay.
+ *
+ * v2 — Swipe works anywhere on the page, D-pad uses touchstart for instant
+ * response on mobile, and D-pad touches don't trigger swipe detection.
  */
 
 class InputHandler {
@@ -9,6 +12,7 @@ class InputHandler {
     this.touchStartX = 0;
     this.touchStartY = 0;
     this.swipeThreshold = 30;
+    this._touchingDpad = false; // true while a dpad touch is in progress
 
     // Directional overlay buttons
     this.upBtn = document.getElementById('btn-up');
@@ -20,37 +24,73 @@ class InputHandler {
   }
 
   _bindEvents() {
-    // Keyboard
+    // Keyboard — always on document
     document.addEventListener('keydown', (e) => this._onKey(e));
 
-    // Touch/swipe on canvas
+    // Touch/swipe on the ENTIRE document, not just the canvas.
+    // This way swiping anywhere on the phone screen works.
+    document.addEventListener('touchstart', (e) => this._onTouchStart(e), { passive: true });
+    document.addEventListener('touchend', (e) => this._onTouchEnd(e), { passive: true });
+
+    // Click on the canvas for desktop click-to-start/tap
     const canvas = this.game.canvas;
     if (canvas) {
-      canvas.addEventListener('touchstart', (e) => this._onTouchStart(e), { passive: true });
-      canvas.addEventListener('touchend', (e) => this._onTouchEnd(e), { passive: true });
       canvas.addEventListener('click', (e) => this._onClick(e));
     }
 
-    // Directional buttons
-    if (this.upBtn) this.upBtn.addEventListener('click', () => this._dir(0, -1));
-    if (this.downBtn) this.downBtn.addEventListener('click', () => this._dir(0, 1));
-    if (this.leftBtn) this.leftBtn.addEventListener('click', () => this._dir(-1, 0));
-    if (this.rightBtn) this.rightBtn.addEventListener('click', () => this._dir(1, 0));
-
-    // Touch on directional buttons (prevent default to avoid double-firing)
-    [this.upBtn, this.downBtn, this.leftBtn, this.rightBtn].forEach(btn => {
-      if (btn) {
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+    // ---- D-pad: use touchstart (not click) for instant response on mobile ----
+    const setDir = (dx, dy) => {
+      const g = this.game;
+      if (g.state === 'PLAYING') {
+        g.snake.setDirection(dx * CONFIG.grid.blockSize, dy * CONFIG.grid.blockSize);
+        g.pushReplayInput([dx, dy]);
       }
-    });
-  }
+    };
 
-  _dir(dx, dy) {
-    const g = this.game;
-    if (g.state === 'PLAYING') {
-      g.snake.setDirection(dx * CONFIG.grid.blockSize, dy * CONFIG.grid.blockSize);
-      g.pushReplayInput([dx, dy]);
+    if (this.upBtn) {
+      this.upBtn.addEventListener('touchstart', (e) => {
+        this._touchingDpad = true;
+        setDir(0, -1);
+        e.preventDefault();
+      }, { passive: false });
+      this.upBtn.addEventListener('click', (e) => { setDir(0, -1); e.preventDefault(); });
+      this.upBtn.addEventListener('mousedown', (e) => e.preventDefault());
     }
+    if (this.downBtn) {
+      this.downBtn.addEventListener('touchstart', (e) => {
+        this._touchingDpad = true;
+        setDir(0, 1);
+        e.preventDefault();
+      }, { passive: false });
+      this.downBtn.addEventListener('click', (e) => { setDir(0, 1); e.preventDefault(); });
+      this.downBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    }
+    if (this.leftBtn) {
+      this.leftBtn.addEventListener('touchstart', (e) => {
+        this._touchingDpad = true;
+        setDir(-1, 0);
+        e.preventDefault();
+      }, { passive: false });
+      this.leftBtn.addEventListener('click', (e) => { setDir(-1, 0); e.preventDefault(); });
+      this.leftBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    }
+    if (this.rightBtn) {
+      this.rightBtn.addEventListener('touchstart', (e) => {
+        this._touchingDpad = true;
+        setDir(1, 0);
+        e.preventDefault();
+      }, { passive: false });
+      this.rightBtn.addEventListener('click', (e) => { setDir(1, 0); e.preventDefault(); });
+      this.rightBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    }
+
+    // Clear the D-pad touch flag when the touch ends (anywhere)
+    document.addEventListener('touchend', () => {
+      this._touchingDpad = false;
+    }, { passive: true });
+    document.addEventListener('touchcancel', () => {
+      this._touchingDpad = false;
+    }, { passive: true });
   }
 
   _onKey(e) {
@@ -138,6 +178,12 @@ class InputHandler {
   }
 
   _onTouchStart(e) {
+    // Don't track swipe start if touching a D-pad button
+    const target = e.target;
+    if (target && target.classList && target.classList.contains('dpad-btn')) {
+      return;
+    }
+
     const touch = e.touches[0];
     this.touchStartX = touch.clientX;
     this.touchStartY = touch.clientY;
@@ -145,8 +191,9 @@ class InputHandler {
 
   _onTouchEnd(e) {
     const g = this.game;
+
+    // Tap to start/restart on title/game-over screens
     if (g.state === 'TITLE' || g.state === 'GAME_OVER') {
-      // Tap to start/restart
       if (g.state === 'TITLE') g.startGame();
       else if (g.state === 'GAME_OVER') g.startGame();
       return;
@@ -154,11 +201,16 @@ class InputHandler {
 
     if (g.state !== 'PLAYING') return;
 
+    // If we were touching a D-pad button, don't interpret as swipe
+    if (this._touchingDpad) {
+      return;
+    }
+
     const touch = e.changedTouches[0];
     const dx = touch.clientX - this.touchStartX;
     const dy = touch.clientY - this.touchStartY;
 
-    // Swipe detection
+    // Swipe detection — only if the finger moved enough
     if (Math.abs(dx) > this.swipeThreshold || Math.abs(dy) > this.swipeThreshold) {
       if (Math.abs(dx) > Math.abs(dy)) {
         // Horizontal swipe

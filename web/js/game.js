@@ -4,6 +4,9 @@
  * No external dependencies.
  */
 
+// ---- Game version ----
+const GAME_VERSION = '0.5.2';
+
 // ---- Constants ----
 const CONFIG = {
   colors: {
@@ -414,6 +417,7 @@ class HissTastic {
     return {
       version: '1.0.0',
       game: 'hiss-tastic',
+      game_version: GAME_VERSION,
       seed: this.replaySeed,
       timestamp: new Date().toISOString(),
       score: this.score,
