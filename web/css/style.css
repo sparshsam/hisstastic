@@ -42,65 +42,8 @@ body {
   background: #FFFFFF;
   touch-action: none;
   max-width: 100%;
-  max-height: min(400px, 100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 200px);
+  max-height: min(560px, 100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 120px);
   height: auto;
-}
-
-/* ---- Dynamic D-pad sizing ---- */
-:root {
-  --dpad-size: min(60px, calc((100vw - 40px) / 3));
-}
-
-/* ---- Directional pad (mobile) ---- */
-.dpad {
-  display: grid;
-  grid-template-columns: var(--dpad-size) var(--dpad-size) var(--dpad-size);
-  grid-template-rows: var(--dpad-size) var(--dpad-size);
-  gap: 4px;
-  margin-top: 12px;
-  justify-content: center;
-  touch-action: manipulation;
-}
-
-.dpad-btn {
-  width: var(--dpad-size);
-  height: var(--dpad-size);
-  border: 2px solid #333;
-  border-radius: 12px;
-  background: #f5f5f5;
-  font-size: calc(var(--dpad-size) * 0.37);
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.1s;
-}
-
-.dpad-btn:active {
-  background: #ddd;
-}
-
-.dpad-up {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.dpad-left {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.dpad-right {
-  grid-column: 3;
-  grid-row: 2;
-}
-
-.dpad-down {
-  grid-column: 2;
-  grid-row: 2;
 }
 
 /* ---- Bottom controls ---- */
@@ -263,31 +206,14 @@ body {
 /* ---- Mobile landscape adjustments ---- */
 @media (max-height: 500px) {
   :root {
-    --dpad-size: min(44px, calc((100vw - 30px) / 3));
-  }
-  #game-container {
+ {
     padding: 4px;
-  }
-  .dpad {
-    gap: 3px;
-    margin-top: 6px;
-  }
-  .dpad-btn {
-    border-radius: 8px;
-  }
-  .controls {
+  } {
     margin-top: 6px;
   }
   .ctrl-btn {
     padding: 4px 10px;
     font-size: 11px;
-  }
-}
-
-/* ---- Hide dpad on large screens ---- */
-@media (min-width: 768px) and (min-height: 600px) {
-  .dpad {
-    display: none;
   }
 }
 

@@ -25,7 +25,7 @@ class Renderer {
     const dpr = window.devicePixelRatio || 1;
     const parent = this.canvas.parentElement;
     const maxW = parent.clientWidth;
-    const maxH = window.innerHeight * 0.7;
+    const maxH = window.innerHeight * 0.85;
     const scale = Math.min(maxW / this.gw, maxH / this.gh, 3);
     // Canvas buffer at full DPR resolution for crisp rendering on high-DPI screens
     this.canvas.width = Math.round(this.gw * dpr);
