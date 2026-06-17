@@ -296,11 +296,11 @@ class HissTastic {
   }
 
   getGridWidth() {
-    return this.isPortrait() ? 280 : CONFIG.grid.width;
+    return this.isPortrait() ? 360 : CONFIG.grid.width;
   }
 
   getGridHeight() {
-    return this.isPortrait() ? 460 : CONFIG.grid.height;
+    return this.isPortrait() ? 560 : CONFIG.grid.height;
   }
 
   on(event, callback) {
