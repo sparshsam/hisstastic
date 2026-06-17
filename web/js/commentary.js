@@ -105,18 +105,10 @@
       this._resetStats();
     }.bind(this));
 
-    // Monkey-patch tick to track collisions
+    // Pass through tick (live commentary disabled — game-over roasts only)
     const origTick = game.tick.bind(game);
-    const self = this;
     game.tick = function (dt) {
-      // Track before original tick
-      const prevHead = game.snake ? { x: game.snake.head.x, y: game.snake.head.y } : null;
-      const prevFood = game.food ? { x: game.food.x, y: game.food.y } : null;
-
       origTick(dt);
-
-      // Detect collisions and events after tick
-      self._detectEvents(game, prevHead, prevFood);
     };
   };
 
