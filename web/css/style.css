@@ -643,3 +643,23 @@ body {
     font-size: 22px;
   }
 }
+
+
+/* ---- Feedback link ---- */
+.feedback-link {
+  text-align: center;
+  margin-top: 4px;
+}
+
+.feedback-link a {
+  font-family: monospace;
+  font-size: 10px;
+  color: #999;
+  text-decoration: none;
+}
+
+.feedback-link a:hover {
+  color: #4CAF50;
+  text-decoration: underline;
+}
+
