@@ -29,20 +29,23 @@ class Renderer {
     this._needsResize = true;
   }
 
-  // ---- Scale canvas to container ----
+  // ---- Scale canvas to container (with devicePixelRatio for crisp rendering) ----
   resize() {
     this.gw = this.game.getGridWidth();
     this.gh = this.game.getGridHeight();
+    const dpr = window.devicePixelRatio || 1;
     const parent = this.canvas.parentElement;
     const maxW = parent.clientWidth;
     const maxH = window.innerHeight * 0.7;
     const scale = Math.min(maxW / this.gw, maxH / this.gh, 1.5);
-    this.canvas.width = this.gw;
-    this.canvas.height = this.gh;
+    // Canvas buffer at full DPR resolution for crisp rendering on high-DPI screens
+    this.canvas.width = Math.round(this.gw * dpr);
+    this.canvas.height = Math.round(this.gh * dpr);
     this.canvas.style.width = (this.gw * scale) + 'px';
     this.canvas.style.height = (this.gh * scale) + 'px';
-    // Reset transform to identity (canvas.width/height setter does this, but be explicit)
+    // Scale context so all drawing ops use logical coordinates (0..gw, 0..gh)
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.scale(dpr, dpr);
     this.scale = scale;
     this._needsResize = false;
   }

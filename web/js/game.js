@@ -340,7 +340,7 @@ class HissTastic {
     const gh = this.getGridHeight();
 
     this.rng = rng;
-    this.snake = new Snake(gw / 2, gh / 2);
+    this.snake = new Snake(Math.floor(gw / bs / 2) * bs, Math.floor(gh / bs / 2) * bs);
     this.snakeSpeed = preset.initialSpeed;
     this.score = 0;
     this.foodCount = 0;
@@ -388,7 +388,7 @@ class HissTastic {
     const gh = this.getGridHeight();
 
     this.rng = rng;
-    this.snake = new Snake(gw / 2, gh / 2);
+    this.snake = new Snake(Math.floor(gw / bs / 2) * bs, Math.floor(gh / bs / 2) * bs);
     this.snakeSpeed = preset.initialSpeed;
     this.score = 0;
     this.foodCount = 0;
