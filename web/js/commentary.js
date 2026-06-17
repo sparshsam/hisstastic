@@ -92,7 +92,7 @@
       }
       if (data.type === 'powerup') {
         this.stats.powerUpCollected = true;
-        this._trigger('power_up');
+        // Live commentary disabled
       }
     }.bind(this));
 
@@ -203,31 +203,10 @@
    * Display a commentary message in the UI.
    */
   CommentaryEngine.prototype._showCommentary = function (text) {
-    if (!this.commentaryEl) return;
-
-    // Clear any pending fade
-    if (this.fadeTimer) {
-      clearTimeout(this.fadeTimer);
+    // Live commentary disabled
+    if (this.commentaryEl) {
+      this.commentaryEl.textContent = text;
     }
-
-    this.commentaryEl.textContent = text;
-    this.commentaryEl.style.display = 'block';
-    this.commentaryEl.classList.remove('commentary-fade');
-    this.commentaryEl.classList.add('commentary-visible');
-
-    // Start fade after display duration
-    this.fadeTimer = setTimeout(function () {
-      if (this.commentaryEl) {
-        this.commentaryEl.classList.remove('commentary-visible');
-        this.commentaryEl.classList.add('commentary-fade');
-        // Hide after transition
-        setTimeout(function () {
-          if (this.commentaryEl) {
-            this.commentaryEl.style.display = 'none';
-          }
-        }.bind(this), 600);
-      }
-    }.bind(this), 5000);
   };
 
   /**
@@ -266,7 +245,7 @@
    * Show an idle reminder.
    */
   CommentaryEngine.prototype.showIdleHint = function () {
-    this._trigger('idle');
+    // Live commentary disabled
   };
 
   /**
