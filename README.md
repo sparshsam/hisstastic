@@ -414,10 +414,10 @@ This repository follows the [ecosystem standards](https://github.com/sparshsam/e
 
 | Layer | Choice |
 |-------|--------|
-| Language | Python |
-| Framework | Pygame |
-| Web dashboard | Flask (HTML/CSS/JS) |
-| Testing | pytest |
+| Language (canonical) | Python |
+| Framework (canonical) | Pygame |
+| Web runtime | JavaScript / Canvas (PWA) |
+| Testing | pytest (Python), manual (browser)
 
 ## Screenshots
 
