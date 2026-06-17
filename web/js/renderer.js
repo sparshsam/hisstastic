@@ -14,19 +14,8 @@ class Renderer {
     this.gh = CONFIG.grid.height;
     this.bs = CONFIG.grid.blockSize;
 
-    // DPR / resize tracking
-    this.dpr = 1;
+    this.dpr = window.devicePixelRatio || 1;
     this.scale = 1;
-    this._needsResize = true;
-
-    // Render-skip tracking: only redraw when state actually changes
-    this._lastState = null;
-    this._lastTickCount = -1;
-  }
-
-  // ---- Mark canvas as needing resize on next render ----
-  markDirty() {
-    this._needsResize = true;
   }
 
   // ---- Scale canvas to container (with devicePixelRatio for crisp rendering) ----
@@ -47,7 +36,6 @@ class Renderer {
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(dpr, dpr);
     this.scale = scale;
-    this._needsResize = false;
   }
 
   // ---- Clear ----
@@ -373,9 +361,7 @@ class Renderer {
 
   // ---- Full frame render ----
   render() {
-    if (this._needsResize) {
-      this.resize();
-    }
+    this.resize();
 
     if (this.game.state === 'TITLE') {
       this.drawTitle();

@@ -483,14 +483,8 @@
       hideOverlay('overlay-scores');
     });
 
-    // ---- Window resize (orientation change, throttled) ----
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        if (renderer) renderer.markDirty();
-      }, 100);
-    });
+    // ---- Window resize (orientation change) ----
+    // resize() is called every render frame, no listener needed
 
     // ---- KEYBOARD SHORTCUTS (global) ----
     document.addEventListener('keydown', (e) => {
