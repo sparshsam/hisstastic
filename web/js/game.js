@@ -361,6 +361,7 @@ class HissTastic {
     const type = types[Math.floor(rng() * types.length)];
     this.powerUp = new PowerUp(px, py, type);
 
+    this.powerupsCollected = 0;
     this.immune = false;
     this.immuneStartTime = 0;
     this.speedBoostActive = false;
@@ -406,6 +407,7 @@ class HissTastic {
     const type = types[Math.floor(rng() * types.length)];
     this.powerUp = new PowerUp(px, py, type);
 
+    this.powerupsCollected = 0;
     this.immune = false;
     this.immuneStartTime = 0;
     this.speedBoostActive = false;
@@ -522,6 +524,7 @@ class HissTastic {
       }
 
       this.emit(EVENTS.DIRECTION, { type: 'powerup', powerUpType: type });
+      this.powerupsCollected++;
     }
 
     // Immunity timeout

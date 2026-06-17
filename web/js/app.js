@@ -143,35 +143,70 @@
     } catch (_) {}
   }
 
-  function renderHighScores() {
+  let _scoresSource = 'local';
+
+  async function renderHighScores() {
     const list = document.getElementById('scores-list');
     const empty = document.getElementById('scores-empty');
-    const scores = getHighScores();
     if (!list || !empty) return;
-    if (scores.length === 0) {
-      list.innerHTML = '';
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-    list.innerHTML = scores.map((s, i) =>
-      '<div class="score-entry">' +
-        '<span class="score-rank">#' + (i + 1) + '</span>' +
-        '<span class="score-val">' + s.score + '</span>' +
-        '<span class="score-meta">' + s.difficulty + '</span>' +
-      '</div>'
-    ).join('');
 
-    // Add stats below scores
-    const stats = game.stats;
-    if (stats.gamesPlayed > 0) {
-      const statsHtml = `
-        <div style="margin-top:12px;padding-top:8px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;">
-          ${stats.gamesPlayed} games · ${stats.totalFood} food eaten · Avg ${Math.round(stats.totalScore / stats.gamesPlayed)}/game
-        </div>
-      `;
-      list.insertAdjacentHTML('afterend', statsHtml);
+    // Toggle button
+    const toggleHtml = '<div style="margin-bottom:10px;text-align:center;">' +
+      '<button id="btn-scores-local" class="ctrl-btn" style="' + (_scoresSource === 'local' ? 'background:#4CAF50;color:#fff;' : '') + '">📱 Local</button> ' +
+      '<button id="btn-scores-cloud" class="ctrl-btn" style="' + (_scoresSource === 'cloud' ? 'background:#4CAF50;color:#fff;' : '') + '">☁️ Cloud</button>' +
+    '</div>';
+
+    if (_scoresSource === 'local') {
+      const scores = getHighScores();
+      if (scores.length === 0) {
+        list.innerHTML = toggleHtml;
+        empty.style.display = 'block';
+        _wireScoreToggles();
+        return;
+      }
+      empty.style.display = 'none';
+      list.innerHTML = toggleHtml + scores.map((s, i) =>
+        '<div class="score-entry">' +
+          '<span class="score-rank">#' + (i + 1) + '</span>' +
+          '<span class="score-val">' + s.score + '</span>' +
+          '<span class="score-meta">' + s.difficulty + '</span>' +
+        '</div>'
+      ).join('');
+
+      // Stats below scores
+      const stats = game.stats;
+      if (stats.gamesPlayed > 0) {
+        list.insertAdjacentHTML('afterend',
+          '<div style="margin-top:12px;padding-top:8px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;">' +
+          stats.gamesPlayed + ' games · ' + stats.totalFood + ' food eaten · Avg ' + Math.round(stats.totalScore / stats.gamesPlayed) + '/game' +
+          '</div>'
+        );
+      }
+    } else {
+      // Cloud scores
+      list.innerHTML = toggleHtml + '<div style="text-align:center;padding:10px;font-size:12px;color:#999;">Loading cloud scores...</div>';
+      empty.style.display = 'none';
+      const cloudScores = await SupabaseClient.getTopScores(10);
+      if (cloudScores.length === 0) {
+        list.innerHTML = toggleHtml + '<div style="text-align:center;padding:20px;font-size:13px;color:#999;">No cloud scores yet. Play and save!</div>';
+      } else {
+        list.innerHTML = toggleHtml + cloudScores.map((s, i) =>
+          '<div class="score-entry">' +
+            '<span class="score-rank">#' + (i + 1) + '</span>' +
+            '<span class="score-val">' + s.score + '</span>' +
+            '<span class="score-meta">' + s.difficulty + '</span>' +
+          '</div>'
+        ).join('');
+      }
     }
+    _wireScoreToggles();
+  }
+
+  function _wireScoreToggles() {
+    const localBtn = document.getElementById('btn-scores-local');
+    const cloudBtn = document.getElementById('btn-scores-cloud');
+    if (localBtn) localBtn.onclick = () => { _scoresSource = 'local'; renderHighScores(); };
+    if (cloudBtn) cloudBtn.onclick = () => { _scoresSource = 'cloud'; renderHighScores(); };
   }
 
   // ---- Theme helpers ----
@@ -375,10 +410,21 @@
     // ---- GAME OVER OVERLAY ----
 
     document.getElementById('btn-retry').addEventListener('click', startNewGame);
-    document.getElementById('btn-save-score').addEventListener('click', () => {
+    document.getElementById('btn-save-score').addEventListener('click', async () => {
       saveHighScore(game.score, game.difficultyMode);
-      document.getElementById('btn-save-score').textContent = '✅ Saved!';
-      document.getElementById('btn-save-score').disabled = true;
+
+      // Submit to Supabase cloud scores
+      const btn = document.getElementById('btn-save-score');
+      btn.textContent = '☁️ Saving...';
+      btn.disabled = true;
+
+      const result = await SupabaseClient.submitScore(
+        game.score,
+        game.difficultyMode,
+        game.snake ? game.snake.length : 1,
+        game.powerupsCollected || 0
+      );
+      btn.textContent = result.ok ? '✅ Saved to Cloud!' : '💾 Saved Locally';
     });
     document.getElementById('btn-home-from-go').addEventListener('click', goHome);
 

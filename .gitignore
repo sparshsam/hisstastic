@@ -27,3 +27,4 @@ replays/
 venv/
 node_modules/
 android/
+android-build/
