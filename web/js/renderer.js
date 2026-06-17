@@ -29,27 +29,20 @@ class Renderer {
     this._needsResize = true;
   }
 
-  // ---- Scale canvas to container (with devicePixelRatio support) ----
+  // ---- Scale canvas to container ----
   resize() {
     this.gw = this.game.getGridWidth();
     this.gh = this.game.getGridHeight();
-    const dpr = window.devicePixelRatio || 1;
-    this.dpr = dpr;
     const parent = this.canvas.parentElement;
     const maxW = parent.clientWidth;
     const maxH = window.innerHeight * 0.7;
     const scale = Math.min(maxW / this.gw, maxH / this.gh, 1.5);
-
-    // Only re-allocate buffer when dimensions actually change (avoid churn)
-    const bufW = Math.round(this.gw * dpr);
-    const bufH = Math.round(this.gh * dpr);
-    if (this.canvas.width !== bufW || this.canvas.height !== bufH) {
-      this.canvas.width = bufW;
-      this.canvas.height = bufH;
-    }
+    this.canvas.width = this.gw;
+    this.canvas.height = this.gh;
     this.canvas.style.width = (this.gw * scale) + 'px';
     this.canvas.style.height = (this.gh * scale) + 'px';
-
+    // Reset transform to identity (canvas.width/height setter does this, but be explicit)
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.scale = scale;
     this._needsResize = false;
   }
@@ -377,22 +370,9 @@ class Renderer {
 
   // ---- Full frame render ----
   render() {
-    // Only resize when layout actually changes (avoids costly buffer re-allocation)
     if (this._needsResize) {
       this.resize();
     }
-
-    // Skip re-render when game state hasn't changed (saves GPU on static screens)
-    if (this.game.state === 'PLAYING') {
-      if (this.game.state === this._lastState && this.game.currentTick === this._lastTickCount) return;
-    } else {
-      if (this.game.state === this._lastState) return;
-    }
-    this._lastState = this.game.state;
-    this._lastTickCount = this.game.currentTick;
-
-    // Apply DPR transform so all drawing stays in logical coordinates
-    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
 
     if (this.game.state === 'TITLE') {
       this.drawTitle();
