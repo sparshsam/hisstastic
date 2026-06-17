@@ -205,12 +205,6 @@ body {
 
 /* ---- Mobile landscape adjustments ---- */
 @media (max-height: 500px) {
-  :root {
- {
-    padding: 4px;
-  } {
-    margin-top: 6px;
-  }
   .ctrl-btn {
     padding: 4px 10px;
     font-size: 11px;
