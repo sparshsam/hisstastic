@@ -1,26 +1,24 @@
 # Hiss-Tastic — Roadmap
 
-> A frantic fruit-collecting arcade game built with Python (Pygame) and a web dashboard.
+> A retro Snake-inspired arcade game. Browser-first, Android via Capacitor.
 
-## Current — v0.5.0 (June 2026)
+## Current — v0.9.0 (June 2026)
 
-Visual and audio polish release.
+Release Candidate — ready for Play Store submission.
 
-- [x] Background music with autoplay and race condition fixes
-- [x] Volume controls and sound effect improvements
-- [x] Game balance tuning
-- [x] Bug fixes and stability improvements
+- [x] 4 power-up types: Immunity, Speed Boost, Shield, Score Multiplier
+- [x] 4 visual themes with settings selector
+- [x] Gameplay stats tracking + cloud high scores (Supabase)
+- [x] Portrait mode + responsive canvas with DPR support
+- [x] Haptic feedback + orientation lock
+- [x] Performance profiling for low-end devices
+- [x] Android APK via Capacitor (6.6MB, signed)
+- [x] Play Store listing copy + privacy policy
+- [x] Feedback links (GitHub Issues)
 
-## Next — v0.6.0
+## Next — v1.0
 
-- [ ] New power-up types
-- [ ] Score multiplier mechanics
-- [ ] High score persistence
-- [ ] Additional level themes
-
-## Future
-
-- [ ] Mobile touch controls
-- [ ] Online leaderboard
-- [ ] Achievement system
-- [ ] Additional game modes
+- [ ] Google Play Store release
+- [ ] Google Play Games achievements + leaderboard (opt-in)
+- [ ] Optional crash reporting (Sentry or Play Console)
+- [ ] Post-launch bug fixes and polish

@@ -1,6 +1,6 @@
 # Hiss-Tastic
 
-A retro Snake-inspired arcade game built with Python and Pygame, with a browser/PWA runtime.
+A retro Snake-inspired arcade game built with a browser/JavaScript runtime (with a preserved Python/Pygame reference implementation).
 Fully local-first — no accounts, telemetry, or backend required.
 
 [![License](https://img.shields.io/github/license/sparshsam/hiss-tastic?style=flat-square)](LICENSE)
@@ -9,32 +9,34 @@ Fully local-first — no accounts, telemetry, or backend required.
 
 ## Status
 
-**Maintained prototype (v0.5.0).** The Python runtime remains the canonical preserved runtime.
-The browser runtime under `web/` is experimental but fully playable.
+**Production-ready arcade game (v0.9.0).** Playable in any modern browser, installable as a PWA, and packaged as a native Android app via Capacitor.
 
-This release focuses on **Local Runtime & Deployment Independence** — ensuring the game
-can be played, tested, and developed entirely on a local machine without relying on Vercel
-or any external service.
+The browser runtime under `web/` is the primary runtime. The Python/Pygame version is preserved as a canonical reference implementation.
 
 ## Features
 
-- Snake movement with grid-based alignment
+- Snake movement with grid-based alignment (portrait and landscape)
 - Rodent collection with quadratic scoring
 - Obstacles with collision detection
-- Immunity power-up with timed invulnerability
-- Title screen with difficulty selection
-- Pause/resume
+- **4 power-up types:** Immunity, Speed Boost, Shield, Score Multiplier
+  - Each with unique color, audio cue, and game effect
+- **4 visual themes:** Classic (green), Midnight (dark), Desert (warm), Ocean (teal)
+- Title screen with difficulty selection (Easy / Normal / Hard)
+- Pause/resume with on-screen pause button
 - Procedural audio with sound effects
-- **Looping background music** with Music On/Off toggle, low default volume, and localStorage persistence
+- Looping background music with toggle and credit link
+- Haptic feedback on mobile (vibration)
 - Deterministic replay recording, playback, and verification
-- Local-only ghost replay foundations
-- Browser/PWA runtime in `web/`
-- Mobile-friendly touch controls and D-pad
-- Animated decorative snake field background (canvas-based, reduced-motion aware)
-- Live snake-fact roast commentary system (local-only, deterministic)
+- **Cloud high scores** via Supabase (shared Elora database)
+- Top 10 leaderboard with local/cloud toggle
+- Gameplay stats tracking (games played, food, averages)
+- Portrait and landscape game modes (360×560 portrait grid)
+- Responsive canvas with DPR support (crisp on high-DPI screens)
 - PWA installability and offline cache behavior
+- Capacitor Android APK (6.6MB, signed)
 - Graceful degradation: game never crashes on missing audio or assets
-- Fully local-first: no accounts, telemetry, external APIs, backend, wallet logic, or multiplayer
+- Animated decorative snake field background (canvas-based)
+- Fully local-first: no accounts, telemetry, external APIs, or multiplayer
 
 ## Architecture
 
@@ -57,13 +59,14 @@ hiss_tastic/       # Python/Pygame package (canonical)
   replay_cli.py     — Command-line replay tools
   ghost.py          — Local ghost replay sync and visualization
 
-web/               # Browser/PWA runtime (experimental, playable)
+web/               # Browser/PWA runtime (primary)
   index.html
-  js/               — Game engine, audio, renderer, input, replay, commentary, snake field, snake facts
+  js/               — Game engine, audio, renderer, input, replay, supabase, snake field, snake facts
   css/style.css
   assets/           — Background music, images
   sw.js             — Service worker (offline caching)
   manifest.webmanifest
+  supabase.js       — Cloud high scores REST client
 ```
 
 ---
@@ -335,6 +338,37 @@ Browser runtime capabilities:
 - No telemetry, accounts, external backend, wallet logic, or multiplayer
 
 See [docs/browser-runtime.md](docs/browser-runtime.md), [docs/mobile-controls.md](docs/mobile-controls.md), and [docs/pwa.md](docs/pwa.md).
+
+## Android App
+
+Hiss-Tastic is packaged as a native Android app via [Capacitor](https://capacitorjs.com/).
+
+### Quick Install
+
+1. Download the latest APK from the releases page
+2. Enable "Install from unknown sources" on your Android device
+3. Open the APK to install
+
+### Building from Source
+
+```bash
+# Prerequisites: Android SDK 34+, Java 17+, Node.js 18+
+npm install
+npx cap sync
+npx cap add android   # one-time setup
+cd android && ./gradlew assembleDebug
+# APK at android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+See [BUILD_ANDROID.md](BUILD_ANDROID.md) for detailed instructions.
+
+## Cloud High Scores
+
+Scores can be submitted to a shared Supabase database (hosted on the Elora project).
+- **Local scores:** stored in browser localStorage
+- **Cloud scores:** submitted to Supabase on save (toggle Local/Cloud on the Scores page)
+- No account or authentication required — anonymous submissions
+- RLS policies allow anyone to read the public leaderboard
 
 ## Validation
 

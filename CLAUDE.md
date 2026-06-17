@@ -1,13 +1,14 @@
 # Claude Notes
 
-Hiss-Tastic is a preserved Python/Pygame arcade prototype with an experimental browser/PWA sibling runtime.
+Hiss-Tastic is a browser-first arcade game (v0.9.0) with a preserved Python/Pygame reference implementation.
+The web runtime (`web/`) is the primary build target, with Capacitor Android packaging.
 
-**The browser runtime (`web/`) is deployed to Vercel at https://hiss-tastic.vercel.app.**
+**Production:** https://hiss-tastic.vercel.app
+**Android APK:** Build from source or download releases.
 
 Before changing this repository, review:
 
 - `AGENTS.md`
-- `docs/modernization-roadmap.md`
 - `README.md`
 - `ARCHITECTURE.md`
 
