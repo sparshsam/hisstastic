@@ -67,3 +67,30 @@ end;
 $$;
 
 grant execute on function public.upsert_my_leaderboard_score(integer, text) to anon, authenticated;
+
+-- Server-side player upsert: insert or update the current player profile.
+-- Reads player_id from x-player-id header.
+create or replace function public.upsert_my_player(
+  p_username text
+)
+returns void
+language plpgsql
+security definer
+as $$
+declare
+  _player_id uuid;
+begin
+  _player_id := public.request_player_id();
+  if _player_id is null then
+    raise exception 'Missing or invalid x-player-id header';
+  end if;
+
+  insert into public.players (id, username)
+  values (_player_id, p_username)
+  on conflict (id) do update
+    set username = excluded.username,
+        updated_at = now();
+end;
+$$;
+
+grant execute on function public.upsert_my_player(text) to anon, authenticated;

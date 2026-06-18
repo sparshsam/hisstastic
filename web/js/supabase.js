@@ -27,27 +27,21 @@ const SupabaseClient = {
   },
 
   /**
-   * Upsert an anonymous player profile.
+   * Upsert an anonymous player profile via server-side RPC.
+   * The RPC reads player_id from x-player-id header.
    * @param {{player_id: string, username: string, created_at: string}} identity
    * @returns {Promise<{ok: boolean, error?: string}>}
    */
   async upsertPlayer(identity) {
     try {
-      const body = {
-        id: identity.player_id,
-        username: identity.username,
-        created_at: identity.created_at,
-        updated_at: new Date().toISOString(),
-      };
-
-      const res = await this._fetch(SUPABASE_URL + '/rest/v1/players?on_conflict=id', {
-        method: 'POST',
-        headers: {
-          ...this._headers(identity.player_id),
-          'Prefer': 'resolution=merge-duplicates,return=minimal',
-        },
-        body: JSON.stringify(body),
-      });
+      const res = await this._fetch(
+        SUPABASE_URL + '/rest/v1/rpc/upsert_my_player',
+        {
+          method: 'POST',
+          headers: this._headers(identity.player_id),
+          body: JSON.stringify({ p_username: identity.username }),
+        }
+      );
 
       if (!res.ok) {
         const text = await res.text();
