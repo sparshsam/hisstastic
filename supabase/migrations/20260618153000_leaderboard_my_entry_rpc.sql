@@ -37,3 +37,33 @@ end;
 $$;
 
 grant execute on function public.get_my_leaderboard_entry() to anon, authenticated;
+
+-- Server-side upsert: insert or update the current player's leaderboard entry.
+-- Reads player_id from x-player-id header; returns nothing on success.
+-- Keeps the highest score via the keep_highest_leaderboard_score trigger.
+create or replace function public.upsert_my_leaderboard_score(
+  p_best_score integer,
+  p_username text
+)
+returns void
+language plpgsql
+security definer
+as $$
+declare
+  _player_id uuid;
+begin
+  _player_id := public.request_player_id();
+  if _player_id is null then
+    raise exception 'Missing or invalid x-player-id header';
+  end if;
+
+  insert into public.leaderboard_scores (player_id, username, best_score)
+  values (_player_id, p_username, p_best_score)
+  on conflict (player_id) do update
+    set best_score = greatest(leaderboard_scores.best_score, excluded.best_score),
+        username = excluded.username,
+        updated_at = now();
+end;
+$$;
+
+grant execute on function public.upsert_my_leaderboard_score(integer, text) to anon, authenticated;

@@ -60,27 +60,25 @@ const SupabaseClient = {
   },
 
   /**
-   * Upsert a player's global personal best.
+   * Upsert a player's global personal best via a server-side RPC.
+   * The RPC reads player_id from x-player-id header, so no player_id
+   * is ever exposed to the client or public queries.
    * @param {{player_id: string, username: string, best_score: number}} entry
    * @returns {Promise<{ok: boolean, error?: string}>}
    */
   async upsertLeaderboardScore(entry) {
     try {
-      const body = {
-        player_id: entry.player_id,
-        username: entry.username,
-        best_score: entry.best_score,
-        updated_at: new Date().toISOString(),
-      };
-
-      const res = await this._fetch(SUPABASE_URL + '/rest/v1/leaderboard_scores?on_conflict=player_id', {
-        method: 'POST',
-        headers: {
-          ...this._headers(entry.player_id),
-          'Prefer': 'resolution=merge-duplicates,return=minimal',
-        },
-        body: JSON.stringify(body),
-      });
+      const res = await this._fetch(
+        SUPABASE_URL + '/rest/v1/rpc/upsert_my_leaderboard_score',
+        {
+          method: 'POST',
+          headers: this._headers(entry.player_id),
+          body: JSON.stringify({
+            p_best_score: entry.best_score,
+            p_username: entry.username,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const text = await res.text();

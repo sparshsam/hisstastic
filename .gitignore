@@ -35,3 +35,4 @@ replays/
 venv/
 node_modules/
 android-build/
+supabase/.temp/
