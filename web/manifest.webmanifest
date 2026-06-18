@@ -2,12 +2,13 @@
   "name": "Hiss-Tastic",
   "short_name": "HissTastic",
   "description": "A retro Snake-inspired arcade game",
+  "version": "1.0.0",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#4CAF50",
-  "theme_color": "#4CAF50",
+  "background_color": "#00BF63",
+  "theme_color": "#00BF63",
   "icons": [
     {
       "src": "icons/icon-192.png",

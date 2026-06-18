@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#4CAF50">
+  <meta name="theme-color" content="#00BF63">
   <meta name="x5-orientation" content="portrait">
   <meta name="screen-orientation" content="portrait">
   <meta name="description" content="Hiss-Tastic — a retro Snake-inspired arcade game">
   <title>Hiss-Tastic</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -35,7 +38,7 @@
         <button id="btn-open-scores" class="home-link">&#127942; Scores</button>
       </div>
 
-      <p class="home-version">v0.6.0</p>
+      <p class="home-version">v1.0.0</p>
     </div>
   </div>
 
@@ -99,6 +102,21 @@
         <button id="settings-music" class="toggle-btn">Off</button>
       </div>
 
+      <div class="setting-row profile-row">
+        <label>Username</label>
+        <div class="profile-editor">
+          <input id="settings-username" class="profile-input" type="text" maxlength="24" autocomplete="off">
+          <button id="settings-randomize-name" class="mini-btn" type="button">Randomize</button>
+        </div>
+      </div>
+
+      <p id="settings-profile-error" class="profile-message" style="display:none;"></p>
+
+      <div class="setting-row">
+        <label>Profile</label>
+        <button id="settings-save-profile" class="toggle-btn">Save</button>
+      </div>
+
       <div class="setting-row">
         <label>Music Credit</label>
         <a href="https://www.youtube.com/watch?v=ahgcD1xjRiQ&list=RDahgcD1xjRiQ&start_radio=1" target="_blank" rel="noopener noreferrer" class="settings-link">YouTube source</a>
@@ -109,7 +127,7 @@
         <a href="https://github.com/sparshsam/hiss-tastic/issues/new" target="_blank" rel="noopener noreferrer" class="settings-link">Open GitHub Issue</a>
       </div>
 
-      <p class="settings-version">Hiss-Tastic v0.6.0</p>
+      <p class="settings-version">Hiss-Tastic v1.0.0</p>
     </div>
   </div>
 
@@ -118,12 +136,29 @@
     <div class="overlay-content">
       <h2 class="overlay-title">GAME OVER</h2>
       <p class="go-score">Score: <span id="go-score-value">0</span></p>
-      <p id="go-highscore" class="go-highscore" style="display:none;">&#127942; New High Score!</p>
+      <p id="go-highscore" class="go-highscore" style="display:none;">&#127942; New personal best!</p>
+      <p id="go-sync-status" class="go-sync-status"></p>
       <p id="go-roast" class="go-roast"></p>
       <p id="go-stats" class="go-stats"></p>
       <button id="btn-retry" class="overlay-btn primary">&#9654; Play Again</button>
-      <button id="btn-save-score" class="overlay-btn">&#128190; Save Score</button>
+      <button id="btn-save-score" class="overlay-btn" disabled>&#128190; Saved</button>
       <button id="btn-home-from-go" class="overlay-btn">&#8962; Home</button>
+    </div>
+  </div>
+
+  <!-- ====== FIRST-RUN PROFILE SETUP ====== -->
+  <div id="modal-profile-setup" class="modal" style="display:none;">
+    <div class="modal-content profile-setup-content">
+      <h2 class="modal-title">Welcome</h2>
+      <p class="profile-copy">Thanks for playing Hiss-Tastic.</p>
+      <p class="profile-copy">Play snake, chase high scores, and appear on the global leaderboard when you set a personal best.</p>
+      <label class="profile-label" for="profile-username">Choose a username</label>
+      <input id="profile-username" class="profile-input large" type="text" maxlength="24" autocomplete="off">
+      <p id="profile-setup-error" class="profile-message" style="display:none;"></p>
+      <div class="profile-actions">
+        <button id="btn-profile-randomize" class="overlay-btn" type="button">Randomize</button>
+        <button id="btn-profile-save" class="overlay-btn primary" type="button">Start</button>
+      </div>
     </div>
   </div>
 
@@ -154,6 +189,7 @@
   <script src="js/snakeFacts.js"></script>
   <script src="js/commentary.js"></script>
   <script src="js/snakeField.js"></script>
+  <script src="js/identity.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/app.js"></script>
 </body>

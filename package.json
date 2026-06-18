@@ -1,14 +1,16 @@
 {
   "name": "hiss-tastic",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "cap:init": "npx cap init Hiss-Tastic com.sparshsam.hisstastic",
     "cap:add:android": "npx cap add android",
-    "cap:sync": "npx cap sync",
+    "cap:sync": "npx cap sync android",
     "cap:open:android": "npx cap open android",
     "cap:build:android": "cd android && ./gradlew assembleDebug",
-    "build:web": "cp -r web/* dist/"
+    "cap:build:release": "cd android && ./gradlew assembleRelease",
+    "cap:bundle:release": "cd android && ./gradlew bundleRelease",
+    "build:web": "mkdir -p dist && cp -R web/. dist/"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.0",

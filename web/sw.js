@@ -2,10 +2,10 @@
  * Hiss-Tastic Service Worker
  * Provides offline caching for the browser game.
  * Gracefully handles missing assets so local dev is never blocked.
- * No telemetry, no analytics, no networking beyond cache.
+ * No telemetry or analytics. Optional leaderboard calls are made by the app.
  */
 
-const CACHE_NAME = 'hiss-tastic-v2';
+const CACHE_NAME = 'hiss-tastic-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -15,6 +15,8 @@ const ASSETS_TO_CACHE = [
   './js/input.js',
   './js/audio.js',
   './js/replay.js',
+  './js/identity.js',
+  './js/supabase.js',
   './js/app.js',
   './js/snakeFacts.js',
   './js/commentary.js',

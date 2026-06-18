@@ -5,7 +5,7 @@
  */
 
 // ---- Game version ----
-const GAME_VERSION = '0.6.0';
+const GAME_VERSION = '1.0.0';
 
 // ---- Constants ----
 const CONFIG = {
@@ -371,6 +371,7 @@ class HissTastic {
     this.scoreMultiplierStartTime = 0;
     this.lastDirection = null;
     this._lastCollisionType = null;
+    this.sessionStartedAt = performance.now();
 
     this.state = 'PLAYING';
     this.stats.gamesPlayed++;

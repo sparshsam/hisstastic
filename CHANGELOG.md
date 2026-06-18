@@ -4,6 +4,36 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project follows [Semantic Versioning](https://semver.org/) for releases.
 
+## [1.0.0] - 2026-06-18
+
+### Added
+
+- First-run player profile setup with local anonymous player ID, username validation, and whimsical random username generation.
+- Local-only score history for every completed game.
+- Personal-best tracking with global leaderboard sync only when the player beats their previous best.
+- Offline pending leaderboard sync for the latest unsynced personal best.
+- Supabase migration for `players` and `leaderboard_scores`; no Supabase `score_history` table is created.
+- Play Store production release preparation with tracked Capacitor Android project.
+- Release AAB build script (`npm run cap:bundle:release`) and Android release signing configuration using local, gitignored keystore files.
+- `RELEASE_PLAYSTORE.md` with internal testing, closed testing, production rollout, rollback, signing, and AAB upload steps.
+- `PLAY_STORE_ASSETS.md` checklist for icon, 1024x500 feature graphic, and 6-8 phone screenshots.
+- CI Android job that syncs Capacitor and builds both debug APK and release AAB.
+
+### Changed
+
+- Global leaderboard now stores one best-score row per anonymous player instead of every score submission.
+- Settings now includes username/profile editing.
+- Scores UI now separates local score history from the global leaderboard and shows personal best/rank context.
+- Privacy, store listing, and release docs now disclose username, anonymous player ID, personal-best leaderboard data, and local-only score history.
+- Normalized app version metadata to v1.0.0 across package metadata, web UI, web manifest, README, changelog, store listing, and Android `versionName`.
+- Documented Android API 35+ readiness; the project compiles and targets SDK 36.
+- Updated privacy policy, README, store listing, and Data Safety notes to accurately disclose optional anonymous Supabase cloud leaderboard behavior.
+- Updated Android repository policy so generated source files are committed while local Gradle output, signing files, and keystores remain ignored.
+
+### Verified
+
+- Android manifest declares only the `INTERNET` permission, required for global leaderboard requests and user-opened external links.
+
 ## [0.5.0] - 2026-06-05
 
 ### Added

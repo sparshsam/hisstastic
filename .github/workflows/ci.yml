@@ -24,3 +24,24 @@ jobs:
       - name: Validation script
         run: |
           python validation.py || echo "Some checks may fail in headless CI (no display)"
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: android-actions/setup-android@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Sync Capacitor Android project
+        run: npm run cap:sync
+      - name: Build debug APK and release AAB
+        run: |
+          cd android
+          ./gradlew :app:assembleDebug :app:bundleRelease

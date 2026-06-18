@@ -10,6 +10,11 @@ set -euo pipefail
 
 PASS=0
 FAIL=0
+PYTHON_BIN="${PYTHON:-python3}"
+
+if [ -z "${PYTHON:-}" ] && [ -x ".venv/bin/python" ]; then
+  PYTHON_BIN=".venv/bin/python"
+fi
 
 pass() { PASS=$((PASS+1)); echo "  [PASS] $1"; }
 fail() { FAIL=$((FAIL+1)); echo "  [FAIL] $1"; }
@@ -20,13 +25,13 @@ echo ""
 
 # --- Python runtime ---
 echo "[Python Runtime]"
-if command -v python3 &>/dev/null; then
-  pass "python3 found: $(python3 --version 2>&1)"
+if command -v "$PYTHON_BIN" &>/dev/null || [ -x "$PYTHON_BIN" ]; then
+  pass "python found: $($PYTHON_BIN --version 2>&1)"
 else
-  fail "python3 not found"
+  fail "python not found ($PYTHON_BIN)"
 fi
 
-if python3 -c "import pygame" 2>/dev/null; then
+if "$PYTHON_BIN" -c "import pygame" >/dev/null 2>&1; then
   pass "pygame module available"
 else
   fail "pygame not installed (run: pip install pygame)"
@@ -52,7 +57,9 @@ if [ -f web/manifest.webmanifest ]; then pass "web/manifest.webmanifest present"
 if [ -f web/sw.js ]; then pass "web/sw.js present"; else fail "web/sw.js missing"; fi
 if [ -f web/js/app.js ]; then pass "web/js/app.js present"; else fail "web/js/app.js missing"; fi
 if [ -f web/js/game.js ]; then pass "web/js/game.js present"; else fail "web/js/game.js missing"; fi
+if [ -f web/js/identity.js ]; then pass "web/js/identity.js present"; else fail "web/js/identity.js missing"; fi
 if [ -f web/js/audio.js ]; then pass "web/js/audio.js present"; else fail "web/js/audio.js missing"; fi
+if [ -f web/js/supabase.js ]; then pass "web/js/supabase.js present"; else fail "web/js/supabase.js missing"; fi
 if [ -f web/css/style.css ]; then pass "web/css/style.css present"; else fail "web/css/style.css missing"; fi
 if [ -f web/assets/background-music.mp3 ]; then pass "web/assets/background-music.mp3 present"; else fail "web/assets/background-music.mp3 missing"; fi
 if [ -d web/icons ]; then pass "web/icons/ directory present"; else fail "web/icons/ missing"; fi
@@ -74,7 +81,7 @@ done
 # --- Validation ---
 echo ""
 echo "[Validation]"
-if python3 -c "import py_compile; py_compile.compile('validation.py', doraise=True)" 2>/dev/null; then
+if "$PYTHON_BIN" -c "import py_compile; py_compile.compile('validation.py', doraise=True)" 2>/dev/null; then
   pass "validation.py compiles"
 else
   fail "validation.py compile error"

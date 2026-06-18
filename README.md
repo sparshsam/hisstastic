@@ -1,7 +1,7 @@
 # Hiss-Tastic
 
 A retro Snake-inspired arcade game built with a browser/JavaScript runtime (with a preserved Python/Pygame reference implementation).
-Fully local-first — no accounts, telemetry, or backend required.
+Local-first by default — no email, real-name account, telemetry, ads, or backend required for normal play. A local anonymous player ID and username support the global personal-best leaderboard.
 
 [![License](https://img.shields.io/github/license/sparshsam/hiss-tastic?style=flat-square)](LICENSE)
 [![Status: Maintained](https://img.shields.io/badge/status-maintained-2ea44f?style=flat-square)](#status)
@@ -9,7 +9,7 @@ Fully local-first — no accounts, telemetry, or backend required.
 
 ## Status
 
-**Production-ready arcade game (v0.9.0).** Playable in any modern browser, installable as a PWA, and packaged as a native Android app via Capacitor.
+**Production-ready arcade game (v1.0.0).** Playable in any modern browser, installable as a PWA, and packaged as a native Android app via Capacitor.
 
 The browser runtime under `web/` is the primary runtime. The Python/Pygame version is preserved as a canonical reference implementation.
 
@@ -27,8 +27,9 @@ The browser runtime under `web/` is the primary runtime. The Python/Pygame versi
 - Looping background music with toggle and credit link
 - Haptic feedback on mobile (vibration)
 - Deterministic replay recording, playback, and verification
-- **Cloud high scores** via Supabase (shared Elora database)
-- Top 10 leaderboard with local/cloud toggle
+- First-run username setup with whimsical random name generator
+- **Global leaderboard** via Supabase for each player's personal best
+- Local score history and personal-best tracking
 - Gameplay stats tracking (games played, food, averages)
 - Portrait and landscape game modes (360×560 portrait grid)
 - Responsive canvas with DPR support (crisp on high-DPI screens)
@@ -36,7 +37,7 @@ The browser runtime under `web/` is the primary runtime. The Python/Pygame versi
 - Capacitor Android APK (6.6MB, signed)
 - Graceful degradation: game never crashes on missing audio or assets
 - Animated decorative snake field background (canvas-based)
-- Fully local-first: no accounts, telemetry, external APIs, or multiplayer
+- Local-first: no real-name accounts, telemetry, ads, or multiplayer; Supabase leaderboard calls store username, anonymous player ID, and personal best only
 
 ## Architecture
 
@@ -66,14 +67,15 @@ web/               # Browser/PWA runtime (primary)
   assets/           — Background music, images
   sw.js             — Service worker (offline caching)
   manifest.webmanifest
-  supabase.js       — Cloud high scores REST client
+  identity.js       — Local anonymous player identity, score history, personal best, pending sync
+  supabase.js       — Global leaderboard REST client
 ```
 
 ---
 
 ## Local Development
 
-Hiss-Tastic has two runtimes. **Neither requires Vercel, a backend, or any external service.**
+Hiss-Tastic has two runtimes. **Neither requires Vercel, a backend, or any external service for normal local play.** The global leaderboard uses Supabase only to sync player profile and personal-best rows.
 
 ### Prerequisites
 
@@ -352,23 +354,41 @@ Hiss-Tastic is packaged as a native Android app via [Capacitor](https://capacito
 ### Building from Source
 
 ```bash
-# Prerequisites: Android SDK 34+, Java 17+, Node.js 18+
+# Prerequisites: Android SDK 35+ (target/compile SDK 36), Java 21+, Node.js 18+
 npm install
 npx cap sync
-npx cap add android   # one-time setup
-cd android && ./gradlew assembleDebug
+npm run cap:bundle:release
 # APK at android/app/build/outputs/apk/debug/app-debug.apk
+# AAB at android/app/build/outputs/bundle/release/app-release.aab
 ```
 
-See [BUILD_ANDROID.md](BUILD_ANDROID.md) for detailed instructions.
+See [BUILD_ANDROID.md](BUILD_ANDROID.md) for detailed debug, release, and signing instructions.
 
-## Cloud High Scores
+## Player Identity and Global Leaderboard
 
-Scores can be submitted to a shared Supabase database (hosted on the Elora project).
-- **Local scores:** stored in browser localStorage
-- **Cloud scores:** submitted to Supabase on save (toggle Local/Cloud on the Scores page)
-- No account or authentication required — anonymous submissions
-- RLS policies allow anyone to read the public leaderboard
+On first launch, Hiss-Tastic creates a local anonymous player profile:
+
+- **player_id:** locally generated UUID
+- **username:** player-chosen or generated whimsical name
+- **created_at / updated_at:** local profile timestamps
+- **local settings:** theme, audio, stats, and score history
+
+No email, phone number, real name, location, contacts, device advertising ID, analytics ID, or account login is collected.
+
+Score behavior:
+
+- Every completed game is saved to local score history.
+- The local personal best is updated only when a new best score is reached.
+- The global leaderboard is updated only for a new personal best.
+- Global leaderboard rows store one best score per player, not every game.
+- If offline, the latest pending personal best is saved locally and synced next time the app is online.
+
+Supabase stores:
+
+- `players`: anonymous `player_id`, username, created/updated timestamps
+- `leaderboard_scores`: anonymous `player_id`, username snapshot, best score, updated timestamp
+
+Score history remains local-only.
 
 ## Validation
 
@@ -387,8 +407,9 @@ See [docs/packaging.md](docs/packaging.md) for standalone executable instruction
 
 ## Limitations
 
-- Python remains canonical; browser runtime is experimental.
-- There is no online multiplayer, leaderboard, telemetry, account system, backend, or wallet/onchain logic.
+- The browser runtime is the primary Play/PWA runtime; Python remains the reference implementation.
+- There is no online multiplayer, telemetry, account system, advertising SDK, crash reporting SDK, or wallet/onchain logic.
+- Global leaderboard access uses Supabase REST calls to sync/read anonymous username and personal-best rows.
 - Replay files are local JSON artifacts only when explicitly recorded, imported, or exported.
 - Ghost racing is local-only and score-neutral.
 - PWA support is limited to installability and offline asset caching.
@@ -414,10 +435,10 @@ This repository follows the [ecosystem standards](https://github.com/sparshsam/e
 
 | Layer | Choice |
 |-------|--------|
-| Language (canonical) | Python |
-| Framework (canonical) | Pygame |
-| Web runtime | JavaScript / Canvas (PWA) |
-| Testing | pytest (Python), manual (browser)
+| Python reference | Python + Pygame |
+| Browser game | HTML/CSS/JavaScript Canvas |
+| Android package | Capacitor + Gradle |
+| Testing | unittest, local health checks, Gradle builds |
 
 ## Screenshots
 

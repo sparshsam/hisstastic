@@ -2,7 +2,7 @@
 
 > A retro Snake-inspired arcade game. Browser-first, Android via Capacitor.
 
-## Current — v0.9.0 (June 2026)
+## Current — v1.0.0 (June 2026)
 
 Release Candidate — ready for Play Store submission.
 
