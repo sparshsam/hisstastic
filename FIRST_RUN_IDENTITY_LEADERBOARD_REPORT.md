@@ -130,6 +130,37 @@ Updated files include:
 - `PRIVACY_POLICY.md`
 - `CHANGELOG.md`
 
+## Supabase RLS and Leaderboard Security Review
+
+Final review status: acceptable for the anonymous/no-account leaderboard model, with one explicit limitation.
+
+Confirmed:
+
+- RLS is enabled and forced on `public.players` and `public.leaderboard_scores`.
+- Public leaderboard reads are restricted with column grants to display-safe fields only: `username`, `best_score`, and `updated_at`.
+- `public.players` grants public clients only `id` and `username`, and RLS limits reads to the `x-player-id` header matching `players.id`.
+- Anonymous inserts/updates require the browser-sent `x-player-id` header to match `players.id` or `leaderboard_scores.player_id`.
+- `leaderboard_scores.username` must match the corresponding `players.username` row.
+- Username validation exists client-side and database-side: 3-24 characters, letters, numbers, spaces, hyphens, and underscores.
+- `leaderboard_scores.best_score` rejects negative values and values above `150000000`, a conservative cap above the theoretical board-clearing score range for the current game.
+- A unique constraint on `leaderboard_scores.player_id` stores one best-score row per player.
+- A trigger preserves the highest leaderboard score if an older/lower pending update is replayed.
+- No Supabase `score_history` table exists; full score history remains local-only.
+- The web client uses the publishable Supabase key only, never a service-role or secret key.
+- Privacy/Data Safety docs match the implementation: username, anonymous player ID, and personal best can be sent to Supabase; email, phone, location, contacts, advertising ID, real name, analytics, telemetry, and crash-reporting data are not collected.
+
+Security limitation:
+
+- Because Hiss-Tastic intentionally has no account login or server-side session, the anonymous `x-player-id` header is not cryptographic authentication. It constrains normal app writes and prevents accidental cross-player updates, but a determined client with the public API key could still forge requests. Stronger protection would require authenticated users, server-verified score proofs, or a backend signing/verifier flow.
+
+Review changes made:
+
+- Replaced broad `true` insert/update RLS policies with request-header player ID checks.
+- Replaced broad table reads with column-level grants.
+- Removed `player_id` from public leaderboard fetches.
+- Disabled exact own-rank display under the public-read model because exposing player IDs would weaken anonymous identity safety.
+- Added database score cap and client-side sync cap for impossible leaderboard values.
+
 ## Validation
 
 Passed:

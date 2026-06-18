@@ -176,7 +176,7 @@
       const rank = await SupabaseClient.getPlayerRank(identity.player_id, 100);
       const rankHtml = rank
         ? '<div class="scores-summary">Your rank: #' + rank.rank + ' · Best ' + rank.row.best_score + '</div>'
-        : '<div class="scores-summary">Your global rank appears after your first synced personal best.</div>';
+        : '<div class="scores-summary">Exact personal rank is hidden to keep anonymous player IDs out of public leaderboard reads.</div>';
       if (cloudScores.length === 0) {
         list.innerHTML = toggleHtml + rankHtml + '<div style="text-align:center;padding:20px;font-size:13px;color:#999;">No global scores yet. Set a personal best!</div>';
       } else {

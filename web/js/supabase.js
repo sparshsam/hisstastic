@@ -15,13 +15,15 @@ const SupabaseClient = {
       .finally(() => clearTimeout(timeout));
   },
 
-  _headers() {
-    return {
+  _headers(playerId) {
+    const headers = {
       'Content-Type': 'application/json',
       'apikey': SUPABASE_KEY,
       'Authorization': 'Bearer ' + SUPABASE_KEY,
       'Prefer': 'return=minimal',
     };
+    if (playerId) headers['x-player-id'] = playerId;
+    return headers;
   },
 
   /**
@@ -41,7 +43,7 @@ const SupabaseClient = {
       const res = await this._fetch(SUPABASE_URL + '/rest/v1/players?on_conflict=id', {
         method: 'POST',
         headers: {
-          ...this._headers(),
+          ...this._headers(identity.player_id),
           'Prefer': 'resolution=merge-duplicates,return=minimal',
         },
         body: JSON.stringify(body),
@@ -74,7 +76,7 @@ const SupabaseClient = {
       const res = await this._fetch(SUPABASE_URL + '/rest/v1/leaderboard_scores?on_conflict=player_id', {
         method: 'POST',
         headers: {
-          ...this._headers(),
+          ...this._headers(entry.player_id),
           'Prefer': 'resolution=merge-duplicates,return=minimal',
         },
         body: JSON.stringify(body),
@@ -99,7 +101,7 @@ const SupabaseClient = {
     limit = limit || 10;
     try {
       const res = await this._fetch(
-        SUPABASE_URL + '/rest/v1/leaderboard_scores?select=player_id,username,best_score,updated_at&order=best_score.desc&limit=' + limit,
+        SUPABASE_URL + '/rest/v1/leaderboard_scores?select=username,best_score,updated_at&order=best_score.desc&limit=' + limit,
         { headers: this._headers() }
       );
       if (!res.ok) return [];
@@ -110,21 +112,16 @@ const SupabaseClient = {
   },
 
   /**
-   * Fetch a player's rank by scanning the top public leaderboard rows.
+   * Exact rank is intentionally unavailable from public display rows because
+   * player_id is not exposed by the leaderboard read grant.
    * @param {string} playerId
    * @param {number} [limit=100]
    * @returns {Promise<{rank: number, row: object}|null>}
    */
   async getPlayerRank(playerId, limit) {
-    limit = limit || 100;
-    try {
-      const scores = await this.getTopScores(limit);
-      const index = scores.findIndex((row) => row.player_id === playerId);
-      if (index < 0) return null;
-      return { rank: index + 1, row: scores[index] };
-    } catch {
-      return null;
-    }
+    void playerId;
+    void limit;
+    return null;
   },
 };
 

@@ -12,6 +12,7 @@
   const PERSONAL_BEST_KEY = 'hissTasticPersonalBest';
   const PENDING_SYNC_KEY = 'hissTasticPendingLeaderboardSync';
   const MAX_HISTORY = 100;
+  const MAX_LEADERBOARD_SCORE = 150000000;
 
   const adjectives = [
     'Brewing', 'Cogitating', 'Curious', 'Dillydallying', 'Fizzy',
@@ -63,6 +64,12 @@
 
   function writeJson(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function normalizeScore(value) {
+    const score = Number(value || 0);
+    if (!Number.isFinite(score)) return 0;
+    return Math.max(0, Math.floor(score));
   }
 
   const PlayerIdentity = {
@@ -126,7 +133,7 @@
     },
 
     setPersonalBest(score) {
-      localStorage.setItem(PERSONAL_BEST_KEY, String(score));
+      localStorage.setItem(PERSONAL_BEST_KEY, String(normalizeScore(score)));
     },
 
     getHistory() {
@@ -141,7 +148,7 @@
       const entry = {
         id: createUuid(),
         player_id: this.getIdentity().player_id,
-        score: Number(data.score || 0),
+        score: normalizeScore(data.score),
         difficulty: game ? game.difficultyMode : 'normal',
         snake_length: game && game.snake ? game.snake.length : 1,
         powerups_collected: game ? (game.powerupsCollected || 0) : 0,
@@ -163,7 +170,7 @@
       writeJson(PENDING_SYNC_KEY, {
         player_id: identity.player_id,
         username: identity.username,
-        best_score: Number(score || 0),
+        best_score: normalizeScore(score),
         updated_at: new Date().toISOString(),
       });
     },
@@ -182,23 +189,27 @@
 
     async syncBestScore(score) {
       const identity = this.getIdentity();
+      const bestScore = normalizeScore(score);
+      if (bestScore > MAX_LEADERBOARD_SCORE) {
+        return { ok: false, skipped: true, error: 'Score exceeds leaderboard limit.' };
+      }
       if (!window.SupabaseClient || !navigator.onLine) {
-        this.setPendingSync(score);
+        this.setPendingSync(bestScore);
         return { ok: false, offline: true };
       }
 
       const player = await SupabaseClient.upsertPlayer(identity);
       if (!player.ok) {
-        this.setPendingSync(score);
+        this.setPendingSync(bestScore);
         return player;
       }
 
       const result = await SupabaseClient.upsertLeaderboardScore({
         player_id: identity.player_id,
         username: identity.username,
-        best_score: Number(score || 0),
+        best_score: bestScore,
       });
-      if (!result.ok) this.setPendingSync(score);
+      if (!result.ok) this.setPendingSync(bestScore);
       else this.clearPendingSync();
       return result;
     },
@@ -210,7 +221,7 @@
     },
 
     async recordGameOver(game, data) {
-      const score = Number(data.score || 0);
+      const score = normalizeScore(data.score);
       const previousBest = this.getPersonalBest();
       const localEntry = this.saveLocalScore(game, data);
       const isPersonalBest = score > previousBest;
