@@ -19,6 +19,14 @@
 Thumbs.db
 __pycache__/
 archive_types/
+*.jks
+*.keystore
+android/.gradle/
+android/**/build/
+android/app/release/
+android/captures/
+android/keystore.properties
+android/local.properties
 build/
 dist/
 python-*.exe
@@ -26,5 +34,4 @@ python-*.pkg
 replays/
 venv/
 node_modules/
-android/
 android-build/

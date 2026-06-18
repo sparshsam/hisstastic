@@ -1,7 +1,7 @@
 # Hiss-Tastic
 
 A retro Snake-inspired arcade game built with a browser/JavaScript runtime (with a preserved Python/Pygame reference implementation).
-Fully local-first — no accounts, telemetry, or backend required.
+Local-first by default — no accounts, telemetry, ads, or backend required for normal play. Anonymous cloud high scores are available when players choose the cloud scores flow.
 
 [![License](https://img.shields.io/github/license/sparshsam/hiss-tastic?style=flat-square)](LICENSE)
 [![Status: Maintained](https://img.shields.io/badge/status-maintained-2ea44f?style=flat-square)](#status)
@@ -9,7 +9,7 @@ Fully local-first — no accounts, telemetry, or backend required.
 
 ## Status
 
-**Production-ready arcade game (v0.9.0).** Playable in any modern browser, installable as a PWA, and packaged as a native Android app via Capacitor.
+**Production-ready arcade game (v1.0.0).** Playable in any modern browser, installable as a PWA, and packaged as a native Android app via Capacitor.
 
 The browser runtime under `web/` is the primary runtime. The Python/Pygame version is preserved as a canonical reference implementation.
 
@@ -36,7 +36,7 @@ The browser runtime under `web/` is the primary runtime. The Python/Pygame versi
 - Capacitor Android APK (6.6MB, signed)
 - Graceful degradation: game never crashes on missing audio or assets
 - Animated decorative snake field background (canvas-based)
-- Fully local-first: no accounts, telemetry, external APIs, or multiplayer
+- Local-first: no accounts, telemetry, ads, or multiplayer; anonymous Supabase leaderboard calls are limited to cloud score save/read flows
 
 ## Architecture
 
@@ -73,7 +73,7 @@ web/               # Browser/PWA runtime (primary)
 
 ## Local Development
 
-Hiss-Tastic has two runtimes. **Neither requires Vercel, a backend, or any external service.**
+Hiss-Tastic has two runtimes. **Neither requires Vercel, a backend, or any external service for normal local play.** Cloud high scores use Supabase only when the player saves or views cloud scores.
 
 ### Prerequisites
 
@@ -352,15 +352,15 @@ Hiss-Tastic is packaged as a native Android app via [Capacitor](https://capacito
 ### Building from Source
 
 ```bash
-# Prerequisites: Android SDK 34+, Java 17+, Node.js 18+
+# Prerequisites: Android SDK 35+ (target/compile SDK 36), Java 21+, Node.js 18+
 npm install
 npx cap sync
-npx cap add android   # one-time setup
-cd android && ./gradlew assembleDebug
+npm run cap:bundle:release
 # APK at android/app/build/outputs/apk/debug/app-debug.apk
+# AAB at android/app/build/outputs/bundle/release/app-release.aab
 ```
 
-See [BUILD_ANDROID.md](BUILD_ANDROID.md) for detailed instructions.
+See [BUILD_ANDROID.md](BUILD_ANDROID.md) for detailed debug, release, and signing instructions.
 
 ## Cloud High Scores
 
@@ -369,6 +369,7 @@ Scores can be submitted to a shared Supabase database (hosted on the Elora proje
 - **Cloud scores:** submitted to Supabase on save (toggle Local/Cloud on the Scores page)
 - No account or authentication required — anonymous submissions
 - RLS policies allow anyone to read the public leaderboard
+- Submitted cloud score fields: anonymous player name, score, difficulty, snake length, and power-ups collected
 
 ## Validation
 
@@ -387,8 +388,9 @@ See [docs/packaging.md](docs/packaging.md) for standalone executable instruction
 
 ## Limitations
 
-- Python remains canonical; browser runtime is experimental.
-- There is no online multiplayer, leaderboard, telemetry, account system, backend, or wallet/onchain logic.
+- The browser runtime is the primary Play/PWA runtime; Python remains the reference implementation.
+- There is no online multiplayer, telemetry, account system, advertising SDK, crash reporting SDK, or wallet/onchain logic.
+- Cloud leaderboard access uses Supabase REST calls only when cloud scores are saved or viewed.
 - Replay files are local JSON artifacts only when explicitly recorded, imported, or exported.
 - Ghost racing is local-only and score-neutral.
 - PWA support is limited to installability and offline asset caching.
@@ -414,10 +416,10 @@ This repository follows the [ecosystem standards](https://github.com/sparshsam/e
 
 | Layer | Choice |
 |-------|--------|
-| Language | Python |
-| Framework | Pygame |
-| Web dashboard | Flask (HTML/CSS/JS) |
-| Testing | pytest |
+| Python reference | Python + Pygame |
+| Browser game | HTML/CSS/JavaScript Canvas |
+| Android package | Capacitor + Gradle |
+| Testing | unittest, local health checks, Gradle builds |
 
 ## Screenshots
 

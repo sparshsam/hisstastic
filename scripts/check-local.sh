@@ -10,6 +10,11 @@ set -euo pipefail
 
 PASS=0
 FAIL=0
+PYTHON_BIN="${PYTHON:-python3}"
+
+if [ -z "${PYTHON:-}" ] && [ -x ".venv/bin/python" ]; then
+  PYTHON_BIN=".venv/bin/python"
+fi
 
 pass() { PASS=$((PASS+1)); echo "  [PASS] $1"; }
 fail() { FAIL=$((FAIL+1)); echo "  [FAIL] $1"; }
@@ -20,13 +25,13 @@ echo ""
 
 # --- Python runtime ---
 echo "[Python Runtime]"
-if command -v python3 &>/dev/null; then
-  pass "python3 found: $(python3 --version 2>&1)"
+if command -v "$PYTHON_BIN" &>/dev/null || [ -x "$PYTHON_BIN" ]; then
+  pass "python found: $($PYTHON_BIN --version 2>&1)"
 else
-  fail "python3 not found"
+  fail "python not found ($PYTHON_BIN)"
 fi
 
-if python3 -c "import pygame" 2>/dev/null; then
+if "$PYTHON_BIN" -c "import pygame" >/dev/null 2>&1; then
   pass "pygame module available"
 else
   fail "pygame not installed (run: pip install pygame)"
@@ -74,7 +79,7 @@ done
 # --- Validation ---
 echo ""
 echo "[Validation]"
-if python3 -c "import py_compile; py_compile.compile('validation.py', doraise=True)" 2>/dev/null; then
+if "$PYTHON_BIN" -c "import py_compile; py_compile.compile('validation.py', doraise=True)" 2>/dev/null; then
   pass "validation.py compiles"
 else
   fail "validation.py compile error"

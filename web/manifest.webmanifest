@@ -2,6 +2,7 @@
   "name": "Hiss-Tastic",
   "short_name": "HissTastic",
   "description": "A retro Snake-inspired arcade game",
+  "version": "1.0.0",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
