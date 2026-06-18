@@ -19,7 +19,7 @@ Confirm:
 - `android/app/build.gradle` has `versionName "1.0.0"` and `versionCode 1`.
 - `android/variables.gradle` targets API 35 or newer. Current target is 36.
 - Android manifest declares only `INTERNET`.
-- Privacy policy, store listing, and Data Safety notes disclose optional anonymous Supabase cloud scores.
+- Privacy policy, store listing, and Data Safety notes disclose username, anonymous player ID, personal-best leaderboard sync, and local-only score history.
 - Play Store assets checklist is complete.
 
 ## 2. Local Signing
@@ -71,7 +71,7 @@ Do not commit `android/keystore.properties`, `*.jks`, or `*.keystore`.
 6. Add release notes:
 
    ```text
-   Hiss-Tastic v1.0.0 production candidate: Play-ready Android bundle, touch controls, themes, power-ups, replay support, local stats, and optional anonymous cloud leaderboard.
+   Hiss-Tastic v1.0.0 production candidate: Play-ready Android bundle, touch controls, themes, power-ups, replay support, local score history, first-run username setup, and anonymous personal-best global leaderboard.
    ```
 
 7. Review warnings. Resolve any permission, target API, signing, or Data Safety issue before rollout.
@@ -83,8 +83,11 @@ Do not commit `android/keystore.properties`, `*.jks`, or `*.keystore`.
    - Touch controls work.
    - Pause/resume works.
    - Game over appears.
-   - Local score save works.
-   - Cloud score save/read either succeeds or fails gracefully.
+   - First-run username setup works.
+   - Local score history works after every completed game.
+   - New personal best syncs to global leaderboard.
+   - Non-best games do not write to the global leaderboard.
+   - Offline personal-best sync is marked pending and later retries.
 
 ## 4. Closed Testing Track
 

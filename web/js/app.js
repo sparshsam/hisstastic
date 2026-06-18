@@ -105,30 +105,7 @@
     animFrame = requestAnimationFrame(mainLoop);
   }
 
-  // ---- High scores (localStorage) ----
-
-  const HS_KEY = 'hissTasticHighScores';
-  const MAX_HS = 10;
-
-  function getHighScores() {
-    try { return JSON.parse(localStorage.getItem(HS_KEY)) || []; }
-    catch { return []; }
-  }
-
-  function saveHighScore(score, difficulty) {
-    const scores = getHighScores();
-    scores.push({ score, difficulty, date: new Date().toISOString() });
-    scores.sort((a, b) => b.score - a.score);
-    const updated = scores.slice(0, MAX_HS);
-    localStorage.setItem(HS_KEY, JSON.stringify(updated));
-    return updated;
-  }
-
-  function isHighScore(score) {
-    const scores = getHighScores();
-    if (scores.length < MAX_HS) return true;
-    return score > scores[scores.length - 1].score;
-  }
+  // ---- Scores and leaderboard ----
 
   // ---- Stats persistence ----
 
@@ -145,56 +122,70 @@
 
   let _scoresSource = 'local';
 
+  function formatDate(value) {
+    if (!value) return '';
+    try { return new Date(value).toLocaleDateString(); }
+    catch { return ''; }
+  }
+
+  function escapeHtml(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   async function renderHighScores() {
     const list = document.getElementById('scores-list');
     const empty = document.getElementById('scores-empty');
     if (!list || !empty) return;
 
-    // Toggle button
+    const identity = PlayerIdentity.getIdentity();
+    const personalBest = PlayerIdentity.getPersonalBest();
+
     const toggleHtml = '<div style="margin-bottom:10px;text-align:center;">' +
-      '<button id="btn-scores-local" class="ctrl-btn" style="' + (_scoresSource === 'local' ? 'background:#4CAF50;color:#fff;' : '') + '">📱 Local</button> ' +
-      '<button id="btn-scores-cloud" class="ctrl-btn" style="' + (_scoresSource === 'cloud' ? 'background:#4CAF50;color:#fff;' : '') + '">☁️ Cloud</button>' +
+      '<button id="btn-scores-local" class="ctrl-btn" style="' + (_scoresSource === 'local' ? 'background:#4CAF50;color:#fff;' : '') + '">Local History</button> ' +
+      '<button id="btn-scores-cloud" class="ctrl-btn" style="' + (_scoresSource === 'cloud' ? 'background:#4CAF50;color:#fff;' : '') + '">Global</button>' +
     '</div>';
 
     if (_scoresSource === 'local') {
-      const scores = getHighScores();
+      const scores = PlayerIdentity.getHistory();
       if (scores.length === 0) {
-        list.innerHTML = toggleHtml;
+        list.innerHTML = toggleHtml +
+          '<div class="scores-summary">' + escapeHtml(identity.username) + ' · Personal best ' + personalBest + '</div>';
         empty.style.display = 'block';
         _wireScoreToggles();
         return;
       }
       empty.style.display = 'none';
-      list.innerHTML = toggleHtml + scores.map((s, i) =>
+      list.innerHTML = toggleHtml +
+        '<div class="scores-summary">' + escapeHtml(identity.username) + ' · Personal best ' + personalBest + '</div>' +
+        scores.slice(0, 20).map((s, i) =>
         '<div class="score-entry">' +
           '<span class="score-rank">#' + (i + 1) + '</span>' +
           '<span class="score-val">' + s.score + '</span>' +
-          '<span class="score-meta">' + s.difficulty + '</span>' +
+          '<span class="score-meta">' + s.difficulty + ' · ' + formatDate(s.created_at) + '</span>' +
         '</div>'
       ).join('');
-
-      // Stats below scores
-      const stats = game.stats;
-      if (stats.gamesPlayed > 0) {
-        list.insertAdjacentHTML('afterend',
-          '<div style="margin-top:12px;padding-top:8px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;">' +
-          stats.gamesPlayed + ' games · ' + stats.totalFood + ' food eaten · Avg ' + Math.round(stats.totalScore / stats.gamesPlayed) + '/game' +
-          '</div>'
-        );
-      }
     } else {
-      // Cloud scores
-      list.innerHTML = toggleHtml + '<div style="text-align:center;padding:10px;font-size:12px;color:#999;">Loading cloud scores...</div>';
+      list.innerHTML = toggleHtml + '<div style="text-align:center;padding:10px;font-size:12px;color:#999;">Loading global leaderboard...</div>';
       empty.style.display = 'none';
       const cloudScores = await SupabaseClient.getTopScores(10);
+      const rank = await SupabaseClient.getPlayerRank(identity.player_id, 100);
+      const rankHtml = rank
+        ? '<div class="scores-summary">Your rank: #' + rank.rank + ' · Best ' + rank.row.best_score + '</div>'
+        : '<div class="scores-summary">Exact personal rank is hidden to keep anonymous player IDs out of public leaderboard reads.</div>';
       if (cloudScores.length === 0) {
-        list.innerHTML = toggleHtml + '<div style="text-align:center;padding:20px;font-size:13px;color:#999;">No cloud scores yet. Play and save!</div>';
+        list.innerHTML = toggleHtml + rankHtml + '<div style="text-align:center;padding:20px;font-size:13px;color:#999;">No global scores yet. Set a personal best!</div>';
       } else {
-        list.innerHTML = toggleHtml + cloudScores.map((s, i) =>
+        list.innerHTML = toggleHtml + rankHtml + cloudScores.map((s, i) =>
           '<div class="score-entry">' +
             '<span class="score-rank">#' + (i + 1) + '</span>' +
-            '<span class="score-val">' + s.score + '</span>' +
-            '<span class="score-meta">' + s.difficulty + '</span>' +
+            '<span class="score-name">' + escapeHtml(s.username) + '</span>' +
+            '<span class="score-val">' + s.best_score + '</span>' +
+            '<span class="score-meta">' + formatDate(s.updated_at) + '</span>' +
           '</div>'
         ).join('');
       }
@@ -255,9 +246,14 @@
     showPage('home');
   }
 
-  function handleGameOver(e) {
+  async function handleGameOver(e) {
     const score = e.score || game.score;
     document.getElementById('go-score-value').textContent = score;
+    const saveBtn = document.getElementById('btn-save-score');
+    if (saveBtn) {
+      saveBtn.textContent = 'Saved locally';
+      saveBtn.disabled = true;
+    }
 
     // Roast message via commentary engine
     const roastEl = document.getElementById('go-roast');
@@ -272,22 +268,48 @@
       }
     }
 
+    const wasPersonalBest = score > PlayerIdentity.getPersonalBest();
+
     // High score check
     const hsEl = document.getElementById('go-highscore');
-    if (isHighScore(score)) {
+    const syncEl = document.getElementById('go-sync-status');
+    if (game.replayMode) {
+      hsEl.style.display = 'none';
+      syncEl.textContent = 'Replay finished — no score history or leaderboard update';
+      showOverlay('overlay-gameover');
+      return;
+    }
+
+    if (wasPersonalBest) {
       hsEl.style.display = 'block';
+      syncEl.textContent = navigator.onLine ? 'Saving personal best...' : 'Saved locally — will sync when online';
     } else {
       hsEl.style.display = 'none';
+      syncEl.textContent = 'Saved to local score history';
     }
 
     // Game-over stats line
     const stats = game.stats;
     const statsEl = document.getElementById('go-stats');
     if (statsEl && stats.gamesPlayed > 0) {
-      statsEl.textContent = 'Game #' + stats.gamesPlayed + ' · Avg ' + Math.round(stats.totalScore / stats.gamesPlayed) + '/game';
+      statsEl.textContent = 'Game #' + stats.gamesPlayed + ' · Personal best ' + PlayerIdentity.getPersonalBest() + ' · Avg ' + Math.round(stats.totalScore / stats.gamesPlayed) + '/game';
     }
 
     showOverlay('overlay-gameover');
+
+    const result = await PlayerIdentity.recordGameOver(game, { score });
+    if (result.isPersonalBest) {
+      if (result.sync && result.sync.ok) {
+        syncEl.textContent = 'Synced to global leaderboard';
+      } else if (result.sync && result.sync.offline) {
+        syncEl.textContent = 'Saved locally — will sync when online';
+      } else {
+        syncEl.textContent = 'Saved locally — leaderboard sync pending';
+      }
+      if (statsEl && stats.gamesPlayed > 0) {
+        statsEl.textContent = 'Game #' + stats.gamesPlayed + ' · Personal best ' + PlayerIdentity.getPersonalBest() + ' · Avg ' + Math.round(stats.totalScore / stats.gamesPlayed) + '/game';
+      }
+    }
   }
 
   function handlePause() {
@@ -301,6 +323,52 @@
     if (game.state === 'PAUSED') {
       game.state = 'PLAYING';
       hideOverlay('overlay-pause');
+    }
+  }
+
+  function setProfileError(id, message) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = message || '';
+    el.style.display = message ? 'block' : 'none';
+  }
+
+  function fillProfileFields() {
+    const identity = PlayerIdentity.getIdentity();
+    const setupInput = document.getElementById('profile-username');
+    const settingsInput = document.getElementById('settings-username');
+    if (setupInput) setupInput.value = identity.username;
+    if (settingsInput) settingsInput.value = identity.username;
+  }
+
+  function saveProfileFromInput(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    const value = input ? input.value : '';
+    const result = PlayerIdentity.saveUsername(value);
+    if (!result.ok) {
+      setProfileError(errorId, result.error);
+      return false;
+    }
+    setProfileError(errorId, '');
+    fillProfileFields();
+    if (PlayerIdentity.getPersonalBest() > 0) {
+      PlayerIdentity.syncBestScore(PlayerIdentity.getPersonalBest()).then(() => PlayerIdentity.syncPendingBest());
+    }
+    return true;
+  }
+
+  function randomizeProfileInput(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    if (input) input.value = PlayerIdentity.generateUsername();
+    setProfileError(errorId, '');
+  }
+
+  function showProfileSetupIfNeeded() {
+    const identity = PlayerIdentity.getIdentity();
+    const input = document.getElementById('profile-username');
+    if (input) input.value = identity.username;
+    if (!PlayerIdentity.isProfileReady()) {
+      showOverlay('modal-profile-setup');
     }
   }
 
@@ -371,6 +439,7 @@
 
     document.getElementById('btn-open-settings').addEventListener('click', () => {
       renderHighScores(); // pre-render for score display
+      fillProfileFields();
       // Sync settings toggle states
       const musicBtn = document.getElementById('settings-music');
       if (musicBtn) {
@@ -410,22 +479,6 @@
     // ---- GAME OVER OVERLAY ----
 
     document.getElementById('btn-retry').addEventListener('click', startNewGame);
-    document.getElementById('btn-save-score').addEventListener('click', async () => {
-      saveHighScore(game.score, game.difficultyMode);
-
-      // Submit to Supabase cloud scores
-      const btn = document.getElementById('btn-save-score');
-      btn.textContent = '☁️ Saving...';
-      btn.disabled = true;
-
-      const result = await SupabaseClient.submitScore(
-        game.score,
-        game.difficultyMode,
-        game.snake ? game.snake.length : 1,
-        game.powerupsCollected || 0
-      );
-      btn.textContent = result.ok ? '✅ Saved to Cloud!' : '💾 Saved Locally';
-    });
     document.getElementById('btn-home-from-go').addEventListener('click', goHome);
 
     // ---- PAUSE OVERLAY ----
@@ -437,6 +490,28 @@
 
     document.getElementById('btn-close-settings').addEventListener('click', () => {
       hideOverlay('modal-settings');
+    });
+
+    document.getElementById('btn-profile-randomize').addEventListener('click', () => {
+      randomizeProfileInput('profile-username', 'profile-setup-error');
+    });
+
+    document.getElementById('btn-profile-save').addEventListener('click', () => {
+      const ok = saveProfileFromInput('profile-username', 'profile-setup-error');
+      if (ok) hideOverlay('modal-profile-setup');
+    });
+
+    document.getElementById('settings-randomize-name').addEventListener('click', () => {
+      randomizeProfileInput('settings-username', 'settings-profile-error');
+    });
+
+    document.getElementById('settings-save-profile').addEventListener('click', () => {
+      const ok = saveProfileFromInput('settings-username', 'settings-profile-error');
+      if (ok) {
+        const btn = document.getElementById('settings-save-profile');
+        btn.textContent = 'Saved';
+        setTimeout(() => { btn.textContent = 'Save'; }, 1200);
+      }
     });
 
     // Settings difficulty
@@ -520,8 +595,15 @@
     // Load saved theme
     loadTheme();
 
+    fillProfileFields();
+    window.addEventListener('online', () => {
+      PlayerIdentity.syncPendingBest();
+    });
+    PlayerIdentity.syncPendingBest();
+
     // Show home page, no main loop yet
     showPage('home');
+    showProfileSetupIfNeeded();
   }
 
   function registerServiceWorker() {

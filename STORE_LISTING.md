@@ -19,7 +19,9 @@ Hiss-Tastic is a modern take on the classic Snake arcade game — rebuilt for mo
 - Proportional D-pad with swipe support
 - Portrait and landscape support
 - Offline play via PWA service worker
-- Anonymous optional cloud leaderboard plus local-only scores
+- First-run username setup with whimsical random name option
+- Global leaderboard for each player's personal best
+- Local-only score history
 - No ads, no tracking, no accounts
 
 **Power-ups:**
@@ -35,7 +37,7 @@ Hiss-Tastic is a modern take on the classic Snake arcade game — rebuilt for mo
 - Ocean: Teal on light blue
 
 **Privacy:**
-Hiss-Tastic is local-first. Local scores, settings, and gameplay stats stay on your device. If you choose to save or view cloud scores, the app uses Supabase to submit or read anonymous leaderboard entries containing score, difficulty, snake length, and power-up count. No accounts, ads, tracking, analytics, location, contacts, device identifiers, or advertising IDs are collected.
+Hiss-Tastic is local-first. Score history, settings, and gameplay stats stay on your device. The global leaderboard stores your chosen username, an anonymous player ID, and your best score only. No real-name account is required. No email, phone number, real name, location, contacts, advertising ID, analytics, tracking, or ads are collected.
 
 ## What's New (v1.0.0)
 - 3 new power-ups: Speed Boost, Shield, Score Multiplier
@@ -45,16 +47,18 @@ Hiss-Tastic is local-first. Local scores, settings, and gameplay stats stay on y
 - Portrait mode support
 - Haptic feedback on mobile
 - Play Store ready Android App Bundle build targeting Android API 36
-- Optional anonymous cloud leaderboard disclosure and release documentation
+- First-run username setup and personal-best global leaderboard
+- Local-only score history with offline pending leaderboard sync
 
 ## Data Safety Notes
 
-- **Data collected:** Optional leaderboard game data only when a player saves a cloud score: anonymous player label, score, difficulty, snake length, and power-ups collected.
-- **Data shared:** Cloud leaderboard entries are sent to Supabase for public leaderboard display.
-- **Personal data:** No name, email, account, location, contacts, photos, files, advertising ID, or device identifier is collected by the app.
-- **Security practices:** Data is transmitted over HTTPS to Supabase. No user account or deletion request flow is available because leaderboard entries are anonymous.
+- **Data collected:** App activity/gameplay leaderboard data: chosen username, anonymous player ID, and personal best score.
+- **Data shared:** Global leaderboard entries are sent to Supabase for public leaderboard display.
+- **Local-only data:** Full score history, settings, and gameplay stats stay on device.
+- **Personal data:** No email, phone, real name, account, location, contacts, photos, files, advertising ID, or device identifier is collected by the app.
+- **Security practices:** Data is transmitted over HTTPS to Supabase. No real-name account is required because leaderboard identity is anonymous.
 - **Ads/analytics:** No ads, analytics SDK, telemetry, or crash reporting SDK.
-- **Permissions:** Android declares `INTERNET` only, required for optional cloud scores and user-opened external links.
+- **Permissions:** Android declares `INTERNET` only, required for global leaderboard requests and user-opened external links.
 
 ## Category
 Games > Arcade
