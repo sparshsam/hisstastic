@@ -715,6 +715,14 @@ body {
   border-bottom: 1px solid #eee;
   margin-bottom: 6px;
 }
+.scores-summary.my-entry {
+  color: #2e7d32;
+  font-weight: bold;
+  background: #e8f5e9;
+  border-radius: 4px;
+  padding: 10px;
+  border-bottom: 1px solid #c8e6c9;
+}
 
 .scores-empty {
   font-family: monospace;

@@ -173,14 +173,15 @@
       list.innerHTML = toggleHtml + '<div style="text-align:center;padding:10px;font-size:12px;color:#999;">Loading global leaderboard...</div>';
       empty.style.display = 'none';
       const cloudScores = await SupabaseClient.getTopScores(10);
-      const rank = await SupabaseClient.getPlayerRank(identity.player_id, 100);
-      const rankHtml = rank
-        ? '<div class="scores-summary">Your rank: #' + rank.rank + ' · Best ' + rank.row.best_score + '</div>'
-        : '<div class="scores-summary">Exact personal rank is hidden to keep anonymous player IDs out of public leaderboard reads.</div>';
+      const myEntry = await SupabaseClient.getMyLeaderboardEntry(identity.player_id);
+      let myEntryHtml = '';
+      if (myEntry) {
+        myEntryHtml = '<div class="scores-summary my-entry">Your global best: #' + myEntry.rank + ' · ' + myEntry.best_score + '</div>';
+      }
       if (cloudScores.length === 0) {
-        list.innerHTML = toggleHtml + rankHtml + '<div style="text-align:center;padding:20px;font-size:13px;color:#999;">No global scores yet. Set a personal best!</div>';
+        list.innerHTML = toggleHtml + myEntryHtml + '<div style="text-align:center;padding:20px;font-size:13px;color:#999;">No global scores yet. Set a personal best!</div>';
       } else {
-        list.innerHTML = toggleHtml + rankHtml + cloudScores.map((s, i) =>
+        list.innerHTML = toggleHtml + myEntryHtml + cloudScores.map((s, i) =>
           '<div class="score-entry">' +
             '<span class="score-rank">#' + (i + 1) + '</span>' +
             '<span class="score-name">' + escapeHtml(s.username) + '</span>' +

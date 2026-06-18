@@ -112,16 +112,24 @@ const SupabaseClient = {
   },
 
   /**
-   * Exact rank is intentionally unavailable from public display rows because
-   * player_id is not exposed by the leaderboard read grant.
+   * Fetch the current player's own leaderboard entry and exact rank.
+   * Identifies the player via x-player-id header; rank is computed
+   * server-side in the RPC. No player_id is exposed.
    * @param {string} playerId
-   * @param {number} [limit=100]
-   * @returns {Promise<{rank: number, row: object}|null>}
+   * @returns {Promise<{username: string, best_score: number, rank: number, updated_at: string}|null>}
    */
-  async getPlayerRank(playerId, limit) {
-    void playerId;
-    void limit;
-    return null;
+  async getMyLeaderboardEntry(playerId) {
+    try {
+      const res = await this._fetch(
+        SUPABASE_URL + '/rest/v1/rpc/get_my_leaderboard_entry',
+        { method: 'POST', headers: this._headers(playerId) }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      return (data && data.length > 0) ? data[0] : null;
+    } catch {
+      return null;
+    }
   },
 };
 
