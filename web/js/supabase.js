@@ -1,13 +1,20 @@
 /**
  * Hiss-Tastic Supabase integration.
  * Lightweight REST client — no SDK dependency.
- * Submits high scores to the shared Elora database.
+ * Stores anonymous player profiles and personal-best leaderboard rows.
  */
 
 const SUPABASE_URL = 'https://qoxmibmbyjmkntzrckyr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_FTJ_XShVabxUb_NVrH7Htw_h3w2ponJ';
 
 const SupabaseClient = {
+  _fetch(url, options) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    return fetch(url, { ...options, signal: controller.signal })
+      .finally(() => clearTimeout(timeout));
+  },
+
   _headers() {
     return {
       'Content-Type': 'application/json',
@@ -18,27 +25,58 @@ const SupabaseClient = {
   },
 
   /**
-   * Submit a high score.
-   * @param {number} score
-   * @param {string} difficulty - easy/normal/hard
-   * @param {number} snakeLength
-   * @param {number} powerupsCollected
-   * @param {string} [playerName] - optional name
+   * Upsert an anonymous player profile.
+   * @param {{player_id: string, username: string, created_at: string}} identity
    * @returns {Promise<{ok: boolean, error?: string}>}
    */
-  async submitScore(score, difficulty, snakeLength, powerupsCollected, playerName) {
+  async upsertPlayer(identity) {
     try {
       const body = {
-        player_name: playerName || 'anonymous',
-        score,
-        difficulty: difficulty || 'normal',
-        snake_length: snakeLength || 1,
-        powerups_collected: powerupsCollected || 0,
+        id: identity.player_id,
+        username: identity.username,
+        created_at: identity.created_at,
+        updated_at: new Date().toISOString(),
       };
 
-      const res = await fetch(SUPABASE_URL + '/rest/v1/hisstastic/high_scores', {
+      const res = await this._fetch(SUPABASE_URL + '/rest/v1/players?on_conflict=id', {
         method: 'POST',
-        headers: this._headers(),
+        headers: {
+          ...this._headers(),
+          'Prefer': 'resolution=merge-duplicates,return=minimal',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        return { ok: false, error: `HTTP ${res.status}: ${text}` };
+      }
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  },
+
+  /**
+   * Upsert a player's global personal best.
+   * @param {{player_id: string, username: string, best_score: number}} entry
+   * @returns {Promise<{ok: boolean, error?: string}>}
+   */
+  async upsertLeaderboardScore(entry) {
+    try {
+      const body = {
+        player_id: entry.player_id,
+        username: entry.username,
+        best_score: entry.best_score,
+        updated_at: new Date().toISOString(),
+      };
+
+      const res = await this._fetch(SUPABASE_URL + '/rest/v1/leaderboard_scores?on_conflict=player_id', {
+        method: 'POST',
+        headers: {
+          ...this._headers(),
+          'Prefer': 'resolution=merge-duplicates,return=minimal',
+        },
         body: JSON.stringify(body),
       });
 
@@ -60,8 +98,8 @@ const SupabaseClient = {
   async getTopScores(limit) {
     limit = limit || 10;
     try {
-      const res = await fetch(
-        SUPABASE_URL + '/rest/v1/hisstastic/high_scores?order=score.desc&limit=' + limit,
+      const res = await this._fetch(
+        SUPABASE_URL + '/rest/v1/leaderboard_scores?select=player_id,username,best_score,updated_at&order=best_score.desc&limit=' + limit,
         { headers: this._headers() }
       );
       if (!res.ok) return [];
@@ -70,4 +108,24 @@ const SupabaseClient = {
       return [];
     }
   },
+
+  /**
+   * Fetch a player's rank by scanning the top public leaderboard rows.
+   * @param {string} playerId
+   * @param {number} [limit=100]
+   * @returns {Promise<{rank: number, row: object}|null>}
+   */
+  async getPlayerRank(playerId, limit) {
+    limit = limit || 100;
+    try {
+      const scores = await this.getTopScores(limit);
+      const index = scores.findIndex((row) => row.player_id === playerId);
+      if (index < 0) return null;
+      return { rank: index + 1, row: scores[index] };
+    } catch {
+      return null;
+    }
+  },
 };
+
+window.SupabaseClient = SupabaseClient;

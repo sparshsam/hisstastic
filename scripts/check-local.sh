@@ -57,7 +57,9 @@ if [ -f web/manifest.webmanifest ]; then pass "web/manifest.webmanifest present"
 if [ -f web/sw.js ]; then pass "web/sw.js present"; else fail "web/sw.js missing"; fi
 if [ -f web/js/app.js ]; then pass "web/js/app.js present"; else fail "web/js/app.js missing"; fi
 if [ -f web/js/game.js ]; then pass "web/js/game.js present"; else fail "web/js/game.js missing"; fi
+if [ -f web/js/identity.js ]; then pass "web/js/identity.js present"; else fail "web/js/identity.js missing"; fi
 if [ -f web/js/audio.js ]; then pass "web/js/audio.js present"; else fail "web/js/audio.js missing"; fi
+if [ -f web/js/supabase.js ]; then pass "web/js/supabase.js present"; else fail "web/js/supabase.js missing"; fi
 if [ -f web/css/style.css ]; then pass "web/css/style.css present"; else fail "web/css/style.css missing"; fi
 if [ -f web/assets/background-music.mp3 ]; then pass "web/assets/background-music.mp3 present"; else fail "web/assets/background-music.mp3 missing"; fi
 if [ -d web/icons ]; then pass "web/icons/ directory present"; else fail "web/icons/ missing"; fi

@@ -371,6 +371,7 @@ class HissTastic {
     this.scoreMultiplierStartTime = 0;
     this.lastDirection = null;
     this._lastCollisionType = null;
+    this.sessionStartedAt = performance.now();
 
     this.state = 'PLAYING';
     this.stats.gamesPlayed++;

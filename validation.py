@@ -36,7 +36,9 @@ REQUIRED_WEB_FILES = [
     "sw.js",
     "js/app.js",
     "js/game.js",
+    "js/identity.js",
     "js/replay.js",
+    "js/supabase.js",
 ]
 
 def ok(msg):
@@ -237,7 +239,7 @@ def check_browser_pwa():
 
     node = _find_node()
     if node:
-        for relative_path in ["js/app.js", "js/game.js", "js/replay.js", "sw.js"]:
+        for relative_path in ["js/app.js", "js/game.js", "js/identity.js", "js/replay.js", "js/supabase.js", "sw.js"]:
             path = os.path.join(WEB_DIR, *relative_path.split("/"))
             result = subprocess.run(
                 [node, "--check", path],
