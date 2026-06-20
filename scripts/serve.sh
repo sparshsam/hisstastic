@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hiss-Tastic — Local Development Server
+# HissTastic — Local Development Server
 # ========================================
 # Usage:
 #   ./scripts/serve.sh          # Starts dev server on port 8080
@@ -12,7 +12,7 @@ set -euo pipefail
 PORT="${1:-8080}"
 DIR="$(cd "$(dirname "$0")/../web" && pwd)"
 
-echo "  Hiss-Tastic Local Dev Server"
+echo "  HissTastic Local Dev Server"
 echo "  ============================"
 echo "  URL:      http://localhost:${PORT}"
 echo "  Serving:  ${DIR}"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hiss-Tastic — Local Health Check
+# HissTastic — Local Health Check
 # =================================
 # Verifies all local dev requirements are met.
 # Run this from the repo root before committing.
@@ -19,7 +19,7 @@ fi
 pass() { PASS=$((PASS+1)); echo "  [PASS] $1"; }
 fail() { FAIL=$((FAIL+1)); echo "  [FAIL] $1"; }
 
-echo "Hiss-Tastic Local Health Check"
+echo "HissTastic Local Health Check"
 echo "=============================="
 echo ""
 
@@ -43,10 +43,10 @@ else
   fail "main.py missing"
 fi
 
-if [ -f hiss_tastic.py ]; then
-  pass "hiss_tastic.py (legacy) present"
+if [ -f hisstastic.py ]; then
+  pass "hisstastic.py (legacy) present"
 else
-  fail "hiss_tastic.py missing"
+  fail "hisstastic.py missing"
 fi
 
 # --- Browser runtime ---

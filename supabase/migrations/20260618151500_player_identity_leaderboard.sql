@@ -1,4 +1,4 @@
--- Hiss-Tastic player identity and global leaderboard.
+-- HissTastic player identity and global leaderboard.
 -- Score history intentionally remains local-only and is not modeled here.
 -- Anonymous writes are constrained to the locally generated player_id carried
 -- in the x-player-id request header. This is not account authentication, but
