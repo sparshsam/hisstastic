@@ -20,7 +20,7 @@ jobs:
           python -c "import py_compile; py_compile.compile('validation.py', doraise=True)"
       - name: Import validation
         run: |
-          python -c "import hiss_tastic; print('Package imports OK')"
+          python -c "import hisstastic; print('Package imports OK')"
       - name: Validation script
         run: |
           python validation.py || echo "Some checks may fail in headless CI (no display)"
