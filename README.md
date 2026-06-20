@@ -7,6 +7,12 @@ Local-first by default — no email, real-name account, telemetry, ads, or backe
 [![Status: Maintained](https://img.shields.io/badge/status-maintained-2ea44f?style=flat-square)](#status)
 [![CI](https://github.com/sparshsam/hisstastic/actions/workflows/ci.yml/badge.svg)](https://github.com/sparshsam/hisstastic/actions/workflows/ci.yml)
 
+<p align="center">
+  <img src="screenshots/gameplay.png" alt="Gameplay" width="32%">
+  <img src="screenshots/home_page.png" alt="Home Page" width="32%">
+  <img src="screenshots/high_scores.png" alt="High Scores" width="32%">
+</p>
+
 ## Status
 
 **Production-ready arcade game (v1.0.0).** Playable in any modern browser, installable as a PWA, and packaged as a native Android app via Capacitor.
@@ -443,25 +449,10 @@ This repository follows the [ecosystem standards](https://github.com/sparshsam/e
 ## Screenshots
 
 <p align="center">
-  <img src="screenshots/home_page.png" alt="Home Page" width="45%">
-  &nbsp;&nbsp;
   <img src="screenshots/welcome_page.png" alt="Welcome Page" width="45%">
-</p>
-<p align="center">
-  <em>Main menu with difficulty selection &bull; Welcome screen with username setup</em>
-</p>
-
-<p align="center">
-  <img src="screenshots/gameplay.png" alt="Gameplay" width="45%">
   &nbsp;&nbsp;
-  <img src="screenshots/high_scores.png" alt="High Scores" width="45%">
-</p>
-<p align="center">
-  <em>Active gameplay with power-ups &bull; Global leaderboard &amp; local score history</em>
-</p>
-
-<p align="center">
   <img src="screenshots/app_icon.png" alt="App Icon" width="96">
-  <br>
-  <em>App icon — #00BF63 green</em>
+</p>
+<p align="center">
+  <em>Welcome screen with username setup &bull; App icon — #00BF63 green</em>
 </p>
