@@ -442,9 +442,10 @@ This repository follows the [ecosystem standards](https://github.com/sparshsam/e
 
 ## Screenshots
 
-> Screenshots to be added.
-
-```
-assets/screenshots/
-└── (to be captured)
-```
+| View | Screenshot |
+|------|-----------|
+| Home Page | ![Home Page](screenshots/home_page.png) |
+| Welcome Page | ![Welcome Page](screenshots/welcome_page.png) |
+| Gameplay | ![Gameplay](screenshots/gameplay.png) |
+| High Scores | ![High Scores](screenshots/high_scores.png) |
+| App Icon | ![App Icon](screenshots/app_icon.png) |
