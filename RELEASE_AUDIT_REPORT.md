@@ -123,3 +123,23 @@ Patterns checked in all source files:
 - Supabase unchanged → leaderboard continues working
 - All builds pass → APK and AAB ready
 - Old domain deleted → no split traffic
+
+---
+
+## Historical Naming Reference
+
+For future reference when debugging signing, builds, or Google Play Console:
+
+| Entity | Current Name | Notes |
+|--------|-------------|-------|
+| **Repository** | `sparshsam/hisstastic` | Renamed from `sparshsam/hiss-tastic` on Jun 20, 2026 |
+| **Vercel project** | `hisstastic` | Renamed from `hiss-tastic`; domain `hisstastic.vercel.app` |
+| **Public app name** | `HissTastic` | Renamed from `Hiss-Tastic`; used in Android, PWA, README, GitHub release |
+| **Title card** | `HISSTASTIC` | Renamed from `HISS-TASTIC`; rendered on canvas and Pygame |
+| **Python module** | `hisstastic/` | Renamed from `hiss_tastic/`; all imports updated |
+| **Android package ID** | `com.sparshsam.hisstastic` | **Never changed** — Java package names don't allow hyphens |
+| **Capacitor appId** | `com.sparshsam.hisstastic` | **Never changed** — matches Android from the start |
+| **Signing key alias** | `hiss-tastic-upload` | **Legacy — intentionally preserved.** The alias inside the JKS was never renamed; only the keystore filename changed. Changing this alias would invalidate the signing chain for future updates. |
+| **Keystore filename** | `hisstastic-upload.jks` | Renamed from `hiss-tastic-upload.jks` to match the repo name |
+| **Supabase URL** | `https://qoxmibmbyjmkntzrckyr.supabase.co` | Unchanged by rename |
+| **Legacy entry point** | `hisstastic.py` (root) | Renamed from `hiss_tastic.py`; no longer imported by any code |
