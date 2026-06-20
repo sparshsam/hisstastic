@@ -442,10 +442,26 @@ This repository follows the [ecosystem standards](https://github.com/sparshsam/e
 
 ## Screenshots
 
-| View | Screenshot |
-|------|-----------|
-| Home Page | ![Home Page](screenshots/home_page.png) |
-| Welcome Page | ![Welcome Page](screenshots/welcome_page.png) |
-| Gameplay | ![Gameplay](screenshots/gameplay.png) |
-| High Scores | ![High Scores](screenshots/high_scores.png) |
-| App Icon | ![App Icon](screenshots/app_icon.png) |
+<p align="center">
+  <img src="screenshots/home_page.png" alt="Home Page" width="45%">
+  &nbsp;&nbsp;
+  <img src="screenshots/welcome_page.png" alt="Welcome Page" width="45%">
+</p>
+<p align="center">
+  <em>Main menu with difficulty selection &bull; Welcome screen with username setup</em>
+</p>
+
+<p align="center">
+  <img src="screenshots/gameplay.png" alt="Gameplay" width="45%">
+  &nbsp;&nbsp;
+  <img src="screenshots/high_scores.png" alt="High Scores" width="45%">
+</p>
+<p align="center">
+  <em>Active gameplay with power-ups &bull; Global leaderboard &amp; local score history</em>
+</p>
+
+<p align="center">
+  <img src="screenshots/app_icon.png" alt="App Icon" width="96">
+  <br>
+  <em>App icon — #00BF63 green</em>
+</p>
