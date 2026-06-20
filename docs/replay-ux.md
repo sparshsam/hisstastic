@@ -2,32 +2,32 @@
 
 ## Purpose
 
-The replay system exists to make Hiss-Tastic runs reproducible, inspectable, and useful for future agent-playable, ghost-racing, and score-verification work.
+The replay system exists to make HissTastic runs reproducible, inspectable, and useful for future agent-playable, ghost-racing, and score-verification work.
 
 ## Current Commands
 
 Record a replay:
 
 ```bash
-python -m hiss_tastic.replay_cli record
+python -m hisstastic.replay_cli record
 ```
 
 Verify a replay:
 
 ```bash
-python -m hiss_tastic.replay_cli verify replays/replay_12345_20260604.json
+python -m hisstastic.replay_cli verify replays/replay_12345_20260604.json
 ```
 
 Load replay metadata:
 
 ```bash
-python -m hiss_tastic.replay_cli play replays/replay_12345_20260604.json
+python -m hisstastic.replay_cli play replays/replay_12345_20260604.json
 ```
 
 Check ghost compatibility:
 
 ```bash
-python -m hiss_tastic.replay_cli ghost-check replays/replay_12345_20260604.json
+python -m hisstastic.replay_cli ghost-check replays/replay_12345_20260604.json
 ```
 
 ## Replay Schema
@@ -35,7 +35,7 @@ python -m hiss_tastic.replay_cli ghost-check replays/replay_12345_20260604.json
 Replay files are local JSON files with:
 
 - `version`: replay schema version.
-- `game`: must be `hiss-tastic`.
+- `game`: must be `hisstastic`.
 - `schema`: schema name, version, and compatible versions.
 - `metadata`: local-only and deterministic replay posture.
 - `seed`: deterministic RNG seed.

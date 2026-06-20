@@ -2,7 +2,7 @@
 
 ## Repository Role
 
-Hiss-Tastic is a browser-first arcade game (v1.0.0) with a preserved Python/Pygame reference implementation. The web runtime (`web/`) is the primary target.
+HissTastic is a browser-first arcade game (v1.0.0) with a preserved Python/Pygame reference implementation. The web runtime (`web/`) is the primary target.
 
 ## Operating Rules
 

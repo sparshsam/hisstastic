@@ -1,5 +1,5 @@
 /**
- * Hiss-Tastic Supabase integration.
+ * HissTastic Supabase integration.
  * Lightweight REST client — no SDK dependency.
  * Stores anonymous player profiles and personal-best leaderboard rows.
  */

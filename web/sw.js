@@ -1,11 +1,11 @@
 /**
- * Hiss-Tastic Service Worker
+ * HissTastic Service Worker
  * Provides offline caching for the browser game.
  * Gracefully handles missing assets so local dev is never blocked.
  * No telemetry or analytics. Optional leaderboard calls are made by the app.
  */
 
-const CACHE_NAME = 'hiss-tastic-v3';
+const CACHE_NAME = 'hisstastic-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

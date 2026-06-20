@@ -2,11 +2,11 @@
 
 **Last updated:** June 18, 2026
 
-Hiss-Tastic does not collect, store, or transmit personal contact or account data. Normal gameplay is local-first. The global leaderboard transmits a chosen username, locally generated anonymous player ID, and personal-best score.
+HissTastic does not collect, store, or transmit personal contact or account data. Normal gameplay is local-first. The global leaderboard transmits a chosen username, locally generated anonymous player ID, and personal-best score.
 
 ## Data Collection
 
-Hiss-Tastic is a local-first application. It operates on your device for normal play, settings, stats, score history, replay files, and PWA offline caching.
+HissTastic is a local-first application. It operates on your device for normal play, settings, stats, score history, replay files, and PWA offline caching.
 
 ### What we DON'T collect:
 - No email address, phone number, or real name
@@ -29,7 +29,7 @@ Hiss-Tastic is a local-first application. It operates on your device for normal 
 
 ## Optional Cloud Leaderboard
 
-Hiss-Tastic uses Supabase REST APIs for the global leaderboard.
+HissTastic uses Supabase REST APIs for the global leaderboard.
 
 Global leaderboard submissions include:
 - Anonymous player ID
@@ -40,14 +40,14 @@ Global leaderboard reads fetch public leaderboard rows from Supabase. No account
 
 ## Network Access
 
-Hiss-Tastic makes network requests only for:
+HissTastic makes network requests only for:
 1. Loading the game files from its host (Vercel or local server)
 2. Supabase leaderboard profile/best-score save and read requests
 3. User-initiated external links, such as the background music credit or GitHub feedback link
 
 ## Third-Party Services
 
-Hiss-Tastic uses Supabase only for anonymous leaderboard profile and personal-best storage/retrieval. It uses no third-party analytics, advertising, crash reporting, or tracking services.
+HissTastic uses Supabase only for anonymous leaderboard profile and personal-best storage/retrieval. It uses no third-party analytics, advertising, crash reporting, or tracking services.
 
 ## Google Play Data Safety Summary
 
@@ -66,4 +66,4 @@ If this policy changes, the updated date at the top will be revised. The policy 
 ## Contact
 
 For questions about this privacy policy, open an issue at:
-https://github.com/sparshsam/hiss-tastic/issues
+https://github.com/sparshsam/hisstastic/issues

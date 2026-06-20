@@ -1,6 +1,6 @@
 """Local ghost replay loading, synchronization, and visualization payloads."""
 
-from hiss_tastic.replay import ReplayPlayer, ReplayValidationError, load_replay_file
+from hisstastic.replay import ReplayPlayer, ReplayValidationError, load_replay_file
 
 
 class GhostReplay:

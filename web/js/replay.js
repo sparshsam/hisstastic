@@ -1,5 +1,5 @@
 /**
- * Replay import/export/display for Hiss-Tastic browser game.
+ * Replay import/export/display for HissTastic browser game.
  * Consumes existing replay JSON schema (v1.0.0).
  * No networking — all local file operations.
  */
@@ -25,7 +25,7 @@ class ReplayManager {
         return { valid: false, error: `Missing required field: ${field}` };
       }
     }
-    if (data.game !== 'hiss-tastic') {
+    if (data.game !== 'hisstastic') {
       return { valid: false, error: `Unknown game: ${data.game}` };
     }
     if (!Array.isArray(data.inputs)) {

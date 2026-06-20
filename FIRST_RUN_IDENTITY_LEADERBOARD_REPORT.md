@@ -5,9 +5,9 @@ Branch: `first-run-identity-leaderboard`
 
 ## First-Run Flow
 
-On first launch, Hiss-Tastic shows a welcome/profile setup modal:
+On first launch, HissTastic shows a welcome/profile setup modal:
 
-- Thanks the player for playing Hiss-Tastic.
+- Thanks the player for playing HissTastic.
 - Explains snake gameplay, high-score chasing, and global leaderboard visibility.
 - Asks for a username.
 - Provides a Randomize button.
@@ -151,7 +151,7 @@ Confirmed:
 
 Security limitation:
 
-- Because Hiss-Tastic intentionally has no account login or server-side session, the anonymous `x-player-id` header is not cryptographic authentication. It constrains normal app writes and prevents accidental cross-player updates, but a determined client with the public API key could still forge requests. Stronger protection would require authenticated users, server-verified score proofs, or a backend signing/verifier flow.
+- Because HissTastic intentionally has no account login or server-side session, the anonymous `x-player-id` header is not cryptographic authentication. It constrains normal app writes and prevents accidental cross-player updates, but a determined client with the public API key could still forge requests. Stronger protection would require authenticated users, server-verified score proofs, or a backend signing/verifier flow.
 
 Review changes made:
 
@@ -187,8 +187,8 @@ Pending:
 Smoke screenshots:
 
 ```text
-/tmp/hiss-tastic-first-run.png
-/tmp/hiss-tastic-profile-settings.png
-/tmp/hiss-tastic-identity-scores.png
-/tmp/hiss-tastic-identity-gameplay.png
+/tmp/hisstastic-first-run.png
+/tmp/hisstastic-profile-settings.png
+/tmp/hisstastic-identity-scores.png
+/tmp/hisstastic-identity-gameplay.png
 ```

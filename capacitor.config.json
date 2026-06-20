@@ -1,6 +1,6 @@
 {
   "appId": "com.sparshsam.hisstastic",
-  "appName": "Hiss-Tastic",
+  "appName": "HissTastic",
   "webDir": "web",
   "bundledWebRuntime": false,
   "server": {

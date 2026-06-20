@@ -14,7 +14,7 @@ Ghost racing is in foundation stage. The repository now supports local ghost rep
 
 ## Current Implementation
 
-- `hiss_tastic.ghost.GhostReplay` loads and validates a replay file.
+- `hisstastic.ghost.GhostReplay` loads and validates a replay file.
 - `GhostReplay.sanity_check()` confirms local-only ghost constraints.
 - `GhostRaceSession` synchronizes a replay by active game tick.
 - `rendering.draw_ghost()` can draw translucent ghost frame payloads when frame snapshots exist.

@@ -2,7 +2,7 @@
 
 ## Policy
 
-Hiss-Tastic follows the ecosystem branch-safety posture: preserve clear history, avoid surprise rewrites, and prefer ordinary pushes after reviewed commits.
+HissTastic follows the ecosystem branch-safety posture: preserve clear history, avoid surprise rewrites, and prefer ordinary pushes after reviewed commits.
 
 ## Rules
 

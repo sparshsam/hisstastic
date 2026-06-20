@@ -1,5 +1,5 @@
 /**
- * Hiss-Tastic — one procedural snake rendered as a filled polygon silhouette.
+ * HissTastic — one procedural snake rendered as a filled polygon silhouette.
  *
  * The snake body is built from a spine curve (path history + sine wave),
  * then expanded left/right using a natural radius profile. The result

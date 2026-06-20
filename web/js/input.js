@@ -1,5 +1,5 @@
 /**
- * Input handler for Hiss-Tastic browser game.
+ * Input handler for HissTastic browser game.
  * Supports keyboard, touch/swipe (anywhere on screen), and directional overlay.
  *
  * v2 — Swipe works anywhere on the page, D-pad uses touchstart for instant

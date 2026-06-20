@@ -1,8 +1,8 @@
 """
-validation.py -- Smoke-test / validation script for Hiss-Tastic.
+validation.py -- Smoke-test / validation script for HissTastic.
 
 Checks:
-  1. hiss_tastic.py compiles (py_compile).
+  1. hisstastic.py compiles (py_compile).
   2. Required imports resolve (os, sys, random, time, pygame).
   3. assets/ directory contains all expected files.
   4. requirements.txt exists and declares pygame.
@@ -23,7 +23,7 @@ import subprocess
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "assets")
 REQUIREMENTS_PATH = os.path.join(PROJECT_ROOT, "requirements.txt")
-MAIN_MODULE = os.path.join(PROJECT_ROOT, "hiss_tastic.py")
+MAIN_MODULE = os.path.join(PROJECT_ROOT, "hisstastic.py")
 WEB_DIR = os.path.join(PROJECT_ROOT, "web")
 MANIFEST_PATH = os.path.join(WEB_DIR, "manifest.webmanifest")
 SERVICE_WORKER_PATH = os.path.join(WEB_DIR, "sw.js")
@@ -57,7 +57,7 @@ def check_compile():
         return False
     try:
         py_compile.compile(MAIN_MODULE, doraise=True)
-        ok("hiss_tastic.py compiles without errors")
+        ok("hisstastic.py compiles without errors")
         return True
     except py_compile.PyCompileError as exc:
         fail(f"Compile error: {exc}")
@@ -115,15 +115,15 @@ def check_requirements():
 def check_replay_schema():
     header("5. Replay schema")
     try:
-        from hiss_tastic.ghost import GhostReplay
-        from hiss_tastic.replay import validate_replay_data, verify_replay
+        from hisstastic.ghost import GhostReplay
+        from hisstastic.replay import validate_replay_data, verify_replay
     except ImportError as exc:
         fail(f"Replay modules cannot be imported: {exc}")
         return False
 
     replay = {
         "version": "1.0.0",
-        "game": "hiss-tastic",
+        "game": "hisstastic",
         "metadata": {
             "deterministic": True,
             "local_only": True,
@@ -279,7 +279,7 @@ def _find_node():
     return None
 
 def main():
-    print("Hiss-Tastic Validation Suite")
+    print("HissTastic Validation Suite")
     print("=" * 40)
     results = [
         check_compile(),

@@ -1,4 +1,4 @@
-# Building Hiss-Tastic for Android
+# Building HissTastic for Android
 
 ## Prerequisites
 - Android Studio (with Android SDK 35+; this project currently compiles and targets SDK 36)
@@ -13,7 +13,7 @@ The Capacitor `android/` project is generated and committed so Play Store releas
 
 1. Install Android dependencies:
    ```bash
-   cd hiss-tastic
+   cd hisstastic
    npm ci
    npm run cap:sync
    ```
@@ -54,8 +54,8 @@ Create a local upload keystore outside git-tracked files:
 mkdir -p android/app/keystores
 keytool -genkeypair \
   -v \
-  -keystore android/app/keystores/hiss-tastic-upload.jks \
-  -alias hiss-tastic-upload \
+  -keystore android/app/keystores/hisstastic-upload.jks \
+  -alias hisstastic-upload \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000
@@ -64,9 +64,9 @@ keytool -genkeypair \
 Create `android/keystore.properties` locally:
 
 ```properties
-storeFile=app/keystores/hiss-tastic-upload.jks
+storeFile=app/keystores/hisstastic-upload.jks
 storePassword=replace-with-local-secret
-keyAlias=hiss-tastic-upload
+keyAlias=hisstastic-upload
 keyPassword=replace-with-local-secret
 ```
 

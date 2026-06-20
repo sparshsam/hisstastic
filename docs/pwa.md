@@ -2,7 +2,7 @@
 
 ## Overview
 
-Hiss-Tastic is installable as a PWA for mobile and desktop devices. The PWA
+HissTastic is installable as a PWA for mobile and desktop devices. The PWA
 provides offline play and a native-app-like experience.
 
 ## Features

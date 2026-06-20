@@ -1,5 +1,5 @@
 /**
- * Procedural audio for Hiss-Tastic browser game.
+ * Procedural audio for HissTastic browser game.
  * Uses Web Audio API to generate simple sound effects.
  * Also manages looping background music via HTMLAudioElement.
  * Silently disables if AudioContext is unavailable.

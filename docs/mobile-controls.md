@@ -2,7 +2,7 @@
 
 ## Overview
 
-Hiss-Tastic is playable on mobile devices through touch controls and a
+HissTastic is playable on mobile devices through touch controls and a
 directional pad overlay. No keyboard is required.
 
 ## Touch Controls

@@ -38,7 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-- **Local Runtime & Deployment Independence.** Hiss-Tastic can now be fully developed,
+- **Local Runtime & Deployment Independence.** HissTastic can now be fully developed,
   tested, and played locally without any reliance on Vercel or external services.
 - **Graceful audio/asset degradation.** Background music detects load failures and
   disables itself gracefully. The game never crashes on missing audio files.
@@ -51,7 +51,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - **Service worker rewritten (v2).** Now uses `Promise.allSettled` for per-asset
   caching — a single missing asset can't block the entire install. Assets list
-  includes `assets/background-music.mp3`. Cache name bumped to `hiss-tastic-v2`.
+  includes `assets/background-music.mp3`. Cache name bumped to `hisstastic-v2`.
 - **Service worker guarded on localhost.** App.js skips SW registration on plain
   HTTP localhost to prevent stale-cache confusion during development. SW still
   activates on HTTPS (PWA/Vercel deployments).
@@ -353,7 +353,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Phase 1 - Stabilize:** Safer asset loading with fallback placeholder surfaces.
 - **Phase 1 - Stabilize:** Spawn safety helpers prevent entity overlap.
 - **Phase 1 - Stabilize:** `validation.py` smoke-test script.
-- **Phase 2 - Modularize:** Full package structure under `hiss_tastic/`.
+- **Phase 2 - Modularize:** Full package structure under `hisstastic/`.
 - **Phase 2 - Modularize:** `main.py` entry point.
 - **Phase 3 - Replay:** Deterministic replay infrastructure with seeded RNG.
 - **Phase 3 - Replay:** Replay CLI with `record`, `play`, and `verify` commands.
@@ -362,13 +362,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 
-- Entry point moved from `hiss_tastic.py` to `main.py`.
-- Architecture modularized into the `hiss_tastic/` package.
+- Entry point moved from `hisstastic.py` to `main.py`.
+- Architecture modularized into the `hisstastic/` package.
 
 ### Preserved
 
 - Original gameplay mechanics, movement, collisions, power-ups, obstacles, scoring messages, and watermark.
-- Original `hiss_tastic.py` retained as legacy reference.
+- Original `hisstastic.py` retained as legacy reference.
 - Local-first privacy posture.
 
 ## [0.1.1] - 2026-06-04
@@ -388,6 +388,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-- Imported original Hiss-Tastic Python/Pygame prototype.
+- Imported original HissTastic Python/Pygame prototype.
 - Preserved core game loop, assets, scoring, obstacles, and power-up mechanics.
 - Removed bundled Python installers from version control plan.

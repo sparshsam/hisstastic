@@ -2,7 +2,7 @@
 
 ## Data Handling
 
-Hiss-Tastic does not collect, transmit, or persist player data by default.
+HissTastic does not collect, transmit, or persist player data by default.
 
 ## Local Runtime
 
@@ -10,7 +10,7 @@ The game runs locally through Python and Pygame. Runtime state such as score, sn
 
 ## Replay Files
 
-When a player explicitly records a replay, Hiss-Tastic writes a local JSON file under `replays/`. Replay files can include deterministic seed metadata, tick-indexed inputs, final score, snake length, and local frame snapshots for ghost visualization.
+When a player explicitly records a replay, HissTastic writes a local JSON file under `replays/`. Replay files can include deterministic seed metadata, tick-indexed inputs, final score, snake length, and local frame snapshots for ghost visualization.
 
 Replay files are not uploaded, synchronized, or used for telemetry.
 

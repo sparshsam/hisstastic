@@ -1,5 +1,5 @@
 /**
- * Hiss-Tastic Browser Game Engine
+ * HissTastic Browser Game Engine
  * Canvas-based snake game matching the Python runtime behavior.
  * No external dependencies.
  */
@@ -577,7 +577,7 @@ class HissTastic {
   getReplayData() {
     return {
       version: '1.0.0',
-      game: 'hiss-tastic',
+      game: 'hisstastic',
       game_version: GAME_VERSION,
       seed: this.replaySeed,
       timestamp: new Date().toISOString(),

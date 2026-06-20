@@ -2,7 +2,7 @@
 
 ## Current Cadence
 
-Hiss-Tastic is in preservation mode. Maintenance should prioritize repository hygiene, compatibility notes, dependency review, and documentation accuracy.
+HissTastic is in preservation mode. Maintenance should prioritize repository hygiene, compatibility notes, dependency review, and documentation accuracy.
 
 ## Dependency Management
 
@@ -23,7 +23,7 @@ Hiss-Tastic is in preservation mode. Maintenance should prioritize repository hy
 For documentation-only changes:
 
 ```bash
-python -m py_compile hiss_tastic.py
+python -m py_compile hisstastic.py
 ```
 
 For runtime checks:
@@ -36,8 +36,8 @@ For replay and ghost checks:
 
 ```bash
 python -m unittest tests.test_replay_validation
-python -m hiss_tastic.replay_cli verify path/to/replay.json
-python -m hiss_tastic.replay_cli ghost-check path/to/replay.json
+python -m hisstastic.replay_cli verify path/to/replay.json
+python -m hisstastic.replay_cli ghost-check path/to/replay.json
 ```
 
 ## Release Readiness

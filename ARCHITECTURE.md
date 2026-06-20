@@ -2,7 +2,7 @@
 
 ## Status
 
-Hiss-Tastic is a maintained modular Python/Pygame arcade game with an
+HissTastic is a maintained modular Python/Pygame arcade game with an
 experimental browser/PWA runtime. The original single-file prototype has been
 preserved, the Python runtime remains canonical, and the browser runtime is a
 playable sibling implementation under `web/`.

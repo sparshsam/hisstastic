@@ -3,8 +3,8 @@ import os
 import tempfile
 import unittest
 
-from hiss_tastic.ghost import GhostReplay, GhostRaceSession
-from hiss_tastic.replay import (
+from hisstastic.ghost import GhostReplay, GhostRaceSession
+from hisstastic.replay import (
     ReplayValidationError,
     validate_replay_data,
     verify_replay,
@@ -14,7 +14,7 @@ from hiss_tastic.replay import (
 def sample_replay(**overrides):
     data = {
         "version": "1.0.0",
-        "game": "hiss-tastic",
+        "game": "hisstastic",
         "metadata": {
             "deterministic": True,
             "local_only": True,

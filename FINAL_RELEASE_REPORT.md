@@ -1,4 +1,4 @@
-# Hiss-Tastic v1.0.0 Release Report
+# HissTastic v1.0.0 Release Report
 
 Date: 2026-06-18
 Branch: `playstore-production-release`
@@ -51,7 +51,7 @@ Passed:
   - Home rendered
   - `v1.0.0` rendered on home
   - Settings modal rendered
-  - `Hiss-Tastic v1.0.0` rendered in settings
+  - `HissTastic v1.0.0` rendered in settings
   - Scores overlay rendered
   - Gameplay page rendered
   - Canvas size: 374 x 560 CSS pixels
@@ -60,10 +60,10 @@ Passed:
 Browser smoke screenshots:
 
 ```text
-/tmp/hiss-tastic-home.png
-/tmp/hiss-tastic-settings.png
-/tmp/hiss-tastic-scores.png
-/tmp/hiss-tastic-gameplay.png
+/tmp/hisstastic-home.png
+/tmp/hisstastic-settings.png
+/tmp/hisstastic-scores.png
+/tmp/hisstastic-gameplay.png
 ```
 
 ## Emulator Smoke

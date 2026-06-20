@@ -4,7 +4,7 @@ All random functions accept an optional seeded RNG for deterministic replay.
 """
 
 import random as _random
-from hiss_tastic.config import CONFIG
+from hisstastic.config import CONFIG
 
 
 def _get_rng(rng):

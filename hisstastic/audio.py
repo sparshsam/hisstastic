@@ -7,7 +7,7 @@ All audio is optional — if pygame.mixer fails to initialize
 import pygame
 import struct
 import math
-from hiss_tastic.config import CONFIG
+from hisstastic.config import CONFIG
 
 _initialized = False
 _mixer_available = False

@@ -4,19 +4,19 @@ import pygame
 import random
 import time as time_module
 
-from hiss_tastic.config import CONFIG, get_difficulty_preset
-from hiss_tastic.assets import load_all_assets, asset_dir
-from hiss_tastic.entities import Snake, Food, Obstacle, PowerUp
-from hiss_tastic import states
-from hiss_tastic.input import process_events
-from hiss_tastic.rendering import (
+from hisstastic.config import CONFIG, get_difficulty_preset
+from hisstastic.assets import load_all_assets, asset_dir
+from hisstastic.entities import Snake, Food, Obstacle, PowerUp
+from hisstastic import states
+from hisstastic.input import process_events
+from hisstastic.rendering import (
     our_snake, draw_obstacles, draw_food, draw_power_up,
     display_score, draw_watermark, draw_game_over,
     draw_title_screen, draw_pause_overlay, draw_ghost,
 )
-from hiss_tastic.scoring import get_quadratic_score, get_mean_message
-from hiss_tastic.audio import init as init_audio, play_eat, play_powerup, play_gameover
-from hiss_tastic.spawns import (
+from hisstastic.scoring import get_quadratic_score, get_mean_message
+from hisstastic.audio import init as init_audio, play_eat, play_powerup, play_gameover
+from hisstastic.spawns import (
     safe_food_position, safe_power_up_position, generate_obstacles,
 )
 

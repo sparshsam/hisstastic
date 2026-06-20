@@ -1,4 +1,4 @@
-# Hiss-Tastic — Roadmap
+# HissTastic — Roadmap
 
 > A retro Snake-inspired arcade game. Browser-first, Android via Capacitor.
 

@@ -2,7 +2,7 @@
 
 import os
 import pygame
-from hiss_tastic.config import CONFIG
+from hisstastic.config import CONFIG
 
 
 def find_asset_dir():

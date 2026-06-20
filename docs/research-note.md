@@ -2,7 +2,7 @@
 
 ## Context
 
-Hiss-Tastic is preserved as an example of a small AI-assisted game prototype from the early ChatGPT/GPT-4o era.
+HissTastic is preserved as an example of a small AI-assisted game prototype from the early ChatGPT/GPT-4o era.
 
 ## Preservation Rationale
 

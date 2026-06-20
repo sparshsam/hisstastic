@@ -1,5 +1,5 @@
 /**
- * Canvas renderer for Hiss-Tastic browser game.
+ * Canvas renderer for HissTastic browser game.
  * Renders game state to an HTML5 Canvas element with responsive scaling.
  */
 
@@ -229,7 +229,7 @@ class Renderer {
     ctx.fillStyle = CONFIG.colors.neonPink;
     ctx.font = 'bold 48px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('HISS-TASTIC', this.gw / 2, this.gh / 3);
+    ctx.fillText('HISSTASTIC', this.gw / 2, this.gh / 3);
 
     ctx.fillStyle = CONFIG.colors.black;
     ctx.font = '18px monospace';

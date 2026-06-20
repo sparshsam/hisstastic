@@ -1,5 +1,5 @@
 /**
- * Hiss-Tastic Snake Facts & Roasts — static local dataset.
+ * HissTastic Snake Facts & Roasts — static local dataset.
  * Each entry has an educational snake fact + contextual roasts triggered by gameplay events.
  * No external APIs, no AI/LLM calls, no telemetry.
  */

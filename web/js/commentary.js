@@ -1,5 +1,5 @@
 /**
- * Hiss-Tastic Live Commentary Engine.
+ * HissTastic Live Commentary Engine.
  * Listens to gameplay events and produces deterministic snake-fact roasts.
  * No external APIs, no AI/LLM calls, no telemetry.
  * Local-only, offline-compatible.

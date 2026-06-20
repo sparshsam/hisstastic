@@ -3,7 +3,7 @@
 Before every release:
 
 - [ ] CHANGELOG.md updated with all changes
-- [ ] Version bumped in `hiss_tastic/__init__.py`
+- [ ] Version bumped in `hisstastic/__init__.py`
 - [ ] All changes committed and pushed
 - [ ] CI passes (`.github/workflows/ci.yml`)
 - [ ] Game runs locally (`python main.py`)

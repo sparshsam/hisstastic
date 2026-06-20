@@ -1,11 +1,11 @@
-# Hiss-Tastic
+# HissTastic
 
 A retro Snake-inspired arcade game built with a browser/JavaScript runtime (with a preserved Python/Pygame reference implementation).
 Local-first by default — no email, real-name account, telemetry, ads, or backend required for normal play. A local anonymous player ID and username support the global personal-best leaderboard.
 
-[![License](https://img.shields.io/github/license/sparshsam/hiss-tastic?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/github/license/sparshsam/hisstastic?style=flat-square)](LICENSE)
 [![Status: Maintained](https://img.shields.io/badge/status-maintained-2ea44f?style=flat-square)](#status)
-[![CI](https://github.com/sparshsam/hiss-tastic/actions/workflows/ci.yml/badge.svg)](https://github.com/sparshsam/hiss-tastic/actions/workflows/ci.yml)
+[![CI](https://github.com/sparshsam/hisstastic/actions/workflows/ci.yml/badge.svg)](https://github.com/sparshsam/hisstastic/actions/workflows/ci.yml)
 
 ## Status
 
@@ -44,7 +44,7 @@ The browser runtime under `web/` is the primary runtime. The Python/Pygame versi
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full module structure and data flow.
 
 ```
-hiss_tastic/       # Python/Pygame package (canonical)
+hisstastic/       # Python/Pygame package (canonical)
   main.py           — Entry point
   game.py           — Game class, state machine
   config.py         — CONFIG dict, difficulty presets
@@ -75,7 +75,7 @@ web/               # Browser/PWA runtime (primary)
 
 ## Local Development
 
-Hiss-Tastic has two runtimes. **Neither requires Vercel, a backend, or any external service for normal local play.** The global leaderboard uses Supabase only to sync player profile and personal-best rows.
+HissTastic has two runtimes. **Neither requires Vercel, a backend, or any external service for normal local play.** The global leaderboard uses Supabase only to sync player profile and personal-best rows.
 
 ### Prerequisites
 
@@ -88,8 +88,8 @@ Hiss-Tastic has two runtimes. **Neither requires Vercel, a backend, or any exter
 
 ```bash
 # Clone the repo
-git clone https://github.com/sparshsam/hiss-tastic.git
-cd hiss-tastic
+git clone https://github.com/sparshsam/hisstastic.git
+cd hisstastic
 
 # Or use the dev server script
 bash scripts/serve.sh
@@ -122,7 +122,7 @@ python main.py
 **Legacy entry point** (preserved, unchanged):
 
 ```bash
-python hiss_tastic.py
+python hisstastic.py
 ```
 
 **Troubleshooting:**
@@ -216,9 +216,9 @@ python validation.py
 python -m unittest discover -v
 
 # Replay system
-python -m hiss_tastic.replay_cli record
-python -m hiss_tastic.replay_cli verify replays/replay_*.json
-python -m hiss_tastic.replay_cli play replays/replay_*.json
+python -m hisstastic.replay_cli record
+python -m hisstastic.replay_cli verify replays/replay_*.json
+python -m hisstastic.replay_cli play replays/replay_*.json
 ```
 
 ### Testing the Browser Runtime
@@ -309,19 +309,19 @@ python -m http.server 8080 --directory web/
 Record a game session:
 
 ```bash
-python -m hiss_tastic.replay_cli record
+python -m hisstastic.replay_cli record
 ```
 
 Verify a replay file:
 
 ```bash
-python -m hiss_tastic.replay_cli verify replays/replay_12345_20260604.json
+python -m hisstastic.replay_cli verify replays/replay_12345_20260604.json
 ```
 
 Play back a replay:
 
 ```bash
-python -m hiss_tastic.replay_cli play replays/replay_12345_20260604.json
+python -m hisstastic.replay_cli play replays/replay_12345_20260604.json
 ```
 
 See [docs/replay-ux.md](docs/replay-ux.md) and [docs/ghost-racing.md](docs/ghost-racing.md).
@@ -343,7 +343,7 @@ See [docs/browser-runtime.md](docs/browser-runtime.md), [docs/mobile-controls.md
 
 ## Android App
 
-Hiss-Tastic is packaged as a native Android app via [Capacitor](https://capacitorjs.com/).
+HissTastic is packaged as a native Android app via [Capacitor](https://capacitorjs.com/).
 
 ### Quick Install
 
@@ -366,7 +366,7 @@ See [BUILD_ANDROID.md](BUILD_ANDROID.md) for detailed debug, release, and signin
 
 ## Player Identity and Global Leaderboard
 
-On first launch, Hiss-Tastic creates a local anonymous player profile:
+On first launch, HissTastic creates a local anonymous player profile:
 
 - **player_id:** locally generated UUID
 - **username:** player-chosen or generated whimsical name
@@ -416,7 +416,7 @@ See [docs/packaging.md](docs/packaging.md) for standalone executable instruction
 
 ## Ecosystem Role
 
-Hiss-Tastic is part of Sparsh Sam's broader public software ecosystem as a preserved AI-assisted
+HissTastic is part of Sparsh Sam's broader public software ecosystem as a preserved AI-assisted
 game prototype and modernization candidate.
 
 ## License

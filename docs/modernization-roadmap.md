@@ -1,4 +1,4 @@
-﻿# Hiss-Tastic Modernization Roadmap
+﻿# HissTastic Modernization Roadmap
 
 ## Completion Status
 
@@ -19,13 +19,13 @@
 
 ## Purpose
 
-This document defines the staged modernization path for Hiss-Tastic after the legacy import and repository standards alignment. The goal is to preserve the original Python/Pygame prototype while gradually turning it into a polished, maintainable arcade project.
+This document defines the staged modernization path for HissTastic after the legacy import and repository standards alignment. The goal is to preserve the original Python/Pygame prototype while gradually turning it into a polished, maintainable arcade project.
 
 Modernization should proceed in small, auditable phases. Preservation commits, documentation commits, refactor commits, and gameplay feature commits should remain separate.
 
 ## North-Star Direction
 
-Hiss-Tastic is no longer just a preserved Python/Pygame Snake prototype. The long-term direction is to evolve it into a modern, browser-first arcade system while keeping the original prototype historically traceable.
+HissTastic is no longer just a preserved Python/Pygame Snake prototype. The long-term direction is to evolve it into a modern, browser-first arcade system while keeping the original prototype historically traceable.
 
 Long-term platform goals:
 
@@ -45,7 +45,7 @@ These goals should not be implemented all at once. They should be sequenced afte
 
 ### Architecture
 
-- The runtime is currently concentrated in `hiss_tastic.py`.
+- The runtime is currently concentrated in `hisstastic.py`.
 - The file owns initialization, asset loading, input handling, game state, scoring, collision checks, rendering, retry behavior, and shutdown.
 - This is acceptable for a preserved prototype, but it limits testability and makes future behavior changes harder to review.
 
@@ -77,7 +77,7 @@ These goals should not be implemented all at once. They should be sequenced afte
 
 ### Packaging and Portability Limitations
 
-- The current run path is manual: create a venv, install Pygame, and run `python hiss_tastic.py`.
+- The current run path is manual: create a venv, install Pygame, and run `python hisstastic.py`.
 - There is no packaged desktop build, release artifact, CI check, smoke-test workflow, PWA, or browser build.
 - Browser delivery is not yet available.
 
@@ -107,7 +107,7 @@ Goal: make the current prototype safer, cleaner, and easier to run without chang
 
 Scope:
 
-- Remove runtime package auto-installation from `hiss_tastic.py`.
+- Remove runtime package auto-installation from `hisstastic.py`.
 - Add a small smoke-test or syntax/import validation path.
 - Replace recursive retry with explicit reset flow.
 - Add deterministic constants for grid size, window size, colors, speed, and timing.
@@ -116,7 +116,7 @@ Scope:
 
 Exit criteria:
 
-- Game still launches via `python hiss_tastic.py`.
+- Game still launches via `python hisstastic.py`.
 - No bundled installers enter git history.
 - Basic validation can run without manually playing the game.
 
@@ -127,7 +127,7 @@ Goal: separate game systems without changing gameplay design.
 Candidate structure:
 
 ```text
-hiss_tastic/
+hisstastic/
   __init__.py
   assets.py
   config.py
@@ -175,7 +175,7 @@ Exit criteria:
 
 ### Phase 4 â€” Visual and Audio Polish
 
-Goal: make Hiss-Tastic feel intentional rather than merely functional.
+Goal: make HissTastic feel intentional rather than merely functional.
 
 Scope:
 
@@ -212,7 +212,7 @@ Exit criteria:
 
 ### Phase 6 â€” Browser-Based Version
 
-Goal: make Hiss-Tastic playable in the browser while preserving the Python prototype as historical source material.
+Goal: make HissTastic playable in the browser while preserving the Python prototype as historical source material.
 
 Options:
 
@@ -248,7 +248,7 @@ Exit criteria:
 
 ### Phase 8 â€” Agent-Playable Mode
 
-Goal: allow AI agents and automated systems to play Hiss-Tastic through a structured interface.
+Goal: allow AI agents and automated systems to play HissTastic through a structured interface.
 
 Scope:
 
@@ -291,7 +291,7 @@ Exit criteria:
 
 ### Phase 10 â€” Onchain Score Verification
 
-Goal: explore optional score provenance without turning Hiss-Tastic into a crypto-first product.
+Goal: explore optional score provenance without turning HissTastic into a crypto-first product.
 
 Scope:
 

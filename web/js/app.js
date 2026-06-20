@@ -1,5 +1,5 @@
 /**
- * Hiss-Tastic Browser App — main entry point.
+ * HissTastic Browser App — main entry point.
  * v0.5.2 — Page navigation with Home, Game, Settings, and overlay screens.
  *
  * Initializes all subsystems and manages page transitions.

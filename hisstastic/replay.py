@@ -4,14 +4,14 @@ import json
 import os
 import time
 
-from hiss_tastic import __version__
+from hisstastic import __version__
 
 REPLAY_VERSION = "1.0.0"
 REPLAY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "replays",
 )
-GAME_ID = "hiss-tastic"
+GAME_ID = "hisstastic"
 SUPPORTED_REPLAY_VERSIONS = {REPLAY_VERSION}
 VALID_DIRECTIONS = {"LEFT", "RIGHT", "UP", "DOWN"}
 
@@ -78,7 +78,7 @@ class ReplayRecorder:
             "version": REPLAY_VERSION,
             "game": GAME_ID,
             "schema": {
-                "name": "hiss-tastic-replay",
+                "name": "hisstastic-replay",
                 "version": REPLAY_VERSION,
                 "compatible_versions": sorted(SUPPORTED_REPLAY_VERSIONS),
             },

@@ -3,7 +3,7 @@
 ## Overview
 
 The browser runtime is a lightweight JavaScript/Canvas reimplementation of
-Hiss-Tastic that lives in `web/`. It is a **sibling implementation** to the
+HissTastic that lives in `web/`. It is a **sibling implementation** to the
 Python/Pygame version — both are maintained independently.
 
 ## Architecture

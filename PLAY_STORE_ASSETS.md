@@ -1,6 +1,6 @@
 # Play Store Assets Checklist
 
-Use this checklist before submitting Hiss-Tastic v1.0.0 to Google Play.
+Use this checklist before submitting HissTastic v1.0.0 to Google Play.
 
 ## Required Graphics
 

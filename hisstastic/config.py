@@ -10,7 +10,7 @@ CONFIG = {
     'window': {
         'width': 600,
         'height': 400,
-        'title': 'Hiss-Tastic',
+        'title': 'HissTastic',
         'scale': 1.0,
         'fullscreen': False,
     },

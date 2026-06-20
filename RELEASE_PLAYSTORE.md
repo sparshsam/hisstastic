@@ -1,6 +1,6 @@
-# Hiss-Tastic Play Store Release Runbook
+# HissTastic Play Store Release Runbook
 
-This runbook is for releasing Hiss-Tastic v1.0.0 to Google Play.
+This runbook is for releasing HissTastic v1.0.0 to Google Play.
 
 ## 1. Pre-Release Checks
 
@@ -30,8 +30,8 @@ Create the upload keystore if one does not already exist:
 mkdir -p android/app/keystores
 keytool -genkeypair \
   -v \
-  -keystore android/app/keystores/hiss-tastic-upload.jks \
-  -alias hiss-tastic-upload \
+  -keystore android/app/keystores/hisstastic-upload.jks \
+  -alias hisstastic-upload \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000
@@ -40,9 +40,9 @@ keytool -genkeypair \
 Create `android/keystore.properties` locally:
 
 ```properties
-storeFile=app/keystores/hiss-tastic-upload.jks
+storeFile=app/keystores/hisstastic-upload.jks
 storePassword=replace-with-local-secret
-keyAlias=hiss-tastic-upload
+keyAlias=hisstastic-upload
 keyPassword=replace-with-local-secret
 ```
 
@@ -64,14 +64,14 @@ Do not commit `android/keystore.properties`, `*.jks`, or `*.keystore`.
 ## 3. Internal Testing Track
 
 1. Open Google Play Console.
-2. Select Hiss-Tastic.
+2. Select HissTastic.
 3. Go to **Testing → Internal testing**.
 4. Create a new release.
 5. Upload `app-release.aab`.
 6. Add release notes:
 
    ```text
-   Hiss-Tastic v1.0.0 production candidate: Play-ready Android bundle, touch controls, themes, power-ups, replay support, local score history, first-run username setup, and anonymous personal-best global leaderboard.
+   HissTastic v1.0.0 production candidate: Play-ready Android bundle, touch controls, themes, power-ups, replay support, local score history, first-run username setup, and anonymous personal-best global leaderboard.
    ```
 
 7. Review warnings. Resolve any permission, target API, signing, or Data Safety issue before rollout.

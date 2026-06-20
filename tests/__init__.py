@@ -1,1 +1,1 @@
-"""Test package for Hiss-Tastic."""
+"""Test package for HissTastic."""

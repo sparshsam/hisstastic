@@ -1,9 +1,9 @@
 # Claude Notes
 
-Hiss-Tastic is a browser-first arcade game (v0.9.0) with a preserved Python/Pygame reference implementation.
+HissTastic is a browser-first arcade game (v0.9.0) with a preserved Python/Pygame reference implementation.
 The web runtime (`web/`) is the primary build target, with Capacitor Android packaging.
 
-**Production:** https://hiss-tastic.vercel.app
+**Production:** https://hisstastic.vercel.app
 **Android APK:** Build from source or download releases.
 
 Before changing this repository, review:
@@ -22,8 +22,8 @@ Repository work should remain aligned with:
 | Property | Value |
 |----------|-------|
 | **Platform** | Vercel (static hosting) |
-| **Project** | `hiss-tastic` (Sparsh Sam's projects team) |
-| **Production URL** | https://hiss-tastic.vercel.app |
+| **Project** | `hisstastic` (Sparsh Sam's projects team) |
+| **Production URL** | https://hisstastic.vercel.app |
 | **Root directory** | `web/` |
 | **Config** | `web/vercel.json` — no build step, no framework, static-only |
 | **Git integration** | Connected — https://github.com/sparshsam/hiss-tactic (branch: main) |
@@ -71,7 +71,7 @@ Performance: snakes pause animation when tab is hidden; count reduces on mobile 
 
 ## Privacy Posture
 
-The deployed version at https://hiss-tastic.vercel.app:
+The deployed version at https://hisstastic.vercel.app:
 
 - No telemetry, analytics, or tracking scripts
 - No cookies or localStorage usage

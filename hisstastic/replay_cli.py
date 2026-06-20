@@ -1,9 +1,9 @@
 """Replay CLI — command-line replay recording, playback, and verification.
 
 Usage:
-    python -m hiss_tastic.replay_cli play <replay_file>
-    python -m hiss_tastic.replay_cli verify <replay_file>
-    python -m hiss_tastic.replay_cli ghost-check <replay_file>
+    python -m hisstastic.replay_cli play <replay_file>
+    python -m hisstastic.replay_cli verify <replay_file>
+    python -m hisstastic.replay_cli ghost-check <replay_file>
 """
 
 import sys
@@ -15,8 +15,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def cmd_play(filepath):
     """Play back a recorded replay."""
-    from hiss_tastic.replay import ReplayPlayer, verify_replay
-    from hiss_tastic.game import Game
+    from hisstastic.replay import ReplayPlayer, verify_replay
+    from hisstastic.game import Game
     import random as _random
 
     print(f"Loading replay: {filepath}")
@@ -46,7 +46,7 @@ def cmd_play(filepath):
 
 def cmd_verify(filepath):
     """Verify a replay file's structure and integrity."""
-    from hiss_tastic.replay import verify_replay
+    from hisstastic.replay import verify_replay
 
     if not os.path.isfile(filepath):
         print(f"Error: File not found: {filepath}")
@@ -68,8 +68,8 @@ def cmd_verify(filepath):
 
 def cmd_record():
     """Record a new replay by playing the game."""
-    from hiss_tastic.game import Game
-    from hiss_tastic.replay import ReplayRecorder
+    from hisstastic.game import Game
+    from hisstastic.replay import ReplayRecorder
     import random as _random
 
     seed = _random.randint(0, 2**31 - 1)
@@ -92,8 +92,8 @@ def cmd_record():
 
 def cmd_ghost_check(filepath):
     """Run local-only ghost replay sanity validation."""
-    from hiss_tastic.ghost import GhostReplay
-    from hiss_tastic.replay import ReplayValidationError
+    from hisstastic.ghost import GhostReplay
+    from hisstastic.replay import ReplayValidationError
 
     if not os.path.isfile(filepath):
         print(f"Error: File not found: {filepath}")

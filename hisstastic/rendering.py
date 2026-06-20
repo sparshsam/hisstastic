@@ -1,8 +1,8 @@
 """All Pygame rendering logic."""
 
 import pygame
-from hiss_tastic.config import CONFIG
-from hiss_tastic import states
+from hisstastic.config import CONFIG
+from hisstastic import states
 
 
 def our_snake(surface, snake_list, snake_img):
@@ -84,7 +84,7 @@ def draw_game_over(surface, score, font_style, score_font, colors, mean_message)
 def draw_title_screen(surface, font_large, font_small, colors):
     """Draw the title screen."""
     surface.fill(colors['bright_white'])
-    title = font_large.render("HISS-TASTIC", True, colors['neon_pink'])
+    title = font_large.render("HISSTASTIC", True, colors['neon_pink'])
     title_rect = title.get_rect(center=(colors['width'] / 2, colors['height'] / 3))
     surface.blit(title, title_rect)
 

@@ -6,7 +6,7 @@ Create a standalone executable that non-developers can run:
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed main.py --name "Hiss-Tastic"
+pyinstaller --onefile --windowed main.py --name "HissTastic"
 ```
 
 The executable will be in the `dist/` directory.
@@ -33,7 +33,7 @@ pip install pygame
 
 This project follows [Semantic Versioning 2.0](https://semver.org/).
 
-1. Update the version in `hiss_tastic/__init__.py`.
+1. Update the version in `hisstastic/__init__.py`.
 2. Add a changelog entry in `CHANGELOG.md`.
 3. Create a GitHub Release with release notes.
 4. Tag the release (e.g., `v1.0.0`).

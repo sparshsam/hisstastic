@@ -2,7 +2,7 @@
 
 ## Scope
 
-Hiss-Tastic is a local Python/Pygame game prototype. It does not currently use accounts, API keys, databases, external services, telemetry, or network requests.
+HissTastic is a local Python/Pygame game prototype. It does not currently use accounts, API keys, databases, external services, telemetry, or network requests.
 
 ## Environment Variables
 
