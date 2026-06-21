@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00BF63">
+  <meta name="description" content="HissTastic Privacy Policy">
+  <title>Privacy Policy – HissTastic</title>
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: #4CAF50;
+      color: #fff;
+      font-family: monospace;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .privacy-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .privacy-wrap h1 {
+      font-size: 28px;
+      margin: 0 0 4px 0;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    .privacy-wrap .last-updated {
+      font-size: 12px;
+      opacity: 0.7;
+      margin: 0 0 24px 0;
+    }
+    .privacy-wrap h2 {
+      font-size: 18px;
+      margin: 28px 0 10px 0;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      padding-bottom: 6px;
+    }
+    .privacy-wrap h3 {
+      font-size: 15px;
+      margin: 20px 0 8px 0;
+      color: #fff;
+    }
+    .privacy-wrap p,
+    .privacy-wrap li {
+      font-size: 13px;
+      line-height: 1.6;
+      opacity: 0.92;
+      margin: 0 0 10px 0;
+    }
+    .privacy-wrap ul {
+      margin: 0 0 14px 0;
+      padding-left: 20px;
+    }
+    .privacy-wrap li {
+      margin-bottom: 4px;
+    }
+    .privacy-wrap a {
+      color: #fff;
+      text-decoration: underline;
+      opacity: 0.85;
+    }
+    .privacy-wrap a:hover {
+      opacity: 1;
+    }
+    .privacy-wrap .back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #fff;
+      opacity: 0.7;
+      text-decoration: none;
+    }
+    .privacy-wrap .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .privacy-wrap hr {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      margin: 28px 0;
+    }
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 16px 20px;
+      font-size: 12px;
+      opacity: 0.6;
+      background: rgba(0,0,0,0.08);
+    }
+    footer a {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="privacy-wrap">
+  <a href="./" class="back-link">&larr; Back to HissTastic</a>
+
+  <h1>Privacy Policy</h1>
+  <p class="last-updated">Last updated: June 18, 2026</p>
+
+  <p>HissTastic does not collect, store, or transmit personal contact or account data. Normal gameplay is local-first. The global leaderboard transmits a chosen username, locally generated anonymous player ID, and personal-best score.</p>
+
+  <h2>Data Collection</h2>
+  <p>HissTastic is a local-first application. It operates on your device for normal play, settings, stats, score history, replay files, and PWA offline caching.</p>
+
+  <h3>What we DON'T collect:</h3>
+  <ul>
+    <li>No email address, phone number, or real name</li>
+    <li>No account credentials</li>
+    <li>No location data</li>
+    <li>No device identifiers</li>
+    <li>No usage analytics or telemetry</li>
+    <li>No crash reports</li>
+    <li>No advertising identifiers</li>
+    <li>No cookies</li>
+  </ul>
+
+  <h3>What is stored locally (on your device only):</h3>
+  <ul>
+    <li><strong>Anonymous player ID:</strong> A locally generated UUID used only to identify your leaderboard row.</li>
+    <li><strong>Username:</strong> Chosen by you or generated locally. It may appear publicly on the global leaderboard.</li>
+    <li><strong>Local score history:</strong> Saved to browser localStorage or device app storage. Never transmitted.</li>
+    <li><strong>Personal best:</strong> Stored locally and synced to the global leaderboard only when it improves.</li>
+    <li><strong>Gameplay stats:</strong> Games played, food eaten, average score. Stored locally. Never transmitted.</li>
+    <li><strong>Theme preference:</strong> Your selected color theme. Stored locally. Never transmitted.</li>
+    <li><strong>Music preference:</strong> Whether background music is enabled. Stored locally. Never transmitted.</li>
+  </ul>
+
+  <h2>Optional Cloud Leaderboard</h2>
+  <p>HissTastic uses Supabase REST APIs for the global leaderboard.</p>
+  <p>Global leaderboard submissions include:</p>
+  <ul>
+    <li>Anonymous player ID</li>
+    <li>Username</li>
+    <li>Personal best score</li>
+  </ul>
+  <p>Global leaderboard reads fetch public leaderboard rows from Supabase. No account, authentication, email address, device identifier, advertising ID, phone number, real name, contact list, or location data is sent by the app. Score history remains local-only.</p>
+
+  <h2>Network Access</h2>
+  <p>HissTastic makes network requests only for:</p>
+  <ol>
+    <li>Loading the game files from its host (Vercel or local server)</li>
+    <li>Supabase leaderboard profile/best-score save and read requests</li>
+    <li>User-initiated external links, such as the background music credit or GitHub feedback link</li>
+  </ol>
+
+  <h2>Third-Party Services</h2>
+  <p>HissTastic uses Supabase only for anonymous leaderboard profile and personal-best storage/retrieval. It uses no third-party analytics, advertising, crash reporting, or tracking services.</p>
+
+  <h2>Google Play Data Safety Summary</h2>
+  <ul>
+    <li>Data collected: app activity/gameplay leaderboard data: username, anonymous player ID, and personal best score.</li>
+    <li>Data shared: public leaderboard entries are transmitted to Supabase.</li>
+    <li>Data purpose: app functionality only.</li>
+    <li>Local-only: full score history, settings, and gameplay stats.</li>
+    <li>Personal contact/account info, location, financial info, contacts, photos/videos, files, health, messages, device identifiers, advertising ID: not collected.</li>
+    <li>Ads, analytics, telemetry, crash reporting SDKs: not used.</li>
+    <li>Android permissions: <code>INTERNET</code> only.</li>
+  </ul>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, the updated date at the top will be revised. The policy will never be retroactively changed to permit data collection without your explicit consent.</p>
+
+  <h2>Contact</h2>
+  <p>For questions about this privacy policy, open an issue at:<br>
+  <a href="https://github.com/sparshsam/hisstastic/issues" target="_blank" rel="noopener">github.com/sparshsam/hisstastic/issues</a></p>
+</div>
+
+<footer>
+  <a href="./">HissTastic</a> &middot; <a href="privacy">Privacy Policy</a>
+</footer>
+
+</body>
+</html>

@@ -345,6 +345,14 @@ body {
   color: #ccc;
   margin-top: 12px;
 }
+.home-version a.privacy-link {
+  color: #ccc;
+  text-decoration: none;
+}
+.home-version a.privacy-link:hover {
+  text-decoration: underline;
+  color: #aaa;
+}
 
 /* =============================================
    Overlay system (game over, pause, scores)
