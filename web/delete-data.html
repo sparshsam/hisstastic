@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00BF63">
+  <meta name="description" content="HissTastic Data Deletion Request">
+  <title>Data Deletion – HissTastic</title>
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: #4CAF50;
+      color: #fff;
+      font-family: monospace;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .delete-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .delete-wrap h1 {
+      font-size: 28px;
+      margin: 0 0 4px 0;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    .delete-wrap .subtitle {
+      font-size: 13px;
+      opacity: 0.8;
+      margin: 0 0 24px 0;
+    }
+    .delete-wrap h2 {
+      font-size: 18px;
+      margin: 28px 0 10px 0;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      padding-bottom: 6px;
+    }
+    .delete-wrap h3 {
+      font-size: 15px;
+      margin: 20px 0 8px 0;
+      color: #fff;
+    }
+    .delete-wrap p,
+    .delete-wrap li {
+      font-size: 13px;
+      line-height: 1.6;
+      opacity: 0.92;
+      margin: 0 0 10px 0;
+    }
+    .delete-wrap ul, .delete-wrap ol {
+      margin: 0 0 14px 0;
+      padding-left: 20px;
+    }
+    .delete-wrap li {
+      margin-bottom: 4px;
+    }
+    .delete-wrap a {
+      color: #fff;
+      text-decoration: underline;
+      opacity: 0.85;
+    }
+    .delete-wrap a:hover {
+      opacity: 1;
+    }
+    .delete-wrap .back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #fff;
+      opacity: 0.7;
+      text-decoration: none;
+    }
+    .delete-wrap .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .delete-wrap .data-box {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .delete-wrap .data-box code {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .delete-wrap .data-box code:last-child {
+      margin-bottom: 0;
+    }
+    .delete-wrap .email-link {
+      display: inline-block;
+      padding: 10px 20px;
+      border: 2px solid #fff;
+      border-radius: 20px;
+      color: #fff;
+      font-family: monospace;
+      font-size: 14px;
+      text-decoration: none;
+      margin: 4px 0;
+    }
+    .delete-wrap .email-link:hover {
+      background: rgba(255,255,255,0.15);
+      text-decoration: none;
+    }
+    .delete-wrap hr {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      margin: 28px 0;
+    }
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 16px 20px;
+      font-size: 12px;
+      opacity: 0.6;
+      background: rgba(0,0,0,0.08);
+    }
+    footer a {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="delete-wrap">
+  <a href="./" class="back-link">&larr; Back to HissTastic</a>
+
+  <h1>Data Deletion Request</h1>
+  <p class="subtitle">HissTastic respects your privacy. Here's how to delete your data.</p>
+
+  <h2>What Data Does HissTastic Store?</h2>
+
+  <p>HissTastic is local-first by design. Most data stays on your device. Only what's necessary for the global leaderboard is transmitted to the cloud.</p>
+
+  <div class="data-box">
+    <strong style="font-size:13px;">Cloud (Supabase) — shared to the leaderboard:</strong>
+    <code>&bull; Anonymous player ID (locally generated UUID)</code>
+    <code>&bull; Username (chosen or auto-generated, may appear publicly)</code>
+    <code>&bull; Personal best score (only your single highest score)</code>
+  </div>
+
+  <div class="data-box">
+    <strong style="font-size:13px;">Local device (browser localStorage or app storage):</strong>
+    <code>&bull; Anonymous player ID &amp; username</code>
+    <code>&bull; Full score history (never transmitted)</code>
+    <code>&bull; Gameplay stats (games played, food eaten, averages)</code>
+    <code>&bull; Theme preference &amp; music preference</code>
+    <code>&bull; Profile ready flag</code>
+  </div>
+
+  <p><strong>No personal contact or account data is ever collected.</strong> HissTastic has no email, phone number, real name, location, device identifier, advertising ID, or cookie collection.</p>
+
+  <h2>Delete Local Data</h2>
+
+  <h3>Browser / PWA</h3>
+  <ol>
+    <li>Open your browser's settings or developer tools.</li>
+    <li>Clear localStorage / site data for <code>hisstastic.vercel.app</code>.</li>
+    <li>Alternatively, uninstall the PWA from your device.</li>
+  </ol>
+
+  <h3>Android App</h3>
+  <ol>
+    <li>Open your device's Settings app.</li>
+    <li>Go to <strong>Apps &rarr; HissTastic</strong>.</li>
+    <li>Tap <strong>Clear storage</strong> (or <strong>Clear data</strong>).</li>
+    <li>Or simply uninstall the app to remove all locally stored data.</li>
+  </ol>
+
+  <p>After clearing local data, a fresh anonymous identity will be generated the next time you open the app.</p>
+
+  <h2>Delete Cloud (Leaderboard) Data</h2>
+
+  <p>To request deletion of your cloud leaderboard data &mdash; including your anonymous player ID, username, and personal best score from Supabase &mdash; send an email to:</p>
+
+  <p style="text-align:center;margin:20px 0;">
+    <a href="mailto:sparshsam@icloud.com?subject=HissTastic%20Data%20Deletion%20Request" class="email-link">&#9993; sparshsam@icloud.com</a>
+  </p>
+
+  <p>Please include <strong>"HissTastic Data Deletion Request"</strong> in the subject line and your <strong>anonymous player ID</strong> (found in the Settings screen of the app) if available. If you don't have your player ID, include your username instead and we'll do our best to match the record.</p>
+
+  <h2>Deletion Timeline</h2>
+
+  <p>We will process your request and delete the identified cloud leaderboard data within <strong>30 days</strong> of receiving a verifiable request. You will receive a confirmation email once the deletion is complete.</p>
+
+  <h2>What Happens After Deletion</h2>
+  <ul>
+    <li>Your leaderboard entry will be removed from the public global leaderboard.</li>
+    <li>A new anonymous identity will be generated the next time you play.</li>
+    <li>Your username will be available for re-use by other players.</li>
+    <li>Local data is not affected by a cloud deletion request &mdash; clear it separately using the steps above.</li>
+  </ul>
+
+  <h2>Data Retention</h2>
+  <p>Cloud leaderboard data is retained until you request deletion. The only cloud data stored is your anonymous player ID, username, and personal best score. No backup copies are retained after deletion.</p>
+
+  <hr>
+
+  <p style="text-align:center;font-size:12px;opacity:0.7;">
+    <a href="privacy">Read the full Privacy Policy</a> &middot;
+    <a href="./">Back to HissTastic</a>
+  </p>
+</div>
+
+<footer>
+  <a href="./">HissTastic</a> &middot;
+  <a href="privacy">Privacy Policy</a> &middot;
+  <a href="delete-data">Data Deletion</a>
+</footer>
+
+</body>
+</html>
