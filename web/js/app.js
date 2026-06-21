@@ -373,6 +373,32 @@
     }
   }
 
+  /**
+   * Hide the loading splash screen (shown before JS init).
+   * Adds a fade transition so there's no flash.
+   */
+  function hideLoadingSplash() {
+    const splash = document.getElementById('loading-splash');
+    if (splash) splash.classList.add('hidden');
+  }
+
+  /**
+   * Show a visible error fallback if JS initialization fails.
+   * Prevents black screen — user sees what went wrong.
+   */
+  function showFatalError(message) {
+    hideLoadingSplash();
+    const body = document.body;
+    if (!body) return;
+    body.innerHTML = '' +
+      '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;font-family:monospace;text-align:center;background:#4CAF50;color:#fff;">' +
+      '<h1 style="font-size:24px;margin-bottom:12px;">HISSTASTIC</h1>' +
+      '<p style="font-size:14px;margin-bottom:8px;opacity:0.9;">Something went wrong starting the game.</p>' +
+      '<p style="font-size:11px;opacity:0.6;max-width:280px;">' + escapeHtml(message) + '</p>' +
+      '<p style="font-size:12px;margin-top:16px;"><button onclick="location.reload()" style="padding:10px 32px;border:2px solid #fff;border-radius:20px;background:transparent;color:#fff;font-size:14px;font-family:monospace;cursor:pointer;">Reload</button></p>' +
+      '</div>';
+  }
+
   // ---- Initialization ----
 
   function init() {
@@ -621,10 +647,36 @@
     });
   }
 
+  function safeInit() {
+    try {
+      init();
+      hideLoadingSplash();
+    } catch (err) {
+      console.error('HissTastic init failed:', err);
+      showFatalError(err && err.message ? err.message : 'Unknown error during startup.');
+    }
+  }
+
+  // Safety timeout: if init hasn't finished after 8s, show error fallback
+  const initTimeout = setTimeout(() => {
+    // If loading splash is still visible, something went wrong silently
+    const splash = document.getElementById('loading-splash');
+    if (splash && !splash.classList.contains('hidden')) {
+      showFatalError('Startup timed out. The page may be too slow or the WebView may have an issue.');
+    }
+  }, 8000);
+
+  // Clear the timeout if init succeeds (called from safeInit -> hideLoadingSplash)
+  const origHide = hideLoadingSplash;
+  hideLoadingSplash = function() {
+    clearTimeout(initTimeout);
+    origHide();
+  };
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', safeInit);
   } else {
-    init();
+    safeInit();
   }
   registerServiceWorker();
 })();
