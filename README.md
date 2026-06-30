@@ -1,458 +1,117 @@
-# HissTastic
+<div align="center">
+  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/branding/icon.png"><img src="assets/branding/icon.png" width="96" height="96" alt="HissTastic"></picture>
+  <h1>HissTastic</h1>
+  <p><strong>A retro Snake-inspired arcade game.</strong><br />Play in your browser or on Android. Local-first, no ads, no accounts.</p>
+</div>
 
-A retro Snake-inspired arcade game built with a browser/JavaScript runtime (with a preserved Python/Pygame reference implementation).
-Local-first by default — no email, real-name account, telemetry, ads, or backend required for normal play. A local anonymous player ID and username support the global personal-best leaderboard.
+[![Play Now](https://img.shields.io/badge/Play%20Now-hiss--tastic.vercel.app-00BF63?style=for-the-badge&logo=vercel)](https://hiss-tastic.vercel.app)
+[![Google Play](https://img.shields.io/badge/Get%20it%20on-Google%20Play-414141?style=for-the-badge&logo=googleplay)](https://play.google.com/store/apps/details?id=org.kovina.hisstastic)
+[![License: MIT](https://img.shields.io/github/license/sparshsam/hisstastic?style=for-the-badge)](LICENSE)
+[![Source Code](https://img.shields.io/badge/Source%20Code-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/sparshsam/hisstastic)
 
-[![License](https://img.shields.io/github/license/sparshsam/hisstastic?style=flat-square)](LICENSE)
-[![Status: Maintained](https://img.shields.io/badge/status-maintained-2ea44f?style=flat-square)](#status)
-[![CI](https://github.com/sparshsam/hisstastic/actions/workflows/ci.yml/badge.svg)](https://github.com/sparshsam/hisstastic/actions/workflows/ci.yml)
+<div align="center">
+  <img src="assets/hero/hero.png" alt="HissTastic Gameplay" width="80%">
+</div>
 
-<p align="center">
-  <img src="screenshots/gameplay.png" alt="Gameplay" width="32%">
-  <img src="screenshots/home_page.png" alt="Home Page" width="32%">
-  <img src="screenshots/high_scores.png" alt="High Scores" width="32%">
-</p>
+## Gallery
 
-## Status
+<div align="center">
+  <img src="assets/gallery/home_page.png" alt="Home Page" width="30%">
+  <img src="assets/gallery/high_scores.png" alt="High Scores" width="30%">
+  <img src="assets/gallery/welcome_page.png" alt="Welcome Page" width="30%">
+</div>
 
-**Production-ready arcade game (v1.0.0).** Playable in any modern browser, installable as a PWA, and packaged as a native Android app via Capacitor.
+## Why HissTastic
 
-The browser runtime under `web/` is the primary runtime. The Python/Pygame version is preserved as a canonical reference implementation.
+A polished Snake game with modern features but no modern annoyances. No ads, no accounts, no telemetry. Just a snake eating food.
 
 ## Features
 
-- Snake movement with grid-based alignment (portrait and landscape)
-- Rodent collection with quadratic scoring
-- Obstacles with collision detection
-- **4 power-up types:** Immunity, Speed Boost, Shield, Score Multiplier
-  - Each with unique color, audio cue, and game effect
-- **4 visual themes:** Classic (green), Midnight (dark), Desert (warm), Ocean (teal)
-- Title screen with difficulty selection (Easy / Normal / Hard)
-- Pause/resume with on-screen pause button
-- Procedural audio with sound effects
-- Looping background music with toggle and credit link
-- Haptic feedback on mobile (vibration)
-- Deterministic replay recording, playback, and verification
-- First-run username setup with whimsical random name generator
-- **Global leaderboard** via Supabase for each player's personal best
-- Local score history and personal-best tracking
-- Gameplay stats tracking (games played, food, averages)
-- Portrait and landscape game modes (360×560 portrait grid)
-- Responsive canvas with DPR support (crisp on high-DPI screens)
-- PWA installability and offline cache behavior
-- Capacitor Android APK (6.6MB, signed)
-- Graceful degradation: game never crashes on missing audio or assets
-- Animated decorative snake field background (canvas-based)
-- Local-first: no real-name accounts, telemetry, ads, or multiplayer; Supabase leaderboard calls store username, anonymous player ID, and personal best only
-
-## Architecture
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full module structure and data flow.
-
-```
-hisstastic/       # Python/Pygame package (canonical)
-  main.py           — Entry point
-  game.py           — Game class, state machine
-  config.py         — CONFIG dict, difficulty presets
-  entities.py       — Snake, Food, Obstacle, PowerUp
-  audio.py          — Procedural sound effects with graceful fallback
-  assets.py         — Asset loading with placeholder fallbacks
-  input.py          — Event-to-action mapping
-  rendering.py      — All Pygame draw functions
-  scoring.py        — Quadratic scoring and legacy messages
-  spawns.py         — Safe grid-aligned entity placement
-  states.py         — Game state constants
-  replay.py         — Deterministic replay recording and validation
-  replay_cli.py     — Command-line replay tools
-  ghost.py          — Local ghost replay sync and visualization
-
-web/               # Browser/PWA runtime (primary)
-  index.html
-  js/               — Game engine, audio, renderer, input, replay, supabase, snake field, snake facts
-  css/style.css
-  assets/           — Background music, images
-  sw.js             — Service worker (offline caching)
-  manifest.webmanifest
-  identity.js       — Local anonymous player identity, score history, personal best, pending sync
-  supabase.js       — Global leaderboard REST client
-```
-
----
-
-## Local Development
-
-HissTastic has two runtimes. **Neither requires Vercel, a backend, or any external service for normal local play.** The global leaderboard uses Supabase only to sync player profile and personal-best rows.
-
-### Prerequisites
-
-- **Python 3.9+** ([python.org](https://python.org))
-- **Git** ([git-scm.com](https://git-scm.com))
-- **A modern browser** (Chrome, Firefox, Edge, Safari)
-- **pygame** (for the Python runtime only)
+<table>
+<tr>
+<td width="50%">
 
-### Quick Start
+**Power-ups** — 4 types:
+- Immunity
+- Speed Boost
+- Shield
+- Score Multiplier
 
-```bash
-# Clone the repo
-git clone https://github.com/sparshsam/hisstastic.git
-cd hisstastic
+**Difficulty** — Easy / Normal / Hard
 
-# Or use the dev server script
-bash scripts/serve.sh
-# Opens at http://localhost:8080 — the browser game, no build step required
-```
+**Audio** — Procedural sound effects + looping background music
 
----
+**Controls** — Keyboard, touch/swipe, on-screen D-pad
 
-### Python Runtime Setup
+**Replay** — Deterministic recording, playback, verification
 
-The Python/Pygame version is the canonical runtime.
+</td>
+<td width="50%">
 
-```bash
-# Create and activate a virtual environment
-python -m venv .venv
+**Visual Themes** — 4 themes:
+- Classic (green)
+- Midnight (dark)
+- Desert (warm)
+- Ocean (teal)
 
-# macOS / Linux:
-source .venv/bin/activate
+**Pause/Resume** — On-screen pause button
 
-# Windows (PowerShell):
-.venv\Scripts\activate
+**Haptic Feedback** — Vibration on mobile devices
 
-# Install pygame
-pip install pygame
+**Leaderboard** — Global personal-best via Supabase
 
-# Run the game
-python main.py
-```
+**Ghost Racing** — Race against your past self
 
-**Legacy entry point** (preserved, unchanged):
+</td>
+</tr>
+</table>
 
-```bash
-python hisstastic.py
-```
+- **PWA** — Installable, playable offline
+- **Android App** — Native APK via Capacitor
+- **Local Score History** — Your stats, your device
+- **Responsive** — Portrait and landscape modes
 
-**Troubleshooting:**
+## Designed For
 
-| Problem | Fix |
-|---------|-----|
-| `ModuleNotFoundError: No module named 'pygame'` | Run `pip install pygame` |
-| `pygame.error: video system not initialized` | Ensure you have a display (no `DISPLAY` in SSH) |
-| `pygame.error: No available video device` | Install X server or use headless mode (see below) |
+Anyone who wants a quick, fun arcade break without signing up for anything.
 
-**Headless/WSL (no display):**
+## Design Philosophy
 
-On WSL or headless servers, the Python runtime won't produce a window. This is expected.
-Use the browser runtime instead — it's the primary local dev workflow.
+> "A game that respects your time and privacy."
 
----
+## Built With
 
-### Browser Runtime Setup
+| Layer | Technology |
+|-------|-----------|
+| Browser game | JavaScript Canvas |
+| Python reference | Python + Pygame |
+| Android package | Capacitor + Gradle |
+| PWA | Service worker + manifest |
 
-The browser runtime is a zero-config static site. No build step, no framework, no Node.js required.
+## Version Journey
 
-#### Option A: Quick Dev Server (Recommended)
-
-```bash
-bash scripts/serve.sh
-# Opens at http://localhost:8080
-```
-
-Or with a custom port:
-
-```bash
-bash scripts/serve.sh 3000
-# Opens at http://localhost:3000
-```
-
-#### Option B: Python HTTP Server (Manual)
-
-```bash
-python -m http.server 8080 --directory web/
-# Opens at http://localhost:8080
-```
-
-#### Option C: Any Static Server
-
-```bash
-# Node (if installed)
-npx serve web/ -p 8080
-
-# PHP
-php -S localhost:8080 -t web/
-```
-
----
-
-### Local Static / Production-Style Preview
-
-To preview the game as it would appear in production, serve from the `web/` directory:
-
-```bash
-# Start server
-python -m http.server 8080 --directory web/
-
-# Open in a browser
-open http://localhost:8080
-```
-
-**Important:** On plain HTTP `localhost`, the service worker is intentionally skipped to
-avoid stale-cache confusion during local development. You can play and test everything on
-localhost without issues — this is the recommended local workflow.
-
-To test full PWA offline caching and service worker behavior, deploy to a secure context
-(HTTPS) such as:
-
-- Vercel preview deployment (`vercel --preview`)
-- GitHub Pages
-- Any HTTPS-enabled hosting
-- A local HTTPS server (e.g. `mkcert` for a trusted local cert)
-
-When deployed to HTTPS, the service worker caches all assets and the game remains
-playable offline.
-
----
-
-### Testing the Python Runtime
-
-```bash
-# Validation suite (checks assets, schema, imports, etc.)
-python validation.py
-
-# Unit tests
-python -m unittest discover -v
-
-# Replay system
-python -m hisstastic.replay_cli record
-python -m hisstastic.replay_cli verify replays/replay_*.json
-python -m hisstastic.replay_cli play replays/replay_*.json
-```
-
-### Testing the Browser Runtime
-
-```bash
-# Local health check — verifies all files, assets, and dependencies
-bash scripts/check-local.sh
-
-# Start the server and open http://localhost:8080
-bash scripts/serve.sh
-
-# Manual smoke tests:
-# 1. Game loads without JS console errors
-# 2. Title screen displays with difficulty selection
-# 3. Gameplay: snake moves, eats food, collides with obstacles
-# 4. Sound effects play on eat/power-up/game-over
-# 5. Background music toggle works (🎵 Music button)
-# 6. Music credit link opens YouTube source
-# 7. PWA manifest loads (check DevTools → Application → Manifest)
-# 8. Service worker state (check DevTools → Application → Service Workers;
-#    on localhost it won't register — expected. Verify on HTTPS/preview.)
-# 9. Import/Export replay buttons work
-# 10. Mobile D-pad controls respond on touch devices
-```
-
----
-
-### Verifying All Assets Load Locally
-
-| Asset | Path | How to Verify |
-|-------|------|---------------|
-| **Browser HTML** | `web/index.html` | Load `http://localhost:8080` |
-| **CSS** | `web/css/style.css` | DevTools → Network → style.css |
-| **JS files** | `web/js/*.js` | DevTools → Sources → js/ |
-| **Background music** | `web/assets/background-music.mp3` | Click 🎵 Music button; should play at low volume |
-| **PWA manifest** | `web/manifest.webmanifest` | DevTools → Application → Manifest |
-| **Service worker** | `web/sw.js` | DevTools → Application → Service Workers |
-| **PWA icons** | `web/icons/icon-{192,512}.png` | DevTools → Application → Manifest |
-| **Python assets** | `assets/snake.png, rodent.png, danger.png, power_up.png, icon.png` | `ls assets/` or `python validation.py` |
-
-**Graceful degradation:** If the background music file is missing or fails to load, the
-Music button becomes disabled and the game continues without crashing.
-
----
-
-### Common Local Issues
-
-#### "The service worker keeps serving old files!"
-
-During development, the service worker caches aggressively. If you see stale content:
-
-1. Open DevTools → Application → Service Workers
-2. Click **"Unregister"**
-3. Hard-reload (`Ctrl+Shift+R` or `Cmd+Shift+R`)
-
-Or, run an incognito/private window where no service worker is registered.
-
-#### "Background music doesn't play!"
-
-- **Browser autoplay policy:** The music only starts after your first click/tap on the page.
-  Click anywhere on the game first.
-- **File not found:** Check that `web/assets/background-music.mp3` exists.
-  If missing, the Music button will be disabled.
-- **Volume too low:** Default volume is 0.15. Ensure your system volume is turned up.
-
-#### "The Python game doesn't start / black screen on WSL"
-
-WSL doesn't have a native display. The Python/Pygame runtime requires a window server.
-Use the browser runtime instead (`bash scripts/serve.sh` then open in Windows browser).
-
-#### "Page looks wrong / assets not loading"
-
-Make sure you're accessing the game through an HTTP server, not by opening the HTML file directly
-(`file:///` path). Browsers block many features (service workers, audio, fetch) on `file://` URLs.
-
-```bash
-# Correct:
-python -m http.server 8080 --directory web/
-# Then open http://localhost:8080
-
-# Incorrect: double-clicking web/index.html (file:///path/to/index.html)
-```
-
----
-
-## Replay System
-
-Record a game session:
-
-```bash
-python -m hisstastic.replay_cli record
-```
-
-Verify a replay file:
-
-```bash
-python -m hisstastic.replay_cli verify replays/replay_12345_20260604.json
-```
-
-Play back a replay:
-
-```bash
-python -m hisstastic.replay_cli play replays/replay_12345_20260604.json
-```
-
-See [docs/replay-ux.md](docs/replay-ux.md) and [docs/ghost-racing.md](docs/ghost-racing.md).
-
-## Browser Runtime
-
-A lightweight JavaScript/Canvas implementation is available in `web/`.
-
-Browser runtime capabilities:
-
-- Canvas rendering for local arcade play
-- Touch/swipe and directional-pad controls
-- PWA manifest and service worker for offline cache behavior
-- Replay import/export with local JSON files
-- Looping background music with toggle and credit link
-- No telemetry, accounts, external backend, wallet logic, or multiplayer
-
-See [docs/browser-runtime.md](docs/browser-runtime.md), [docs/mobile-controls.md](docs/mobile-controls.md), and [docs/pwa.md](docs/pwa.md).
-
-## Android App
-
-HissTastic is packaged as a native Android app via [Capacitor](https://capacitorjs.com/).
-
-### Quick Install
-
-1. Download the latest APK from the releases page
-2. Enable "Install from unknown sources" on your Android device
-3. Open the APK to install
-
-### Building from Source
-
-```bash
-# Prerequisites: Android SDK 35+ (target/compile SDK 36), Java 21+, Node.js 18+
-npm install
-npx cap sync
-npm run cap:bundle:release
-# APK at android/app/build/outputs/apk/debug/app-debug.apk
-# AAB at android/app/build/outputs/bundle/release/app-release.aab
-```
-
-See [BUILD_ANDROID.md](BUILD_ANDROID.md) for detailed debug, release, and signing instructions.
-
-## Player Identity and Global Leaderboard
-
-On first launch, HissTastic creates a local anonymous player profile:
-
-- **player_id:** locally generated UUID
-- **username:** player-chosen or generated whimsical name
-- **created_at / updated_at:** local profile timestamps
-- **local settings:** theme, audio, stats, and score history
-
-No email, phone number, real name, location, contacts, device advertising ID, analytics ID, or account login is collected.
-
-Score behavior:
-
-- Every completed game is saved to local score history.
-- The local personal best is updated only when a new best score is reached.
-- The global leaderboard is updated only for a new personal best.
-- Global leaderboard rows store one best score per player, not every game.
-- If offline, the latest pending personal best is saved locally and synced next time the app is online.
-
-Supabase stores:
-
-- `players`: anonymous `player_id`, username, created/updated timestamps
-- `leaderboard_scores`: anonymous `player_id`, username snapshot, best score, updated timestamp
-
-Score history remains local-only.
-
-## Validation
-
-```bash
-# Python validation suite
-python validation.py
-python -m unittest discover -v
-
-# Local health check (browser assets + Python)
-bash scripts/check-local.sh
-```
-
-## Packaging
-
-See [docs/packaging.md](docs/packaging.md) for standalone executable instructions.
-
-## Limitations
-
-- The browser runtime is the primary Play/PWA runtime; Python remains the reference implementation.
-- There is no online multiplayer, telemetry, account system, advertising SDK, crash reporting SDK, or wallet/onchain logic.
-- Global leaderboard access uses Supabase REST calls to sync/read anonymous username and personal-best rows.
-- Replay files are local JSON artifacts only when explicitly recorded, imported, or exported.
-- Ghost racing is local-only and score-neutral.
-- PWA support is limited to installability and offline asset caching.
-
-## Ecosystem Role
-
-HissTastic is part of Sparsh Sam's broader public software ecosystem as a preserved AI-assisted
-game prototype and modernization candidate.
+| Version | Date | Milestone |
+|---------|------|-----------|
+| v1.0.0 | — | Production release |
+| v0.5.0 | 2026-05 | PWA + Android |
+| v0.3.0 | 2026-04 | Power-ups + themes |
+| v0.1.0 | 2026-03 | MVP |
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+[MIT](LICENSE)
 
----
+## Open Collection
 
-This repository follows the [ecosystem standards](https://github.com/sparshsam/ecosystem-standards).
+HissTastic is part of a broader open-source ecosystem. Explore sibling projects:
+
+| Project | Description |
+|---------|-------------|
+| [OpenPalette](https://github.com/sparshsam/openpalette) | Color palette generator |
+| [OpenSend](https://github.com/sparshsam/opensend) | Secure file sharing |
+| [OpenSprout](https://github.com/sparshsam/opensprout) | Plant care tracker |
+| [OpenTone](https://github.com/sparshsam/opentone) | Music theory tool |
 
 ---
 
 *Last updated: June 2026*
-
-## Tech Stack
-
-| Layer | Choice |
-|-------|--------|
-| Python reference | Python + Pygame |
-| Browser game | HTML/CSS/JavaScript Canvas |
-| Android package | Capacitor + Gradle |
-| Testing | unittest, local health checks, Gradle builds |
-
-## Screenshots
-
-<p align="center">
-  <img src="screenshots/welcome_page.png" alt="Welcome Page" width="45%">
-  &nbsp;&nbsp;
-  <img src="screenshots/app_icon.png" alt="App Icon" width="96">
-</p>
-<p align="center">
-  <em>Welcome screen with username setup &bull; App icon — #00BF63 green</em>
-</p>
